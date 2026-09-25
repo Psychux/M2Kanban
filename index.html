@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Master Planner - Suivi & Agenda</title>
+  <title>Master Planner - Ergonomie & Facteurs Humains</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons CDN -->
@@ -15,6 +15,8 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 1); }
+    .kanban-col.drag-over { background-color: rgba(30, 41, 59, 0.9); border-style: dashed; }
+    .task-card.dragging { opacity: 0.4; scale: 0.98; }
   </style>
 </head>
 <body class="h-full text-slate-100 font-sans flex flex-col overflow-hidden">
@@ -38,24 +40,29 @@
         <!-- Onglets de Navigation -->
         <nav class="flex space-x-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
           <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-indigo-400 bg-slate-800 border border-slate-700/50 shadow-sm transition">
-            <i class="fa-solid fa-chart-pie mr-2"></i>Dashboard
+            <i class="fa-solid fa-chart-pie mr-1.5"></i>Dashboard
           </button>
           <button onclick="switchTab('agenda')" id="tab-agenda" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-calendar-days mr-2"></i>Agenda <span id="next-course-badge" class="hidden ml-1 px-1.5 py-0.5 text-[10px] bg-indigo-500 text-white font-bold rounded-full">Prochain</span>
+            <i class="fa-solid fa-calendar-days mr-1.5"></i>Agenda <span id="next-course-badge" class="ml-1 px-1.5 py-0.5 text-[10px] bg-indigo-500 text-white font-bold rounded-full">Prochain</span>
           </button>
           <button onclick="switchTab('kanban')" id="tab-kanban" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-border-all mr-2"></i>Kanban
+            <i class="fa-solid fa-border-all mr-1.5"></i>Kanban
           </button>
           <button onclick="switchTab('ressources')" id="tab-ressources" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-book-bookmark mr-2"></i>Ressources
+            <i class="fa-solid fa-book-bookmark mr-1.5"></i>Ressources
           </button>
         </nav>
 
         <!-- Actions rapides -->
-        <div class="flex items-center gap-3">
-          <button onclick="openModal('task')" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium shadow-lg shadow-indigo-950 transition flex items-center gap-2">
-            <i class="fa-solid fa-plus"></i>
-            <span class="hidden sm:inline">Ajouter</span>
+        <div class="flex items-center gap-2">
+          <button onclick="resetToDefaultData()" title="Réinitialiser données de démonstration" class="p-2 text-slate-400 hover:text-rose-400 transition text-xs">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+          <button onclick="openModal('task')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-950 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> Tâche
+          </button>
+          <button onclick="openModal('resource')" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-950 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> Ressource
           </button>
         </div>
 
@@ -67,144 +74,399 @@
   <main class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-900">
     <div class="max-w-7xl mx-auto">
 
-      <!-- ================= VUE AGENDA (OPTION 1 : iCal) ================= -->
+      <!-- ================= 1. DASHBOARD ================= -->
+      <section id="view-dashboard" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Urgences Imminentes</h3>
+            <p id="dash-urgent-count" class="text-2xl font-bold text-rose-400 mt-2">0 Tâche(s)</p>
+            <p class="text-xs text-slate-500 mt-1">Échéance dans les 7 prochains jours</p>
+          </div>
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bibliothèque</h3>
+            <p id="dash-resource-count" class="text-2xl font-bold text-emerald-400 mt-2">0 Ouvrage(s)</p>
+            <p id="dash-resource-detail" class="text-xs text-slate-500 mt-1">Livres & articles répertoriés</p>
+          </div>
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Progrès Globaux</h3>
+            <p id="dash-progress-percent" class="text-2xl font-bold text-indigo-400 mt-2">0% Effectué</p>
+            <p id="dash-progress-ratio" class="text-xs text-slate-500 mt-1">0/0 tâches terminées</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
+          <h2 class="text-base font-bold text-white mb-4 flex items-center justify-between">
+            <span>Focus Échéances Imminentes</span>
+            <span class="text-xs font-normal text-slate-400">Classées par urgence</span>
+          </h2>
+          <div id="dash-urgent-list" class="space-y-3">
+            <!-- Liste générée par JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. AGENDA ================= -->
       <section id="view-agenda" class="space-y-6 hidden">
-        
-        <!-- Header & Config iCal -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
           <div>
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
               <i class="fa-regular fa-calendar-check text-indigo-400"></i> Emploi du Temps Universitaire
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Synchronisé avec ton flux d'agenda iCal (.ics)</p>
+            <p class="text-xs text-slate-400 mt-0.5">Synchronisé avec votre flux iCal (.ics)</p>
           </div>
-          
-          <!-- Configuration URL iCal -->
           <div class="flex items-center gap-2 w-full md:w-auto">
-            <div class="relative flex-1 md:w-80">
-              <input type="text" id="ical-url-input" placeholder="Lien du flux iCal (URL .ics)..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-            </div>
-            <button onclick="syncICalFeed()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition flex items-center gap-1.5 shrink-0">
-              <i class="fa-solid fa-rotate"></i> Sync
-            </button>
+            <input type="text" placeholder="Lien du flux iCal (URL .ics)..." class="w-full md:w-80 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+            <button class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition">Sync</button>
           </div>
         </div>
 
-        <!-- WIDGET : Prochain cours à venir -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div id="next-course-card" class="lg:col-span-2 bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 p-6 rounded-2xl border border-indigo-500/30 shadow-xl relative overflow-hidden">
-            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <div class="flex items-center justify-between mb-4">
-              <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold rounded-full flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
-                PROCHAIN COURS À VENIR
-              </span>
-              <span id="course-countdown" class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
-                --
-              </span>
-            </div>
-
-            <div class="space-y-2">
-              <h3 id="course-title" class="text-2xl font-bold text-white">Méthodologie de l'Évaluation Ergonomique</h3>
-              <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300">
-                <span id="course-time" class="flex items-center gap-1.5 text-slate-200 font-medium">
-                  <i class="fa-regular fa-clock text-indigo-400"></i> Lundi 28 Sept. — 09:00 - 12:00
-                </span>
-                <span id="course-location" class="flex items-center gap-1.5 text-slate-200 font-medium">
-                  <i class="fa-solid fa-location-dot text-rose-400"></i> Amphi B - Bât. Olympe de Gouges
-                </span>
-                <span id="course-teacher" class="flex items-center gap-1.5 text-slate-400">
-                  <i class="fa-solid fa-user-tie text-slate-500"></i> Prof. Dupuis
-                </span>
-              </div>
-            </div>
-
-            <!-- Rappel Devoirs liés à cette UE -->
-            <div class="mt-5 pt-4 border-t border-slate-800/80">
-              <p class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-link text-indigo-400"></i> Tâches associées à cette UE dans ton Kanban :
-              </p>
-              <div id="course-linked-tasks" class="flex flex-wrap gap-2">
-                <span class="px-2.5 py-1 bg-rose-950/50 text-rose-300 border border-rose-800/50 text-xs rounded-lg flex items-center gap-1.5">
-                  <i class="fa-solid fa-file-export"></i> Livrable final J-2
-                </span>
-                <span class="px-2.5 py-1 bg-amber-950/50 text-amber-300 border border-amber-800/50 text-xs rounded-lg flex items-center gap-1.5">
-                  <i class="fa-solid fa-book-open"></i> Chapitre 3 à lire
-                </span>
-              </div>
-            </div>
+        <div class="bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 p-6 rounded-2xl border border-indigo-500/30 shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold rounded-full flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> PROCHAIN COURS
+            </span>
+            <span class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">Dans 2h</span>
           </div>
-
-          <!-- Statistiques de présence / heures -->
-          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col justify-between">
-            <div>
-              <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Volume Horaire Hebdo</h3>
-              <div class="flex items-baseline gap-2">
-                <span class="text-3xl font-extrabold text-white">18.5h</span>
-                <span class="text-xs text-slate-400">de cours cette semaine</span>
-              </div>
-              <div class="w-full bg-slate-900 rounded-full h-2 mt-3 overflow-hidden border border-slate-800">
-                <div class="bg-indigo-500 h-full rounded-full" style="width: 65%"></div>
-              </div>
-            </div>
-            
-            <div class="mt-6 pt-4 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
-              <span>Flux iCal : <strong class="text-emerald-400">Actif</strong></span>
-              <button onclick="document.getElementById('ical-file-input').click()" class="text-indigo-400 hover:underline">Importer .ics local</button>
-              <input type="file" id="ical-file-input" accept=".ics" class="hidden" onchange="handleICalFileUpload(event)">
-            </div>
+          <h3 class="text-2xl font-bold text-white">Méthodologie de l'Évaluation Ergonomique</h3>
+          <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-2">
+            <span><i class="fa-regular fa-clock text-indigo-400 mr-1"></i> Aujourd'hui — 14:00 - 17:00</span>
+            <span><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i> Amphi B - Bât. Olympe de Gouges</span>
           </div>
         </div>
-
-        <!-- Planning de la Semaine -->
-        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
-          <h3 class="text-base font-bold text-white mb-4 flex items-center justify-between">
-            <span>Planning de la Semaine</span>
-            <span class="text-xs font-normal text-slate-400">Source : iCal Universitaire</span>
-          </h3>
-          
-          <div id="weekly-schedule" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <!-- Journées générées dynamiquement par JS -->
-          </div>
-        </div>
-
       </section>
 
-      <!-- AUTRES SECTION (Dashboard, Kanban, Ressources) CONSERVÉES -->
-      <section id="view-dashboard" class="space-y-6">
-        <p class="text-slate-400 text-sm">Contenu du Dashboard (déjà configuré)...</p>
-      </section>
+      <!-- ================= 3. KANBAN ================= -->
       <section id="view-kanban" class="space-y-6 hidden">
-        <p class="text-slate-400 text-sm">Contenu du Kanban (déjà configuré)...</p>
+        
+        <!-- Filtres du Kanban -->
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="text-xs font-semibold text-slate-400"><i class="fa-solid fa-filter mr-1"></i> Filtrer :</span>
+            
+            <select id="filter-ue" onchange="renderKanban()" class="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500">
+              <option value="all">Toutes les UE</option>
+              <option value="Ergonomie IHM">UE Ergonomie IHM</option>
+              <option value="Psychologie Cognitive">UE Psychologie Cognitive</option>
+              <option value="Sociologie des Orga">UE Sociologie des Orga</option>
+              <option value="Facteurs Humains">UE Facteurs Humains</option>
+            </select>
+
+            <select id="filter-type" onchange="renderKanban()" class="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500">
+              <option value="all">Tous les Types</option>
+              <option value="Livrable">Livrables</option>
+              <option value="Lecture">Lectures</option>
+              <option value="Devoir">Devoirs</option>
+            </select>
+          </div>
+
+          <p class="text-xs text-slate-500">
+            <i class="fa-solid fa-hand-pointer mr-1"></i> Glissez-déposez les cartes pour changer d'état
+          </p>
+        </div>
+
+        <!-- Colonnes du Kanban -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          
+          <!-- Colonne 1 : À faire -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[650px]">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
+              <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-slate-400"></span> À Faire
+              </h3>
+              <span id="count-todo" class="bg-slate-900 text-slate-300 text-xs px-2 py-0.5 rounded-md border border-slate-800 font-mono">0</span>
+            </div>
+            <div id="col-todo" data-status="todo" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1 transition-colors"></div>
+          </div>
+
+          <!-- Colonne 2 : En cours -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[650px]">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
+              <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-indigo-400"></span> En Cours
+              </h3>
+              <span id="count-in_progress" class="bg-indigo-950/50 text-indigo-300 text-xs px-2 py-0.5 rounded-md border border-indigo-800/50 font-mono">0</span>
+            </div>
+            <div id="col-in_progress" data-status="in_progress" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1 transition-colors"></div>
+          </div>
+
+          <!-- Colonne 3 : Relecture / Validation -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[650px]">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
+              <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span> Relecture
+              </h3>
+              <span id="count-review" class="bg-amber-950/50 text-amber-300 text-xs px-2 py-0.5 rounded-md border border-amber-800/50 font-mono">0</span>
+            </div>
+            <div id="col-review" data-status="review" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1 transition-colors"></div>
+          </div>
+
+          <!-- Colonne 4 : Terminé -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[650px]">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
+              <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Terminé
+              </h3>
+              <span id="count-done" class="bg-emerald-950/50 text-emerald-300 text-xs px-2 py-0.5 rounded-md border border-emerald-800/50 font-mono">0</span>
+            </div>
+            <div id="col-done" data-status="done" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1 transition-colors"></div>
+          </div>
+
+        </div>
       </section>
+
+      <!-- ================= 4. RESSOURCES (INTERACTIF) ================= -->
       <section id="view-ressources" class="space-y-6 hidden">
-        <p class="text-slate-400 text-sm">Contenu des Ressources (déjà configuré)...</p>
+        
+        <!-- Header & Filtres -->
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-semibold text-slate-400"><i class="fa-solid fa-filter mr-1"></i> Format :</span>
+            <select id="filter-res-format" onchange="renderRessources()" class="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500">
+              <option value="all">Tous les formats</option>
+              <option value="Physique">📕 Livres Physiques</option>
+              <option value="Numérique">💻 Numérique (PDF / Ebook)</option>
+              <option value="Web">🌐 Web & BDD Académiques</option>
+            </select>
+          </div>
+
+          <button onclick="openModal('resource')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> Ajouter une ressource
+          </button>
+        </div>
+
+        <!-- Liste des Ressources Grid -->
+        <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Carte dynamique JS -->
+        </div>
       </section>
 
     </div>
   </main>
 
-  <!-- ================= LOGIQUE JAVASCRIPT ICAL ================= -->
+  <!-- ================= MODAL DE CRÉATION DE TÂCHE ================= -->
+  <div id="modal-task" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-square-plus text-indigo-400 mr-2"></i>Nouvelle Tâche</h3>
+        <button onclick="closeModal('task')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="form-task" onsubmit="handleAddTask(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Titre de la tâche *</label>
+          <input type="text" id="task-title" required placeholder="Ex: Synthèse d'usabilité Vinted" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Type de travail</label>
+            <select id="task-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="Livrable">Livrable / Rendu</option>
+              <option value="Lecture">Lecture</option>
+              <option value="Devoir">Devoir / Exercice</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Unité d'Enseignement (UE)</label>
+            <select id="task-ue" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="Ergonomie IHM">UE Ergonomie IHM</option>
+              <option value="Psychologie Cognitive">UE Psychologie Cognitive</option>
+              <option value="Sociologie des Orga">UE Sociologie des Orga</option>
+              <option value="Facteurs Humains">UE Facteurs Humains</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Date d'échéance *</label>
+          <input type="date" id="task-dueDate" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Notes / Description</label>
+          <textarea id="task-notes" rows="3" placeholder="Consignes, liens ou références..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('task')" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition">Annuler</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-indigo-950">Créer la tâche</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DE CRÉATION DE RESSOURCE ================= -->
+  <div id="modal-resource" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-book-bookmark text-emerald-400 mr-2"></i>Nouvelle Ressource</h3>
+        <button onclick="closeModal('resource')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="form-resource" onsubmit="handleAddResource(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Titre de l'ouvrage / article *</label>
+          <input type="text" id="res-title" required placeholder="Ex: Ergonomie des interfaces" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Auteur(s)</label>
+          <input type="text" id="res-author" placeholder="Ex: Jean-François Rouet" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Format</label>
+            <select id="res-format" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+              <option value="Physique">📕 Livre Physique</option>
+              <option value="Numérique">💻 Numérique (PDF/Ebook)</option>
+              <option value="Web">🌐 Site Web / BDD</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Domaine</label>
+            <select id="res-domain" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+              <option value="Ergonomie">Ergonomie</option>
+              <option value="Psychologie Cognitive">Psychologie Cognitive</option>
+              <option value="Sociologie des Orga">Sociologie des Orga</option>
+              <option value="Facteurs Humains">Facteurs Humains</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Statut de lecture</label>
+            <select id="res-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+              <option value="À lire">À lire</option>
+              <option value="En cours">En cours</option>
+              <option value="Fiché">Fiché / Résumé</option>
+              <option value="Lu">Lu</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Lien Web / Emplacement</label>
+            <input type="text" id="res-link" placeholder="https://... ou Biblio BU" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Notes / Fiche rapide</label>
+          <textarea id="res-notes" rows="2" placeholder="Citations, idées clés..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeModal('resource')" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition">Annuler</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-emerald-950">Ajouter la ressource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= LOGIQUE JAVASCRIPT ================= -->
   <script>
-    // Exemple de données iCal démo si aucun fichier chargé
-    const MOCK_EVENTS = [
+    // Données Tâches par défaut
+    const DEFAULT_TASKS = [
       {
-        summary: "Méthodologie de l'Évaluation Ergonomique",
-        location: "Amphi B - Bât. Olympe de Gouges",
-        start: new Date(Date.now() + 3600000 * 2), // Dans 2h
-        end: new Date(Date.now() + 3600000 * 5),
-        description: "Prof. Dupuis — UE Ergonomie IHM"
+        id: "task-1",
+        title: "Rapport d'Évaluation Ergonomique (Leboncoin vs Vinted)",
+        type: "Livrable",
+        ue: "Ergonomie IHM",
+        dueDate: "2026-09-28",
+        status: "in_progress",
+        notes: "Comparer l'ergonomie des filtres de recherche."
       },
       {
-        summary: "Psychologie Cognitive & Travail",
-        location: "Salle A204",
-        start: new Date(Date.now() + 3600000 * 26), // Demain
-        end: new Date(Date.now() + 3600000 * 29),
-        description: "Prof. Martin — UE Psychologie"
+        id: "task-2",
+        title: "Lecture Chapitre 1-5 : Sociologie des Organisations",
+        type: "Lecture",
+        ue: "Sociologie des Orga",
+        dueDate: "2026-10-02",
+        status: "todo",
+        notes: "Préparer la fiche de lecture pour l'enseignant."
       }
     ];
 
+    // Données Ressources par défaut
+    const DEFAULT_RESOURCES = [
+      {
+        id: "res-1",
+        title: "Ergonomie des interfaces",
+        author: "Jean-François Rouet",
+        format: "Physique",
+        domain: "Ergonomie",
+        status: "Fiché",
+        link: "Exemplaire personnel",
+        notes: "Principes fondamentaux de guidage et charge mentale."
+      },
+      {
+        id: "res-2",
+        title: "Sociologie des organisations",
+        author: "Michel Crozier & Erhard Friedberg",
+        format: "Numérique",
+        domain: "Sociologie des Orga",
+        status: "En cours",
+        link: "https://cairn.info",
+        notes: "Analyse du pouvoir et des règles du jeu dans les entreprises."
+      },
+      {
+        id: "res-3",
+        title: "Cairn.info — Sciences Humaines",
+        author: "Plateforme Académique",
+        format: "Web",
+        domain: "Facteurs Humains",
+        status: "Lu",
+        link: "https://cairn.info",
+        notes: "Accès gratuit via les identifiants universitaires."
+      }
+    ];
+
+    let tasks = [];
+    let resources = [];
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      renderKanban();
+      renderRessources();
+      updateDashboard();
+      setupDragAndDrop();
+    });
+
+    // Chargement depuis localStorage
+    function loadData() {
+      const savedTasks = localStorage.getItem('master_planner_tasks');
+      tasks = savedTasks ? JSON.parse(savedTasks) : [...DEFAULT_TASKS];
+
+      const savedRes = localStorage.getItem('master_planner_resources');
+      resources = savedRes ? JSON.parse(savedRes) : [...DEFAULT_RESOURCES];
+    }
+
+    function saveTasks() {
+      localStorage.setItem('master_planner_tasks', JSON.stringify(tasks));
+      updateDashboard();
+    }
+
+    function saveResources() {
+      localStorage.setItem('master_planner_resources', JSON.stringify(resources));
+      updateDashboard();
+    }
+
+    function resetToDefaultData() {
+      if (confirm("Réinitialiser l'ensemble des tâches et ressources aux valeurs de démonstration ?")) {
+        tasks = [...DEFAULT_TASKS];
+        resources = [...DEFAULT_RESOURCES];
+        saveTasks();
+        saveResources();
+        renderKanban();
+        renderRessources();
+      }
+    }
+
+    // Basculement d'onglets
     function switchTab(tabId) {
       document.querySelectorAll('main > div > section').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${tabId}`).classList.remove('hidden');
@@ -218,65 +480,252 @@
       activeBtn.classList.remove('text-slate-400');
     }
 
-    // Traitement du fichier .ics téléversé
-    function handleICalFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    // Modals
+    function openModal(type) { document.getElementById(`modal-${type}`).classList.remove('hidden'); }
+    function closeModal(type) { document.getElementById(`modal-${type}`).classList.add('hidden'); }
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        parseICalData(e.target.result);
+    // GESTION TÂCHES (KANBAN)
+    function handleAddTask(e) {
+      e.preventDefault();
+      const newTask = {
+        id: 'task-' + Date.now(),
+        title: document.getElementById('task-title').value,
+        type: document.getElementById('task-type').value,
+        ue: document.getElementById('task-ue').value,
+        dueDate: document.getElementById('task-dueDate').value,
+        notes: document.getElementById('task-notes').value,
+        status: 'todo'
       };
-      reader.readAsText(file);
+      tasks.push(newTask);
+      saveTasks();
+      renderKanban();
+      closeModal('task');
+      document.getElementById('form-task').reset();
     }
 
-    // Parser le contenu iCal
-    function parseICalData(icalText) {
-      try {
-        const jcalData = ICAL.parse(icalText);
-        const comp = new ICAL.Component(jcalData);
-        const vevents = comp.getAllSubcomponents('vevent');
-        
-        const events = vevents.map(vevent => {
-          const event = new ICAL.Event(vevent);
-          return {
-            summary: event.summary,
-            location: event.location,
-            start: event.startDate.toJSDate(),
-            end: event.endDate.toJSDate(),
-            description: event.description
-          };
-        }).sort((a, b) => a.start - b.start);
-
-        renderAgenda(events);
-      } catch (err) {
-        alert("Erreur lors de la lecture du fichier iCal (.ics)");
+    function deleteTask(id) {
+      if (confirm("Voulez-vous supprimer cette tâche ?")) {
+        tasks = tasks.filter(t => t.id !== id);
+        saveTasks();
+        renderKanban();
       }
     }
 
-    // Rendu de l'agenda
-    function renderAgenda(events) {
-      const now = new Date();
-      const upcomingEvents = events.filter(e => e.start >= now);
+    function renderKanban() {
+      const filterUE = document.getElementById('filter-ue').value;
+      const filterType = document.getElementById('filter-type').value;
+      const statuses = ['todo', 'in_progress', 'review', 'done'];
       
-      if (upcomingEvents.length > 0) {
-        const next = upcomingEvents[0];
-        document.getElementById('course-title').innerText = next.summary;
-        document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Salle non définie'}`;
-        document.getElementById('course-time').innerHTML = `<i class="fa-regular fa-clock text-indigo-400"></i> ${next.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'})} — ${next.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-        
-        // Calcul du décompte
-        const diffMs = next.start - now;
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        document.getElementById('course-countdown').innerText = `Dans ${diffHours}h`;
-        document.getElementById('next-course-badge').classList.remove('hidden');
+      statuses.forEach(status => {
+        const col = document.getElementById(`col-${status}`);
+        col.innerHTML = '';
+
+        const filtered = tasks.filter(t => {
+          const matchStatus = t.status === status;
+          const matchUE = filterUE === 'all' || t.ue === filterUE;
+          const matchType = filterType === 'all' || t.type === filterType;
+          return matchStatus && matchUE && matchType;
+        });
+
+        document.getElementById(`count-${status}`).innerText = filtered.length;
+
+        filtered.forEach(task => {
+          col.appendChild(createTaskCard(task));
+        });
+      });
+
+      setupDragAndDrop();
+    }
+
+    function createTaskCard(task) {
+      const card = document.createElement('div');
+      card.className = 'task-card bg-slate-900 p-3.5 rounded-xl border border-slate-800 hover:border-slate-700 shadow-md space-y-2.5 cursor-grab active:cursor-grabbing transition';
+      card.draggable = true;
+      card.id = task.id;
+
+      let typeBadge = 'bg-slate-800 text-slate-300 border-slate-700';
+      if (task.type === 'Livrable') typeBadge = 'bg-rose-950/80 text-rose-300 border-rose-800/50';
+      if (task.type === 'Lecture') typeBadge = 'bg-amber-950/80 text-amber-300 border-amber-800/50';
+      if (task.type === 'Devoir') typeBadge = 'bg-indigo-950/80 text-indigo-300 border-indigo-800/50';
+
+      const today = new Date().toISOString().split('T')[0];
+      const isUrgent = task.dueDate <= today && task.status !== 'done';
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="px-2 py-0.5 border text-[10px] font-bold rounded-md ${typeBadge}">${task.type}</span>
+          <button onclick="deleteTask('${task.id}')" class="text-slate-500 hover:text-rose-400 text-xs transition px-1">
+            <i class="fa-regular fa-trash-can"></i>
+          </button>
+        </div>
+        <h4 class="text-xs font-bold text-white leading-snug">${task.title}</h4>
+        ${task.notes ? `<p class="text-[11px] text-slate-400 line-clamp-2">${task.notes}</p>` : ''}
+        <div class="flex items-center justify-between pt-2 border-t border-slate-800/60 text-[10px]">
+          <span class="text-slate-400 font-medium">${task.ue}</span>
+          <span class="${isUrgent ? 'text-rose-400 font-bold animate-pulse' : 'text-slate-400'} flex items-center gap-1">
+            <i class="fa-regular fa-clock"></i> ${task.dueDate}
+          </span>
+        </div>
+      `;
+      return card;
+    }
+
+    function setupDragAndDrop() {
+      const cards = document.querySelectorAll('.task-card');
+      const cols = document.querySelectorAll('.kanban-col');
+
+      cards.forEach(card => {
+        card.addEventListener('dragstart', (e) => {
+          card.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', card.id);
+        });
+        card.addEventListener('dragend', () => card.classList.remove('dragging'));
+      });
+
+      cols.forEach(col => {
+        col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('drag-over'); });
+        col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+        col.addEventListener('drop', (e) => {
+          e.preventDefault();
+          col.classList.remove('drag-over');
+          const id = e.dataTransfer.getData('text/plain');
+          const newStatus = col.getAttribute('data-status');
+          const task = tasks.find(t => t.id === id);
+          if (task) {
+            task.status = newStatus;
+            saveTasks();
+            renderKanban();
+          }
+        });
+      });
+    }
+
+    // GESTION RESSOURCES
+    function handleAddResource(e) {
+      e.preventDefault();
+      const newRes = {
+        id: 'res-' + Date.now(),
+        title: document.getElementById('res-title').value,
+        author: document.getElementById('res-author').value,
+        format: document.getElementById('res-format').value,
+        domain: document.getElementById('res-domain').value,
+        status: document.getElementById('res-status').value,
+        link: document.getElementById('res-link').value,
+        notes: document.getElementById('res-notes').value
+      };
+
+      resources.push(newRes);
+      saveResources();
+      renderRessources();
+      closeModal('resource');
+      document.getElementById('form-resource').reset();
+    }
+
+    function deleteResource(id) {
+      if (confirm("Voulez-vous vraiment supprimer cette ressource ?")) {
+        resources = resources.filter(r => r.id !== id);
+        saveResources();
+        renderRessources();
       }
     }
 
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', () => {
-      renderAgenda(MOCK_EVENTS);
-    });
+    function renderRessources() {
+      const filterFormat = document.getElementById('filter-res-format').value;
+      const grid = document.getElementById('resources-grid');
+      grid.innerHTML = '';
+
+      const filtered = resources.filter(r => filterFormat === 'all' || r.format === filterFormat);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-slate-500 col-span-3 py-6 text-center">Aucune ressource répertoriée dans cette catégorie.</p>`;
+        return;
+      }
+
+      filtered.forEach(r => {
+        let formatBadge = 'bg-emerald-950 text-emerald-400 border-emerald-800/50';
+        let icon = '📕';
+        if (r.format === 'Numérique') { formatBadge = 'bg-sky-950 text-sky-400 border-sky-800/50'; icon = '💻'; }
+        if (r.format === 'Web') { formatBadge = 'bg-indigo-950 text-indigo-400 border-indigo-800/50'; icon = '🌐'; }
+
+        const isUrl = r.link && (r.link.startsWith('http://') || r.link.startsWith('https://'));
+
+        const card = document.createElement('div');
+        card.className = 'bg-slate-950 p-4 rounded-2xl border border-slate-800 hover:border-slate-700 transition space-y-3 flex flex-col justify-between';
+        card.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 border text-[10px] font-bold rounded-md ${formatBadge}">${icon} ${r.format}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] bg-slate-900 border border-slate-800 px-2 py-0.5 rounded text-slate-400">${r.status}</span>
+                <button onclick="deleteResource('${r.id}')" class="text-slate-500 hover:text-rose-400 text-xs transition">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+            <h4 class="text-sm font-bold text-white leading-tight">${r.title}</h4>
+            ${r.author ? `<p class="text-xs text-slate-400">${r.author}</p>` : ''}
+            ${r.notes ? `<p class="text-xs text-slate-400 bg-slate-900 p-2 rounded-xl border border-slate-800/60 line-clamp-2">${r.notes}</p>` : ''}
+          </div>
+
+          <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between text-xs">
+            <span class="text-[10px] font-semibold text-slate-500 uppercase">${r.domain}</span>
+            ${isUrl ? `<a href="${r.link}" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1"><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Accéder</a>` : `<span class="text-[11px] text-slate-500">${r.link || ''}</span>`}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // UPDATE DASHBOARD
+    function updateDashboard() {
+      const now = new Date();
+      const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      // Tâches urgentes
+      const urgentTasks = tasks.filter(t => t.status !== 'done' && t.dueDate <= in7Days)
+                              .sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+      document.getElementById('dash-urgent-count').innerText = `${urgentTasks.length} Tâche(s)`;
+
+      // Ressources count
+      document.getElementById('dash-resource-count').innerText = `${resources.length} Ouvrage(s)`;
+
+      // Progression Tâches
+      const doneCount = tasks.filter(t => t.status === 'done').length;
+      const totalCount = tasks.length;
+      const percent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+
+      document.getElementById('dash-progress-percent').innerText = `${percent}% Effectué`;
+      document.getElementById('dash-progress-ratio').innerText = `${doneCount}/${totalCount} tâches terminées`;
+
+      // Liste urgences Dashboard
+      const listContainer = document.getElementById('dash-urgent-list');
+      listContainer.innerHTML = '';
+
+      if (urgentTasks.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-500 py-2">Aucune échéance urgente dans les 7 prochains jours.</p>`;
+        return;
+      }
+
+      urgentTasks.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800';
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="px-2 py-0.5 bg-rose-950 text-rose-400 border border-rose-800/50 text-[10px] font-bold rounded">${t.type}</span>
+            <div>
+              <h4 class="text-xs font-bold text-white">${t.title}</h4>
+              <p class="text-[10px] text-slate-400">${t.ue}</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-rose-400 bg-rose-950/40 px-2 py-1 rounded-lg border border-rose-900/50 flex items-center gap-1">
+            <i class="fa-regular fa-clock"></i> ${t.dueDate}
+          </span>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
   </script>
 </body>
 </html>
