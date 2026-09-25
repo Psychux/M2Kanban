@@ -136,11 +136,11 @@
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
               <i class="fa-regular fa-calendar-check text-indigo-400"></i> Emploi du Temps Universitaire
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Vue dynamique des cours et agenda Google partagé</p>
+            <p class="text-xs text-slate-400 mt-0.5">Chargement automatique (basic.ics) & vue Google Calendar</p>
           </div>
           <div>
             <button onclick="document.getElementById('ical-file-input').click()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl text-white transition flex items-center gap-2 shadow-lg shadow-indigo-950">
-              <i class="fa-solid fa-file-import"></i> Importer fichier .ics
+              <i class="fa-solid fa-file-import"></i> Mettre à jour (fichier .ics)
             </button>
             <input type="file" id="ical-file-input" accept=".ics" class="hidden" onchange="handleICalFileUpload(event)">
           </div>
@@ -158,7 +158,7 @@
               <span id="course-countdown" class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">--</span>
             </div>
 
-            <h3 id="course-title" class="text-2xl font-bold text-white">Importez votre fichier .ics pour charger les cours</h3>
+            <h3 id="course-title" class="text-2xl font-bold text-white">Chargement du fichier basic.ics...</h3>
             <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-2">
               <span id="course-time" class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-indigo-400"></i> --:--</span>
               <span id="course-location" class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-rose-400"></i> --</span>
@@ -172,9 +172,8 @@
             </h4>
             
             <div id="next-courses-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <!-- Case par défaut -->
               <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-500">
-                Aucun cours suivant chargé.
+                En attente du fichier d'agenda.
               </div>
             </div>
           </div>
@@ -442,13 +441,32 @@
     let selectedTypes = [];
 
     document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialiser la connexion Firebase
       const checkFirebase = setInterval(() => {
         if (window.db && window.fb) {
           clearInterval(checkFirebase);
           setupFirebaseListeners();
         }
       }, 100);
+
+      // 2. Charger automatiquement le fichier basic.ics du dépôt GitHub
+      autoLoadRepoICal();
     });
+
+    // CHARGEMENT AUTOMATIQUE DU FICHIER BASIC.ICS DU DÉPÔT
+    async function autoLoadRepoICal() {
+      try {
+        const response = await fetch('./basic.ics?v=' + new Date().getTime());
+        if (response.ok) {
+          const text = await response.text();
+          if (text && text.includes('BEGIN:VCALENDAR')) {
+            parseICalData(text);
+          }
+        }
+      } catch (err) {
+        console.warn("Fichier basic.ics non trouvé à la racine.");
+      }
+    }
 
     // SYNCHRONISATION CLOUD FIREBASE
     function setupFirebaseListeners() {
@@ -667,7 +685,7 @@
       });
     }
 
-    // GESTION IMPORTATION ET PARSING AGENDA ICAL (.ICS)
+    // GESTION MANUELLE OU AUTOMATIQUE ICAL
     function handleICalFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -728,7 +746,7 @@
       const upcomingEvents = events.filter(e => e.start >= now);
       
       if (upcomingEvents.length > 0) {
-        // 1. Prochain Cours (En gros)
+        // 1. Prochain Cours
         const next = upcomingEvents[0];
         document.getElementById('course-title').innerText = next.summary || 'Sans titre';
         document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Lieu non spécifié'}`;
@@ -738,7 +756,7 @@
         document.getElementById('course-countdown').innerText = diffHours > 0 ? `Dans ${diffHours}h` : 'Imminent';
         document.getElementById('next-course-badge').classList.remove('hidden');
 
-        // 2. Les 4 Cours Suivants (Case alignées horizontalement)
+        // 2. Les 4 Cours Suivants
         const followingEvents = upcomingEvents.slice(1, 5);
         const grid = document.getElementById('next-courses-grid');
         grid.innerHTML = '';
