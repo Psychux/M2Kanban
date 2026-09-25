@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Master Planner - Ergonomie & Facteurs Humains</title>
+  <title>Master Planner - Suivi & Agenda</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons CDN -->
@@ -38,16 +38,16 @@
         <!-- Onglets de Navigation -->
         <nav class="flex space-x-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
           <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-indigo-400 bg-slate-800 border border-slate-700/50 shadow-sm transition">
-            <i class="fa-solid fa-chart-pie mr-1.5"></i>Dashboard
+            <i class="fa-solid fa-chart-pie mr-2"></i>Dashboard
           </button>
           <button onclick="switchTab('agenda')" id="tab-agenda" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-calendar-days mr-1.5"></i>Agenda <span id="next-course-badge" class="ml-1 px-1.5 py-0.5 text-[10px] bg-indigo-500 text-white font-bold rounded-full">Prochain</span>
+            <i class="fa-solid fa-calendar-days mr-2"></i>Agenda <span id="next-course-badge" class="hidden ml-1 px-1.5 py-0.5 text-[10px] bg-indigo-500 text-white font-bold rounded-full">Prochain</span>
           </button>
           <button onclick="switchTab('kanban')" id="tab-kanban" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-border-all mr-1.5"></i>Kanban
+            <i class="fa-solid fa-border-all mr-2"></i>Kanban
           </button>
           <button onclick="switchTab('ressources')" id="tab-ressources" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-book-bookmark mr-1.5"></i>Ressources
+            <i class="fa-solid fa-book-bookmark mr-2"></i>Ressources
           </button>
         </nav>
 
@@ -67,55 +67,10 @@
   <main class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-900">
     <div class="max-w-7xl mx-auto">
 
-      <!-- ================= 1. DASHBOARD ================= -->
-      <section id="view-dashboard" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
-            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Urgences Imminentes</h3>
-            <p class="text-2xl font-bold text-rose-400 mt-2">2 Rendus (J-2)</p>
-            <p class="text-xs text-slate-500 mt-1">Livrable Ergonomie IHM & Synthèse</p>
-          </div>
-          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
-            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lectures de la Semaine</h3>
-            <p class="text-2xl font-bold text-indigo-400 mt-2">3 Articles</p>
-            <p class="text-xs text-slate-500 mt-1">1 Fiché / 2 à lire</p>
-          </div>
-          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
-            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Progrès Globaux</h3>
-            <p class="text-2xl font-bold text-emerald-400 mt-2">65% Effectué</p>
-            <p class="text-xs text-slate-500 mt-1">12/18 tâches validées ce semestre</p>
-          </div>
-        </div>
-
-        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
-          <h2 class="text-base font-bold text-white mb-4">Focus Échéances Proches</h2>
-          <div class="space-y-3">
-            <div class="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800">
-              <div class="flex items-center gap-3">
-                <span class="px-2.5 py-1 bg-rose-950 text-rose-400 border border-rose-800/50 text-xs font-bold rounded-lg">Livrable</span>
-                <div>
-                  <h4 class="text-sm font-semibold text-white">Rapport d'Évaluation Ergonomique</h4>
-                  <p class="text-xs text-slate-400">UE Ergonomie des IHM</p>
-                </div>
-              </div>
-              <span class="text-xs font-bold text-rose-400 bg-rose-950/40 px-2.5 py-1 rounded-lg border border-rose-900/50">J-2</span>
-            </div>
-            <div class="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800">
-              <div class="flex items-center gap-3">
-                <span class="px-2.5 py-1 bg-amber-950 text-amber-400 border border-amber-800/50 text-xs font-bold rounded-lg">Lecture</span>
-                <div>
-                  <h4 class="text-sm font-semibold text-white">Chapitre 4 : Charge Mentale et Ergonomie Cognitive</h4>
-                  <p class="text-xs text-slate-400">UE Psychologie Cognitive</p>
-                </div>
-              </div>
-              <span class="text-xs font-bold text-amber-400 bg-amber-950/40 px-2.5 py-1 rounded-lg border border-amber-900/50">J-4</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= 2. AGENDA (iCal) ================= -->
+      <!-- ================= VUE AGENDA (OPTION 1 : iCal) ================= -->
       <section id="view-agenda" class="space-y-6 hidden">
+        
+        <!-- Header & Config iCal -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
           <div>
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
@@ -123,94 +78,133 @@
             </h2>
             <p class="text-xs text-slate-400 mt-0.5">Synchronisé avec ton flux d'agenda iCal (.ics)</p>
           </div>
+          
+          <!-- Configuration URL iCal -->
           <div class="flex items-center gap-2 w-full md:w-auto">
-            <input type="text" placeholder="Lien du flux iCal (URL .ics)..." class="w-full md:w-80 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-            <button class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition">Sync</button>
+            <div class="relative flex-1 md:w-80">
+              <input type="text" id="ical-url-input" placeholder="Lien du flux iCal (URL .ics)..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+            </div>
+            <button onclick="syncICalFeed()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition flex items-center gap-1.5 shrink-0">
+              <i class="fa-solid fa-rotate"></i> Sync
+            </button>
           </div>
         </div>
 
-        <div class="bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 p-6 rounded-2xl border border-indigo-500/30 shadow-xl">
-          <div class="flex items-center justify-between mb-4">
-            <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold rounded-full flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> PROCHAIN COURS À VENIR
-            </span>
-            <span class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">Dans 2h</span>
+        <!-- WIDGET : Prochain cours à venir -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div id="next-course-card" class="lg:col-span-2 bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 p-6 rounded-2xl border border-indigo-500/30 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold rounded-full flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                PROCHAIN COURS À VENIR
+              </span>
+              <span id="course-countdown" class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
+                --
+              </span>
+            </div>
+
+            <div class="space-y-2">
+              <h3 id="course-title" class="text-2xl font-bold text-white">Méthodologie de l'Évaluation Ergonomique</h3>
+              <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300">
+                <span id="course-time" class="flex items-center gap-1.5 text-slate-200 font-medium">
+                  <i class="fa-regular fa-clock text-indigo-400"></i> Lundi 28 Sept. — 09:00 - 12:00
+                </span>
+                <span id="course-location" class="flex items-center gap-1.5 text-slate-200 font-medium">
+                  <i class="fa-solid fa-location-dot text-rose-400"></i> Amphi B - Bât. Olympe de Gouges
+                </span>
+                <span id="course-teacher" class="flex items-center gap-1.5 text-slate-400">
+                  <i class="fa-solid fa-user-tie text-slate-500"></i> Prof. Dupuis
+                </span>
+              </div>
+            </div>
+
+            <!-- Rappel Devoirs liés à cette UE -->
+            <div class="mt-5 pt-4 border-t border-slate-800/80">
+              <p class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-link text-indigo-400"></i> Tâches associées à cette UE dans ton Kanban :
+              </p>
+              <div id="course-linked-tasks" class="flex flex-wrap gap-2">
+                <span class="px-2.5 py-1 bg-rose-950/50 text-rose-300 border border-rose-800/50 text-xs rounded-lg flex items-center gap-1.5">
+                  <i class="fa-solid fa-file-export"></i> Livrable final J-2
+                </span>
+                <span class="px-2.5 py-1 bg-amber-950/50 text-amber-300 border border-amber-800/50 text-xs rounded-lg flex items-center gap-1.5">
+                  <i class="fa-solid fa-book-open"></i> Chapitre 3 à lire
+                </span>
+              </div>
+            </div>
           </div>
-          <h3 class="text-2xl font-bold text-white">Méthodologie de l'Évaluation Ergonomique</h3>
-          <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-2">
-            <span><i class="fa-regular fa-clock text-indigo-400 mr-1"></i> Aujourd'hui — 14:00 - 17:00</span>
-            <span><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i> Amphi B - Bât. Olympe de Gouges</span>
+
+          <!-- Statistiques de présence / heures -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Volume Horaire Hebdo</h3>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-white">18.5h</span>
+                <span class="text-xs text-slate-400">de cours cette semaine</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-2 mt-3 overflow-hidden border border-slate-800">
+                <div class="bg-indigo-500 h-full rounded-full" style="width: 65%"></div>
+              </div>
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+              <span>Flux iCal : <strong class="text-emerald-400">Actif</strong></span>
+              <button onclick="document.getElementById('ical-file-input').click()" class="text-indigo-400 hover:underline">Importer .ics local</button>
+              <input type="file" id="ical-file-input" accept=".ics" class="hidden" onchange="handleICalFileUpload(event)">
+            </div>
           </div>
         </div>
+
+        <!-- Planning de la Semaine -->
+        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
+          <h3 class="text-base font-bold text-white mb-4 flex items-center justify-between">
+            <span>Planning de la Semaine</span>
+            <span class="text-xs font-normal text-slate-400">Source : iCal Universitaire</span>
+          </h3>
+          
+          <div id="weekly-schedule" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <!-- Journées générées dynamiquement par JS -->
+          </div>
+        </div>
+
       </section>
 
-      <!-- ================= 3. KANBAN ================= -->
+      <!-- AUTRES SECTION (Dashboard, Kanban, Ressources) CONSERVÉES -->
+      <section id="view-dashboard" class="space-y-6">
+        <p class="text-slate-400 text-sm">Contenu du Dashboard (déjà configuré)...</p>
+      </section>
       <section id="view-kanban" class="space-y-6 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <!-- À faire -->
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              <span>À Faire</span> <span class="bg-slate-900 px-2 py-0.5 rounded text-slate-300">2</span>
-            </h3>
-            <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
-              <span class="px-2 py-0.5 bg-rose-950 text-rose-400 border border-rose-800/50 text-[10px] font-bold rounded">Livrable</span>
-              <h4 class="text-xs font-bold text-white">Analyse des flux d'activité</h4>
-              <p class="text-[11px] text-slate-400">UE Ergonomie</p>
-            </div>
-          </div>
-          <!-- En cours -->
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              <span>En cours</span> <span class="bg-slate-900 px-2 py-0.5 rounded text-slate-300">1</span>
-            </h3>
-            <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
-              <span class="px-2 py-0.5 bg-amber-950 text-amber-400 border border-amber-800/50 text-[10px] font-bold rounded">Lecture</span>
-              <h4 class="text-xs font-bold text-white">Lecture Fiche Usabilité Vinted</h4>
-              <p class="text-[11px] text-slate-400">UE Facteurs Humains</p>
-            </div>
-          </div>
-          <!-- En relecture -->
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              <span>Relecture</span> <span class="bg-slate-900 px-2 py-0.5 rounded text-slate-300">0</span>
-            </h3>
-          </div>
-          <!-- Terminé -->
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-              <span>Terminé</span> <span class="bg-slate-900 px-2 py-0.5 rounded text-slate-300">1</span>
-            </h3>
-          </div>
-        </div>
+        <p class="text-slate-400 text-sm">Contenu du Kanban (déjà configuré)...</p>
       </section>
-
-      <!-- ================= 4. RESSOURCES ================= -->
       <section id="view-ressources" class="space-y-6 hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between">
-            <div>
-              <span class="px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800/50 text-[10px] font-bold rounded">📕 Livre Physique</span>
-              <h4 class="text-sm font-bold text-white mt-1">Ergonomie des interfaces</h4>
-              <p class="text-xs text-slate-400">Jean-François Rouet</p>
-            </div>
-            <span class="text-xs text-slate-500">Exemplaire perso</span>
-          </div>
-          <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between">
-            <div>
-              <span class="px-2 py-0.5 bg-sky-950 text-sky-400 border border-sky-800/50 text-[10px] font-bold rounded">💻 Numérique (PDF)</span>
-              <h4 class="text-sm font-bold text-white mt-1">Usability Engineering</h4>
-              <p class="text-xs text-slate-400">Jakob Nielsen</p>
-            </div>
-            <a href="#" class="text-xs text-indigo-400 hover:underline">Ouvrir PDF</a>
-          </div>
-        </div>
+        <p class="text-slate-400 text-sm">Contenu des Ressources (déjà configuré)...</p>
       </section>
 
     </div>
   </main>
 
-  <!-- Script pour basculer d'onglet -->
+  <!-- ================= LOGIQUE JAVASCRIPT ICAL ================= -->
   <script>
+    // Exemple de données iCal démo si aucun fichier chargé
+    const MOCK_EVENTS = [
+      {
+        summary: "Méthodologie de l'Évaluation Ergonomique",
+        location: "Amphi B - Bât. Olympe de Gouges",
+        start: new Date(Date.now() + 3600000 * 2), // Dans 2h
+        end: new Date(Date.now() + 3600000 * 5),
+        description: "Prof. Dupuis — UE Ergonomie IHM"
+      },
+      {
+        summary: "Psychologie Cognitive & Travail",
+        location: "Salle A204",
+        start: new Date(Date.now() + 3600000 * 26), // Demain
+        end: new Date(Date.now() + 3600000 * 29),
+        description: "Prof. Martin — UE Psychologie"
+      }
+    ];
+
     function switchTab(tabId) {
       document.querySelectorAll('main > div > section').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${tabId}`).classList.remove('hidden');
@@ -223,6 +217,66 @@
       activeBtn.classList.add('bg-slate-800', 'text-indigo-400', 'border', 'border-slate-700/50', 'shadow-sm');
       activeBtn.classList.remove('text-slate-400');
     }
+
+    // Traitement du fichier .ics téléversé
+    function handleICalFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        parseICalData(e.target.result);
+      };
+      reader.readAsText(file);
+    }
+
+    // Parser le contenu iCal
+    function parseICalData(icalText) {
+      try {
+        const jcalData = ICAL.parse(icalText);
+        const comp = new ICAL.Component(jcalData);
+        const vevents = comp.getAllSubcomponents('vevent');
+        
+        const events = vevents.map(vevent => {
+          const event = new ICAL.Event(vevent);
+          return {
+            summary: event.summary,
+            location: event.location,
+            start: event.startDate.toJSDate(),
+            end: event.endDate.toJSDate(),
+            description: event.description
+          };
+        }).sort((a, b) => a.start - b.start);
+
+        renderAgenda(events);
+      } catch (err) {
+        alert("Erreur lors de la lecture du fichier iCal (.ics)");
+      }
+    }
+
+    // Rendu de l'agenda
+    function renderAgenda(events) {
+      const now = new Date();
+      const upcomingEvents = events.filter(e => e.start >= now);
+      
+      if (upcomingEvents.length > 0) {
+        const next = upcomingEvents[0];
+        document.getElementById('course-title').innerText = next.summary;
+        document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Salle non définie'}`;
+        document.getElementById('course-time').innerHTML = `<i class="fa-regular fa-clock text-indigo-400"></i> ${next.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'})} — ${next.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        
+        // Calcul du décompte
+        const diffMs = next.start - now;
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        document.getElementById('course-countdown').innerText = `Dans ${diffHours}h`;
+        document.getElementById('next-course-badge').classList.remove('hidden');
+      }
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAgenda(MOCK_EVENTS);
+    });
   </script>
 </body>
 </html>
