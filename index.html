@@ -128,21 +128,21 @@
         </div>
       </section>
 
-      <!-- ================= 2. AGENDA (iCal + Proxy CORS) ================= -->
+      <!-- ================= 2. AGENDA ================= -->
       <section id="view-agenda" class="space-y-6 hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
           <div>
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fa-regular fa-calendar-check text-indigo-400"></i> Emploi du Temps Universitaire
+              <i class="fa-regular fa-calendar-check text-indigo-400"></i> Google Calendar & Agenda
             </h2>
             <p class="text-xs text-slate-400 mt-0.5">Synchronisé automatiquement via flux iCal (.ics)</p>
           </div>
           <div class="flex items-center gap-2 w-full md:w-auto">
-            <input type="text" id="ical-url-input" placeholder="URL de votre flux iCal (.ics)..." class="w-full md:w-80 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-            <button onclick="syncICalFeed()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl text-white transition flex items-center gap-1.5">
+            <input type="text" id="ical-url-input" value="https://calendar.google.com/calendar/ical/psycho.desdouits%40gmail.com/public/basic.ics" placeholder="URL de votre flux iCal (.ics)..." class="w-full md:w-80 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+            <button onclick="syncICalFeed()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl text-white transition flex items-center gap-1.5 shrink-0">
               <i class="fa-solid fa-rotate"></i> Sync
             </button>
-            <button onclick="document.getElementById('ical-file-input').click()" title="Importer un fichier .ics local" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition">
+            <button onclick="document.getElementById('ical-file-input').click()" title="Importer un fichier .ics local" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition shrink-0">
               <i class="fa-solid fa-file-import"></i>
             </button>
             <input type="file" id="ical-file-input" accept=".ics" class="hidden" onchange="handleICalFileUpload(event)">
@@ -153,12 +153,12 @@
         <div class="bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 p-6 rounded-2xl border border-indigo-500/30 shadow-xl relative overflow-hidden">
           <div class="flex items-center justify-between mb-4">
             <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold rounded-full flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> PROCHAIN COURS
+              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> PROCHAIN ÉVÉNEMENT / COURS
             </span>
             <span id="course-countdown" class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">--</span>
           </div>
 
-          <h3 id="course-title" class="text-2xl font-bold text-white">Aucun cours chargé</h3>
+          <h3 id="course-title" class="text-2xl font-bold text-white">Chargement de l'agenda...</h3>
           <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-2">
             <span id="course-time" class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-indigo-400"></i> --:--</span>
             <span id="course-location" class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-rose-400"></i> --</span>
@@ -167,10 +167,10 @@
           <!-- Liaisons avec le Kanban -->
           <div class="mt-5 pt-4 border-t border-slate-800/80">
             <p class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="fa-solid fa-link text-indigo-400"></i> Tâches du Kanban associées à ce cours / UE :
+              <i class="fa-solid fa-link text-indigo-400"></i> Tâches du Kanban associées :
             </p>
             <div id="course-linked-tasks" class="flex flex-wrap gap-2">
-              <span class="text-xs text-slate-500">Aucune tâche en attente pour ce cours.</span>
+              <span class="text-xs text-slate-500">Aucune tâche en attente.</span>
             </div>
           </div>
         </div>
@@ -293,7 +293,7 @@
     </div>
   </main>
 
-  <!-- ================= MODAL TÂCHE (Création / Édition) ================= -->
+  <!-- ================= MODAL TÂCHE ================= -->
   <div id="modal-task" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -309,11 +309,10 @@
           <input type="text" id="task-title" required placeholder="Ex: Synthèse d'usabilité Vinted" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
         </div>
 
-        <!-- Échelle de Priorité 1 à 10 -->
         <div>
           <div class="flex items-center justify-between mb-1">
             <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Degré d'Urgence / Priorité (1 à 10)</label>
-            <span id="priority-value-display" class="text-xs font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800/50">8/10</span>
+            <span id="priority-value-display" class="text-xs font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800/50">5/10</span>
           </div>
           <input type="range" id="task-priority" min="1" max="10" value="5" oninput="updatePrioritySliderDisplay(this.value)" class="w-full accent-indigo-500 cursor-pointer">
         </div>
@@ -422,7 +421,6 @@
     let resources = [];
     let selectedTypes = [];
 
-    // Attendre l'initialisation de Firebase
     document.addEventListener('DOMContentLoaded', () => {
       const checkFirebase = setInterval(() => {
         if (window.db && window.fb) {
@@ -431,24 +429,22 @@
         }
       }, 100);
 
-      // Charger l'URL iCal sauvegardée si elle existe
+      // Charger l'URL iCal sauvegardée ou la valeur par défaut
       const savedIcalUrl = localStorage.getItem('master_planner_ical_url');
       if (savedIcalUrl) {
         document.getElementById('ical-url-input').value = savedIcalUrl;
-        syncICalFeed();
       }
+      syncICalFeed();
     });
 
     // SYNCHRONISATION CLOUD FIREBASE
     function setupFirebaseListeners() {
-      // Écouteur temps réel pour les tâches
       window.fb.onSnapshot(window.fb.collection(window.db, "tasks"), (snapshot) => {
         tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderKanban();
         updateDashboard();
       });
 
-      // Écouteur temps réel pour les ressources
       window.fb.onSnapshot(window.fb.collection(window.db, "resources"), (snapshot) => {
         resources = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderRessources();
@@ -658,45 +654,107 @@
       });
     }
 
-// SYNCHRONISATION AGENDA (MULTI-PROXY CORS)
-async function syncICalFeed() {
-  const inputUrl = document.getElementById('ical-url-input').value.trim();
-  if (!inputUrl) return;
+    // SYNCHRONISATION AGENDA (MULTI-PROXY CORS)
+    async function syncICalFeed() {
+      const inputUrl = document.getElementById('ical-url-input').value.trim();
+      if (!inputUrl) return;
 
-  // Formater l'URL si elle commence par webcal://
-  let cleanUrl = inputUrl.replace(/^webcal:\/\//i, 'https://');
-  localStorage.setItem('master_planner_ical_url', cleanUrl);
+      let cleanUrl = inputUrl.replace(/^webcal:\/\//i, 'https://');
+      localStorage.setItem('master_planner_ical_url', cleanUrl);
 
-  // Liste de proxies CORS de secours
-  const proxies = [
-    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    url => `https://proxy.cors.sh/${url}`
-  ];
+      const proxies = [
+        url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+      ];
 
-  let success = false;
+      let success = false;
 
-  for (const getProxyUrl of proxies) {
-    try {
-      const targetUrl = getProxyUrl(cleanUrl);
-      const res = await fetch(targetUrl);
-      if (res.ok) {
-        const text = await res.text();
-        if (text && text.includes('BEGIN:VCALENDAR')) {
-          parseICalData(text);
-          success = true;
-          break; // Succès ! On sort de la boucle
+      for (const getProxyUrl of proxies) {
+        try {
+          const targetUrl = getProxyUrl(cleanUrl);
+          const res = await fetch(targetUrl);
+          if (res.ok) {
+            const text = await res.text();
+            if (text && text.includes('BEGIN:VCALENDAR')) {
+              parseICalData(text);
+              success = true;
+              break;
+            }
+          }
+        } catch (err) {
+          console.warn("Échec proxy, tentative suivante...");
         }
       }
-    } catch (err) {
-      console.warn("Échec du proxy, tentative avec le suivant...");
-    }
-  }
 
-  if (!success) {
-    alert("Impossible de synchroniser le flux iCal. Vérifiez que l'URL est bien un lien public ou d'adresse secrète .ics.");
-  }
-}
+      if (!success) {
+        console.warn("L'agenda n'a pas pu être chargé automatiquement.");
+      }
+    }
+
+    function handleICalFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) { parseICalData(e.target.result); };
+      reader.readAsText(file);
+    }
+
+    function parseICalData(icalText) {
+      try {
+        const jcalData = ICAL.parse(icalText);
+        const comp = new ICAL.Component(jcalData);
+        const vevents = comp.getAllSubcomponents('vevent');
+        
+        const events = vevents.map(vevent => {
+          const event = new ICAL.Event(vevent);
+          return {
+            summary: event.summary,
+            location: event.location,
+            start: event.startDate.toJSDate(),
+            end: event.endDate.toJSDate()
+          };
+        }).sort((a, b) => a.start - b.start);
+
+        renderAgenda(events);
+      } catch (err) {
+        console.error("Erreur parsing iCal:", err);
+      }
+    }
+
+    function renderAgenda(events) {
+      const now = new Date();
+      const upcomingEvents = events.filter(e => e.start >= now);
+      
+      if (upcomingEvents.length > 0) {
+        const next = upcomingEvents[0];
+        document.getElementById('course-title').innerText = next.summary || 'Sans titre';
+        document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Lieu non spécifié'}`;
+        document.getElementById('course-time').innerHTML = `<i class="fa-regular fa-clock text-indigo-400"></i> ${next.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'})} — ${next.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        
+        const diffHours = Math.floor((next.start - now) / (1000 * 60 * 60));
+        document.getElementById('course-countdown').innerText = diffHours > 0 ? `Dans ${diffHours}h` : 'Imminent';
+        document.getElementById('next-course-badge').classList.remove('hidden');
+
+        // Liaison devoirs Kanban associés
+        const linkedTasks = tasks.filter(t => t.status !== 'done' && (next.summary || '').toLowerCase().includes((t.ue || '').toLowerCase()));
+        const linkedContainer = document.getElementById('course-linked-tasks');
+        linkedContainer.innerHTML = '';
+
+        if (linkedTasks.length === 0) {
+          linkedContainer.innerHTML = `<span class="text-xs text-slate-500">Aucune tâche en attente pour cette UE.</span>`;
+        } else {
+          linkedTasks.forEach(t => {
+            linkedContainer.innerHTML += `
+              <span class="px-2.5 py-1 bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 text-xs rounded-lg flex items-center gap-1.5">
+                <i class="fa-solid fa-check text-[10px]"></i> ${t.title} (${t.dueDate})
+              </span>`;
+          });
+        }
+      } else {
+        document.getElementById('course-title').innerText = "Aucun événement à venir";
+        document.getElementById('course-countdown').innerText = "--";
+      }
+    }
 
     // GESTION RESSOURCES ET DASHBOARD
     async function handleAddResource(e) {
