@@ -1,1221 +1,228 @@
 <!DOCTYPE html>
-<html lang="fr" class="h-full bg-slate-900 text-slate-100">
+<html lang="fr" class="h-full bg-slate-900">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Planner - Gestion d'Études</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0f5ff',
-                            100: '#e0ebff',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Custom scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
-        .kanban-col {
-            min-height: calc(100vh - 240px);
-        }
-        .dragging {
-            opacity: 0.4;
-            transform: scale(0.98);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Planner - Ergonomie & Facteurs Humains</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- ICAL Parser CDN pour la lecture des flux .ics -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.5.0/ical.min.js"></script>
+  <style>
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 1); }
+  </style>
 </head>
-<body class="h-full flex flex-col font-sans bg-slate-900 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
+<body class="h-full text-slate-100 font-sans flex flex-col overflow-hidden">
 
-    <!-- Top Navigation Bar -->
-    <header class="sticky top-0 z-30 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                
-                <!-- Logo & Title -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
-                        <i class="fa-solid fa-graduation-cap text-white text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-lg text-white leading-none">Master<span class="text-brand-500">Planner</span></h1>
-                        <p class="text-xs text-slate-400 font-medium">Ergonomie & Facteurs Humains</p>
-                    </div>
-                </div>
-
-                <!-- Main Nav Tabs -->
-                <nav class="hidden md:flex items-center space-x-1 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800">
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 bg-brand-600 text-white shadow-sm">
-                        <i class="fa-solid fa-chart-pie text-xs"></i>
-                        <span>Dashboard</span>
-                    </button>
-                    <button onclick="switchTab('kanban')" id="nav-kanban" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all duration-150 flex items-center space-x-2">
-                        <i class="fa-solid fa-table-columns text-xs"></i>
-                        <span>Kanban</span>
-                    </button>
-                    <button onclick="switchTab('ressources')" id="nav-ressources" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all duration-150 flex items-center space-x-2">
-                        <i class="fa-solid fa-book-bookmark text-xs"></i>
-                        <span>Ressources</span>
-                    </button>
-                </nav>
-
-                <!-- Actions -->
-                <div class="flex items-center space-x-3">
-                    <button onclick="openModal('task')" class="bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg shadow-brand-600/25 transition-all duration-150 flex items-center space-x-2 active:scale-95">
-                        <i class="fa-solid fa-plus text-xs"></i>
-                        <span class="hidden sm:inline">Nouvelle Tâche</span>
-                    </button>
-                    
-                    <div class="relative group">
-                        <button class="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition">
-                            <i class="fa-solid fa-ellipsis-vertical text-lg"></i>
-                        </button>
-                        <div class="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-1 hidden group-hover:block z-50">
-                            <button onclick="exportData()" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-700 flex items-center space-x-2">
-                                <i class="fa-solid fa-download"></i>
-                                <span>Exporter les données</span>
-                            </button>
-                            <button onclick="importDataTrigger()" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-700 flex items-center space-x-2">
-                                <i class="fa-solid fa-upload"></i>
-                                <span>Importer une sauvegarde</span>
-                            </button>
-                            <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
-                            <div class="border-t border-slate-700 my-1"></div>
-                            <button onclick="resetDemoData()" class="w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-slate-700 flex items-center space-x-2">
-                                <i class="fa-solid fa-arrow-rotate-left"></i>
-                                <span>Réinitialiser la Démo</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Mobile Nav Bar -->
-        <div class="md:hidden border-t border-slate-800/80 px-4 py-2 bg-slate-950 flex justify-around">
-            <button onclick="switchTab('dashboard')" id="mobile-nav-dashboard" class="px-3 py-1.5 rounded-lg text-xs font-medium text-brand-400 flex flex-col items-center">
-                <i class="fa-solid fa-chart-pie text-sm mb-0.5"></i>
-                Dashboard
-            </button>
-            <button onclick="switchTab('kanban')" id="mobile-nav-kanban" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 flex flex-col items-center">
-                <i class="fa-solid fa-table-columns text-sm mb-0.5"></i>
-                Kanban
-            </button>
-            <button onclick="switchTab('ressources')" id="mobile-nav-ressources" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 flex flex-col items-center">
-                <i class="fa-solid fa-book-bookmark text-sm mb-0.5"></i>
-                Ressources
-            </button>
-        </div>
-    </header>
-
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-        <!-- ================================================================= -->
-        <!-- VIEW 1: DASHBOARD -->
-        <!-- ================================================================= -->
-        <section id="view-dashboard" class="tab-content space-y-6">
-            
-            <!-- Welcome Banner & Quick Stats -->
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                <div class="lg:col-span-2 bg-gradient-to-r from-slate-800 to-slate-800/60 p-6 rounded-2xl border border-slate-700/60 shadow-md relative overflow-hidden flex flex-col justify-between">
-                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                    <div>
-                        <div class="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-brand-500/10 text-brand-400 text-xs font-semibold mb-3 border border-brand-500/20">
-                            <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
-                            <span>Semestre 1 • Séquence active</span>
-                        </div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Bienvenue sur votre espace Master</h2>
-                        <p class="text-sm text-slate-400 leading-relaxed max-w-md">
-                            Vue synthétique de vos écheances académiques. Gardez le contrôle sur vos livrables et lectures obligatoires.
-                        </p>
-                    </div>
-                    <div class="mt-6 flex flex-wrap gap-3">
-                        <button onclick="switchTab('kanban')" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-3.5 py-2 rounded-lg font-medium transition flex items-center space-x-2">
-                            <span>Ouvrir le Kanban</span>
-                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                        </button>
-                        <button onclick="openModal('resource')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3.5 py-2 rounded-lg font-medium transition flex items-center space-x-2">
-                            <i class="fa-solid fa-plus text-[10px]"></i>
-                            <span>Ajouter une ressource</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Global Progress Cards -->
-                <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700/60 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Avancement Livrables</span>
-                            <span id="stat-livrables-percent" class="text-xs font-bold text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded-full">0%</span>
-                        </div>
-                        <div id="stat-livrables-count" class="text-2xl font-bold text-white mb-2">0 / 0</div>
-                        <div class="w-full bg-slate-700 rounded-full h-2.5 overflow-hidden">
-                            <div id="stat-livrables-bar" class="bg-gradient-to-r from-brand-500 to-indigo-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                        </div>
-                    </div>
-                    <p class="text-[11px] text-slate-400 mt-4 flex items-center space-x-1">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
-                        <span>Priorité haute sur les devoirs finaux</span>
-                    </p>
-                </div>
-
-                <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700/60 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lectures Validées</span>
-                            <span id="stat-lectures-percent" class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">0%</span>
-                        </div>
-                        <div id="stat-lectures-count" class="text-2xl font-bold text-white mb-2">0 / 0</div>
-                        <div class="w-full bg-slate-700 rounded-full h-2.5 overflow-hidden">
-                            <div id="stat-lectures-bar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                        </div>
-                    </div>
-                    <p class="text-[11px] text-slate-400 mt-4 flex items-center space-x-1">
-                        <i class="fa-solid fa-book-open text-emerald-400"></i>
-                        <span>Livres & Articles de recherche</span>
-                    </p>
-                </div>
-            </div>
-
-            <!-- Urgent Deadlines Section -->
-            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-800">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-3 h-3 rounded-full bg-red-500 animate-ping"></div>
-                        <h3 class="text-lg font-bold text-white">Focus Urgences (Prochains 14 jours)</h3>
-                    </div>
-                    <span id="urgent-count-badge" class="text-xs font-medium text-slate-400 bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-full">0 urgence(s)</span>
-                </div>
-
-                <div id="urgent-tasks-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Dynamic Urgent Task Cards inserted by JS -->
-                </div>
-            </div>
-
-            <!-- Modules / UE Summary Grid -->
-            <div>
-                <h3 class="text-lg font-bold text-white mb-4 flex items-center space-x-2">
-                    <i class="fa-solid fa-layer-group text-brand-400 text-sm"></i>
-                    <span>Synthèse par Matière / Module (UE)</span>
-                </h3>
-                
-                <div id="modules-summary-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Dynamic Module Cards inserted by JS -->
-                </div>
-            </div>
-
-        </section>
-
-        <!-- ================================================================= -->
-        <!-- VIEW 2: KANBAN -->
-        <!-- ================================================================= -->
-        <section id="view-kanban" class="tab-content hidden space-y-4">
-            
-            <!-- Filters Toolbar -->
-            <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/60 flex flex-wrap gap-3 items-center justify-between">
-                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                    <!-- Filter Module -->
-                    <div class="flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700/80 w-full sm:w-auto">
-                        <i class="fa-solid fa-filter text-slate-400 text-xs"></i>
-                        <select id="filter-module" onchange="renderKanban()" class="bg-transparent text-xs text-slate-200 font-medium focus:outline-none cursor-pointer w-full">
-                            <option value="ALL" class="bg-slate-800">Toutes les matières</option>
-                            <option value="Ergonomie Cognitives" class="bg-slate-800">Ergonomie Cognitive</option>
-                            <option value="Psychologie du Travail" class="bg-slate-800">Psychologie du Travail</option>
-                            <option value="Facteurs Humains & IHM" class="bg-slate-800">Facteurs Humains & IHM</option>
-                            <option value="Méthodologie de Recherche" class="bg-slate-800">Méthodologie de Recherche</option>
-                        </select>
-                    </div>
-
-                    <!-- Filter Type -->
-                    <div class="flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700/80 w-full sm:w-auto">
-                        <i class="fa-solid fa-tag text-slate-400 text-xs"></i>
-                        <select id="filter-type" onchange="renderKanban()" class="bg-transparent text-xs text-slate-200 font-medium focus:outline-none cursor-pointer w-full">
-                            <option value="ALL" class="bg-slate-800">Tous les types</option>
-                            <option value="Livrable" class="bg-slate-800">Livrable / Rendu</option>
-                            <option value="Lecture" class="bg-slate-800">Lecture / Article</option>
-                            <option value="Devoir" class="bg-slate-800">Devoir / Exercice</option>
-                            <option value="Projet Groupe" class="bg-slate-800">Projet de groupe</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="text-xs text-slate-400 flex items-center space-x-2">
-                    <i class="fa-solid fa-hand-pointer text-slate-500"></i>
-                    <span>Glissez-déposez les cartes pour changer le statut</span>
-                </div>
-            </div>
-
-            <!-- Kanban Board Columns Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                
-                <!-- Column: À FAIRE -->
-                <div class="bg-slate-950/60 rounded-2xl p-3 border border-slate-800/80 flex flex-col">
-                    <div class="flex items-center justify-between pb-3 px-2 border-b border-slate-800/80 mb-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
-                            <h4 class="font-bold text-sm text-slate-200">À FAIRE</h4>
-                        </div>
-                        <span id="count-todo" class="text-xs font-semibold bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">0</span>
-                    </div>
-                    <div id="col-todo" data-status="TODO" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="kanban-col space-y-3 flex-1 transition-colors rounded-xl p-1">
-                        <!-- Dynamic Kanban Cards -->
-                    </div>
-                </div>
-
-                <!-- Column: EN COURS -->
-                <div class="bg-slate-950/60 rounded-2xl p-3 border border-slate-800/80 flex flex-col">
-                    <div class="flex items-center justify-between pb-3 px-2 border-b border-slate-800/80 mb-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                            <h4 class="font-bold text-sm text-slate-200">EN COURS</h4>
-                        </div>
-                        <span id="count-in_progress" class="text-xs font-semibold bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">0</span>
-                    </div>
-                    <div id="col-in_progress" data-status="IN_PROGRESS" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="kanban-col space-y-3 flex-1 transition-colors rounded-xl p-1">
-                        <!-- Dynamic Kanban Cards -->
-                    </div>
-                </div>
-
-                <!-- Column: EN RELECTURE -->
-                <div class="bg-slate-950/60 rounded-2xl p-3 border border-slate-800/80 flex flex-col">
-                    <div class="flex items-center justify-between pb-3 px-2 border-b border-slate-800/80 mb-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
-                            <h4 class="font-bold text-sm text-slate-200">RELECTURE</h4>
-                        </div>
-                        <span id="count-review" class="text-xs font-semibold bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">0</span>
-                    </div>
-                    <div id="col-review" data-status="REVIEW" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="kanban-col space-y-3 flex-1 transition-colors rounded-xl p-1">
-                        <!-- Dynamic Kanban Cards -->
-                    </div>
-                </div>
-
-                <!-- Column: TERMINÉ -->
-                <div class="bg-slate-950/60 rounded-2xl p-3 border border-slate-800/80 flex flex-col">
-                    <div class="flex items-center justify-between pb-3 px-2 border-b border-slate-800/80 mb-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                            <h4 class="font-bold text-sm text-slate-200">TERMINÉ</h4>
-                        </div>
-                        <span id="count-done" class="text-xs font-semibold bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">0</span>
-                    </div>
-                    <div id="col-done" data-status="DONE" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="kanban-col space-y-3 flex-1 transition-colors rounded-xl p-1">
-                        <!-- Dynamic Kanban Cards -->
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- ================================================================= -->
-        <!-- VIEW 3: RESSOURCES -->
-        <!-- ================================================================= -->
-        <section id="view-ressources" class="tab-content hidden space-y-8">
-            
-            <!-- SECTION A: Ouvrages & Articles de Recherche -->
-            <div>
-                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-                    <div>
-                        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-                            <i class="fa-solid fa-book-journal-whills text-emerald-400"></i>
-                            <span>Bibliothèque & Articles à lire</span>
-                        </h3>
-                        <p class="text-xs text-slate-400">Suivi des ouvrages théoriques, chapitres et articles scientifiques</p>
-                    </div>
-
-                    <div class="flex items-center space-x-3">
-                        <!-- Filter Format -->
-                        <div class="flex items-center space-x-1 bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs">
-                            <button onclick="filterResources('ALL')" id="res-filter-all" class="px-3 py-1 rounded-lg font-medium bg-brand-600 text-white">Tous</button>
-                            <button onclick="filterResources('PHY')" id="res-filter-phy" class="px-3 py-1 rounded-lg font-medium text-slate-400 hover:text-slate-200">📕 Physique</button>
-                            <button onclick="filterResources('NUM')" id="res-filter-num" class="px-3 py-1 rounded-lg font-medium text-slate-400 hover:text-slate-200">💻 Numérique</button>
-                        </div>
-
-                        <button onclick="openModal('resource')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-md transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>Ajouter Livre/Article</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Dynamic Resource Cards -->
-                </div>
-            </div>
-
-            <!-- SECTION B: Annuaire & Moteurs Académiques -->
-            <div class="border-t border-slate-800 pt-6">
-                <h3 class="text-lg font-bold text-white mb-2 flex items-center space-x-2">
-                    <i class="fa-solid fa-globe text-brand-400"></i>
-                    <span>Portails & Moteurs de Recherche Académiques</span>
-                </h3>
-                <p class="text-xs text-slate-400 mb-4">Ressources en accès direct pour la recherche documentaire en ergonomie et psychologie</p>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    
-                    <!-- Link Card: Cairn.info -->
-                    <a href="https://www.cairn.info" target="_blank" class="bg-slate-800/60 hover:bg-slate-800 p-4 rounded-xl border border-slate-700/60 transition group flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-bold text-sm text-slate-200 group-hover:text-brand-400 transition">Cairn.info</span>
-                                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-500 group-hover:text-slate-300"></i>
-                            </div>
-                            <p class="text-xs text-slate-400 leading-relaxed mb-3">Recherche d'articles en SHS, psychologie et ergonomie francophone.</p>
-                        </div>
-                        <span class="text-[10px] font-semibold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20 w-fit">Accès BU / Open</span>
-                    </a>
-
-                    <!-- Link Card: HAL Science -->
-                    <a href="https://hal.science" target="_blank" class="bg-slate-800/60 hover:bg-slate-800 p-4 rounded-xl border border-slate-700/60 transition group flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-bold text-sm text-slate-200 group-hover:text-brand-400 transition">HAL Open Science</span>
-                                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-500 group-hover:text-slate-300"></i>
-                            </div>
-                            <p class="text-xs text-slate-400 leading-relaxed mb-3">Archives ouvertes d'articles et thèses de recherche française.</p>
-                        </div>
-                        <span class="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 w-fit">Open Access</span>
-                    </a>
-
-                    <!-- Link Card: Google Scholar -->
-                    <a href="https://scholar.google.com" target="_blank" class="bg-slate-800/60 hover:bg-slate-800 p-4 rounded-xl border border-slate-700/60 transition group flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-bold text-sm text-slate-200 group-hover:text-brand-400 transition">Google Scholar</span>
-                                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-500 group-hover:text-slate-300"></i>
-                            </div>
-                            <p class="text-xs text-slate-400 leading-relaxed mb-3">Recherche internationale exhaustive de publications et citations.</p>
-                        </div>
-                        <span class="text-[10px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 w-fit">International</span>
-                    </a>
-
-                    <!-- Link Card: ScienceDirect -->
-                    <a href="https://www.sciencedirect.com" target="_blank" class="bg-slate-800/60 hover:bg-slate-800 p-4 rounded-xl border border-slate-700/60 transition group flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-bold text-sm text-slate-200 group-hover:text-brand-400 transition">ScienceDirect</span>
-                                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-500 group-hover:text-slate-300"></i>
-                            </div>
-                            <p class="text-xs text-slate-400 leading-relaxed mb-3">Articles internationaux en Ergonomics, Human Factors et Ergonomie Cognitive.</p>
-                        </div>
-                        <span class="text-[10px] font-semibold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20 w-fit">Accès BU</span>
-                    </a>
-
-                </div>
-            </div>
-
-        </section>
-
-    </main>
-
-    <!-- MODAL: CREATION DIALOG -->
-    <div id="creation-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden transform transition-all">
-            
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50">
-                <div class="flex items-center space-x-2">
-                    <span id="modal-type-indicator" class="w-2 h-2 rounded-full bg-brand-500"></span>
-                    <h3 id="modal-title" class="font-bold text-white text-base">Ajouter un Élément</h3>
-                </div>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1 transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <!-- Modal Type Toggle -->
-            <div class="px-6 pt-4">
-                <div class="bg-slate-950 p-1 rounded-xl flex border border-slate-800 text-xs">
-                    <button type="button" onclick="setModalMode('task')" id="modal-tab-task" class="flex-1 py-2 font-semibold rounded-lg bg-brand-600 text-white transition">
-                        <i class="fa-solid fa-list-check mr-1.5"></i>Tâche / Devoir
-                    </button>
-                    <button type="button" onclick="setModalMode('resource')" id="modal-tab-resource" class="flex-1 py-2 font-semibold rounded-lg text-slate-400 hover:text-white transition">
-                        <i class="fa-solid fa-book mr-1.5"></i>Ressource / Livre
-                    </button>
-                </div>
-            </div>
-
-            <!-- Modal Form -->
-            <form id="modal-form" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
-                
-                <!-- Common Field: Title -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Titre *</label>
-                    <input type="text" id="input-title" required placeholder="ex: Rédaction Synthèse Ergonomie IHM" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
-                </div>
-
-                <!-- Common Field: Module / UE -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Matière / UE *</label>
-                    <select id="input-module" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 transition">
-                        <option value="Ergonomie Cognitives">Ergonomie Cognitive</option>
-                        <option value="Psychologie du Travail">Psychologie du Travail</option>
-                        <option value="Facteurs Humains & IHM">Facteurs Humains & IHM</option>
-                        <option value="Méthodologie de Recherche">Méthodologie de Recherche</option>
-                        <option value="Transversal / Master">Transversal / Autre</option>
-                    </select>
-                </div>
-
-                <!-- TASK SPECIFIC FIELDS -->
-                <div id="form-task-fields" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Type de tâche</label>
-                            <select id="input-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
-                                <option value="Livrable">Livrable / Rendu</option>
-                                <option value="Lecture">Lecture obligatoire</option>
-                                <option value="Devoir">Devoir à faire</option>
-                                <option value="Projet Groupe">Projet de groupe</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Date d'échéance</label>
-                            <input type="date" id="input-duedate" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Statut initial</label>
-                            <select id="input-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
-                                <option value="TODO">À FAIRE</option>
-                                <option value="IN_PROGRESS">EN COURS</option>
-                                <option value="REVIEW">EN RELECTURE</option>
-                                <option value="DONE">TERMINÉ</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Temps estimé (h)</label>
-                            <input type="number" step="0.5" id="input-duration" placeholder="2.5" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RESOURCE SPECIFIC FIELDS -->
-                <div id="form-resource-fields" class="space-y-4 hidden">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Auteur(s)</label>
-                            <input type="text" id="input-author" placeholder="ex: Falzon, P." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Format *</label>
-                            <select id="input-format" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
-                                <option value="PHY">📕 Livre Physique</option>
-                                <option value="NUM">💻 Numérique (PDF / Ebook)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Statut de lecture</label>
-                            <select id="input-readstatus" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
-                                <option value="NON_LU">Non Lu</option>
-                                <option value="EN_COURS">En cours de lecture</option>
-                                <option value="FICHE">Fiché / Résumé fait</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">Lien / Emplacement</label>
-                            <input type="text" id="input-link" placeholder="URL ou 'Bibliothèque BU'" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Common Field: Description / Notes -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Notes / Consignes / Détails</label>
-                    <textarea id="input-notes" rows="3" placeholder="Informations complémentaires, consignes du professeur..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition"></textarea>
-                </div>
-
-                <!-- Form Submit Buttons -->
-                <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 transition">Annuler</button>
-                    <button type="submit" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2 rounded-xl text-xs font-semibold shadow-lg shadow-brand-600/30 transition">Enregistrer</button>
-                </div>
-
-            </form>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT APP ENGINE -->
-    <script>
-        /* -------------------------------------------------------------------
-           1. INITIAL STATE & DEMO DATA STORAGE
-           ------------------------------------------------------------------- */
+  <!-- ================= NAVBAR ================= -->
+  <header class="bg-slate-950 border-b border-slate-800 shrink-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
         
-        const DEFAULT_TASKS = [
-            {
-                id: 'task-1',
-                title: 'Rapport d\'Analyse Ergonomique des Postes',
-                module: 'Ergonomie Cognitives',
-                type: 'Livrable',
-                dueDate: '2026-10-02', // Urgent (close date)
-                status: 'IN_PROGRESS',
-                duration: '6',
-                notes: 'Analyse de l\'activité sur le terrain d\'expérimentation. Grille de critères NF EN ISO 9241 à joindre en annexe.'
-            },
-            {
-                id: 'task-2',
-                title: 'Lecture Falzon (Chapitre 4 : La Charge Mentale)',
-                module: 'Ergonomie Cognitives',
-                type: 'Lecture',
-                dueDate: '2026-09-29',
-                status: 'TODO',
-                duration: '1.5',
-                notes: 'Préparer 3 questions clés pour la séance de TD.'
-            },
-            {
-                id: 'task-3',
-                title: 'Dossier de Psychologie des Organisations',
-                module: 'Psychologie du Travail',
-                type: 'Projet Groupe',
-                dueDate: '2026-10-15',
-                status: 'TODO',
-                duration: '8',
-                notes: 'Travail en sous-groupe de 4. Définir le questionnaire d\'épuisement professionnel (MBI).'
-            },
-            {
-                id: 'task-4',
-                title: 'Maquettage Basse Fidélité App Santé',
-                module: 'Facteurs Humains & IHM',
-                type: 'Devoir',
-                dueDate: '2026-10-05',
-                status: 'REVIEW',
-                duration: '4',
-                notes: 'Prototypage Figma des écrans principaux. Effectuer un test d\'utilisabilité rapide sur 2 utilisateurs.'
-            },
-            {
-                id: 'task-5',
-                title: 'Fiche de synthèse : Biais Cognitifs & Prise de Décision',
-                module: 'Ergonomie Cognitives',
-                type: 'Lecture',
-                dueDate: '2026-09-27',
-                status: 'DONE',
-                duration: '2',
-                notes: 'Synthèse terminée et rangée dans les ressources.'
-            }
-        ];
-
-        const DEFAULT_RESOURCES = [
-            {
-                id: 'res-1',
-                title: 'Ergonomie (Manuel de référence)',
-                author: 'Falzon, Pierre',
-                module: 'Ergonomie Cognitives',
-                format: 'PHY', // Physical Book
-                readStatus: 'EN_COURS',
-                link: 'Bibliothèque Universitaire - Rayon 15',
-                notes: 'Livre fondamental pour tout le Semestre 1.'
-            },
-            {
-                id: 'res-2',
-                title: 'The Design of Everyday Things',
-                author: 'Norman, Don',
-                module: 'Facteurs Humains & IHM',
-                format: 'NUM', // Digital PDF
-                readStatus: 'FICHE',
-                link: 'https://archive.org',
-                notes: 'Incontournable pour les principes d\'affordance et de modèle mental.'
-            },
-            {
-                id: 'res-3',
-                title: 'Introduction à la Psychologie du Travail',
-                author: 'Brangier, E. et al.',
-                module: 'Psychologie du Travail',
-                format: 'PHY',
-                readStatus: 'NON_LU',
-                link: 'Exemplaire Personnel',
-                notes: 'Consulter spécifiquement les chapitres sur la motivation et la satisfaction.'
-            }
-        ];
-
-        // State variables
-        let tasks = [];
-        let resources = [];
-        let currentTab = 'dashboard';
-        let currentModalMode = 'task'; // 'task' or 'resource'
-        let currentResourceFilter = 'ALL';
-
-        // Initialize App on DOM Load
-        window.onload = function() {
-            loadFromStorage();
-            renderAll();
-        };
-
-        // Storage helpers
-        function loadFromStorage() {
-            const savedTasks = localStorage.getItem('master_planner_tasks');
-            const savedResources = localStorage.getItem('master_planner_resources');
-
-            tasks = savedTasks ? JSON.parse(savedTasks) : [...DEFAULT_TASKS];
-            resources = savedResources ? JSON.parse(savedResources) : [...DEFAULT_RESOURCES];
-        }
-
-        function saveToStorage() {
-            localStorage.setItem('master_planner_tasks', JSON.stringify(tasks));
-            localStorage.setItem('master_planner_resources', JSON.stringify(resources));
-            renderAll();
-        }
-
-        function resetDemoData() {
-            if (confirm("Réinitialiser toutes les données aux exemples de démonstration ?")) {
-                tasks = [...DEFAULT_TASKS];
-                resources = [...DEFAULT_RESOURCES];
-                saveToStorage();
-            }
-        }
-
-        /* -------------------------------------------------------------------
-           2. NAVIGATION & TAB SWITCHING
-           ------------------------------------------------------------------- */
-        function switchTab(tabName) {
-            currentTab = tabName;
-            
-            // Hide all contents
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            
-            // Show selected tab content
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-
-            // Style nav buttons (Desktop)
-            document.querySelectorAll('.nav-tab').forEach(btn => {
-                btn.className = "nav-tab px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all duration-150 flex items-center space-x-2";
-            });
-            const activeNav = document.getElementById(`nav-${tabName}`);
-            if (activeNav) {
-                activeNav.className = "nav-tab px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-2 bg-brand-600 text-white shadow-sm";
-            }
-
-            // Style mobile buttons
-            ['dashboard', 'kanban', 'ressources'].forEach(t => {
-                const mobBtn = document.getElementById(`mobile-nav-${t}`);
-                if (mobBtn) {
-                    if (t === tabName) {
-                        mobBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium text-brand-400 flex flex-col items-center";
-                    } else {
-                        mobBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 flex flex-col items-center";
-                    }
-                }
-            });
-
-            // Re-render
-            renderAll();
-        }
-
-        /* -------------------------------------------------------------------
-           3. RENDERERS (DASHBOARD, KANBAN, RESSOURCES)
-           ------------------------------------------------------------------- */
-        function renderAll() {
-            renderDashboard();
-            renderKanban();
-            renderResources();
-        }
-
-        // --- DASHBOARD RENDERER ---
-        function renderDashboard() {
-            // 1. Calculate Stats
-            const totalLivrables = tasks.filter(t => t.type === 'Livrable' || t.type === 'Devoir' || t.type === 'Projet Groupe').length;
-            const doneLivrables = tasks.filter(t => (t.type === 'Livrable' || t.type === 'Devoir' || t.type === 'Projet Groupe') && t.status === 'DONE').length;
-            const livrablesPercent = totalLivrables > 0 ? Math.round((doneLivrables / totalLivrables) * 100) : 0;
-
-            document.getElementById('stat-livrables-count').textContent = `${doneLivrables} / ${totalLivrables}`;
-            document.getElementById('stat-livrables-percent').textContent = `${livrablesPercent}%`;
-            document.getElementById('stat-livrables-bar').style.width = `${livrablesPercent}%`;
-
-            const totalLectures = tasks.filter(t => t.type === 'Lecture').length + resources.length;
-            const doneLectures = tasks.filter(t => t.type === 'Lecture' && t.status === 'DONE').length + resources.filter(r => r.readStatus === 'FICHE').length;
-            const lecturesPercent = totalLectures > 0 ? Math.round((doneLectures / totalLectures) * 100) : 0;
-
-            document.getElementById('stat-lectures-count').textContent = `${doneLectures} / ${totalLectures}`;
-            document.getElementById('stat-lectures-percent').textContent = `${lecturesPercent}%`;
-            document.getElementById('stat-lectures-bar').style.width = `${lecturesPercent}%`;
-
-            // 2. Urgent Tasks (Deadlines in next 14 days and not DONE)
-            const urgentContainer = document.getElementById('urgent-tasks-container');
-            urgentContainer.innerHTML = '';
-
-            const today = new Date();
-            const activeUrgentTasks = tasks.filter(t => {
-                if (t.status === 'DONE' || !t.dueDate) return false;
-                const due = new Date(t.dueDate);
-                const diffTime = due - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays <= 14; // within 14 days
-            }).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-            document.getElementById('urgent-count-badge').textContent = `${activeUrgentTasks.length} urgence(s)`;
-
-            if (activeUrgentTasks.length === 0) {
-                urgentContainer.innerHTML = `
-                    <div class="col-span-full bg-slate-900/50 p-6 rounded-xl text-center border border-slate-800 text-slate-500 text-xs">
-                        <i class="fa-solid fa-circle-check text-emerald-400 text-lg mb-2 block"></i>
-                        Aucune échéance urgente dans les 14 prochains jours. Vous êtes à jour !
-                    </div>
-                `;
-            } else {
-                activeUrgentTasks.forEach(task => {
-                    const daysLeft = Math.ceil((new Date(task.dueDate) - today) / (1000 * 60 * 60 * 24));
-                    let urgencyBadgeClass = "bg-amber-500/10 text-amber-400 border-amber-500/20";
-                    let urgencyText = `J-${daysLeft}`;
-                    if (daysLeft <= 2) {
-                        urgencyBadgeClass = "bg-red-500/20 text-red-400 border-red-500/30 animate-pulse";
-                        urgencyText = daysLeft < 0 ? "En retard !" : (daysLeft === 0 ? "Aujourd'hui !" : `J-${daysLeft}`);
-                    }
-
-                    const cardHtml = `
-                        <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700/80 shadow-sm flex flex-col justify-between hover:border-slate-600 transition">
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${urgencyBadgeClass}">
-                                        ${urgencyText}
-                                    </span>
-                                    <span class="text-[10px] text-slate-400 font-mono"><i class="fa-regular fa-clock mr-1"></i>${task.dueDate}</span>
-                                </div>
-                                <h4 class="text-sm font-bold text-slate-100 mb-1 leading-snug">${escapeHtml(task.title)}</h4>
-                                <p class="text-xs text-brand-400 font-medium mb-3">${escapeHtml(task.module)}</p>
-                            </div>
-                            <div class="flex items-center justify-between pt-2 border-t border-slate-800 text-[11px]">
-                                <span class="text-slate-400"><i class="fa-solid fa-tag mr-1 text-slate-500"></i>${task.type}</span>
-                                <button onclick="quickMoveTask('${task.id}', 'DONE')" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium flex items-center space-x-1">
-                                    <i class="fa-solid fa-check"></i>
-                                    <span>Marquer Fait</span>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    urgentContainer.insertAdjacentHTML('beforeend', cardHtml);
-                });
-            }
-
-            // 3. Modules / UE Summary Grid
-            const modules = [
-                'Ergonomie Cognitives',
-                'Psychologie du Travail',
-                'Facteurs Humains & IHM',
-                'Méthodologie de Recherche'
-            ];
-
-            const modulesGrid = document.getElementById('modules-summary-grid');
-            modulesGrid.innerHTML = '';
-
-            modules.forEach(mod => {
-                const modTasks = tasks.filter(t => t.module === mod);
-                const pendingTasks = modTasks.filter(t => t.status !== 'DONE').length;
-                const nextTask = modTasks.filter(t => t.status !== 'DONE' && t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
-
-                const modCard = `
-                    <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/60 hover:bg-slate-800 transition flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-brand-500"></span>
-                                <span class="text-[10px] font-bold bg-slate-900 px-2 py-0.5 rounded-full text-slate-400 border border-slate-700">${pendingTasks} restante(s)</span>
-                            </div>
-                            <h4 class="font-bold text-sm text-slate-200 mb-2 leading-snug">${mod}</h4>
-                            ${nextTask ? `
-                                <p class="text-[11px] text-slate-400">
-                                    <span class="text-slate-500">Prochain :</span> ${escapeHtml(nextTask.title.substring(0, 28))}...
-                                </p>
-                            ` : `
-                                <p class="text-[11px] text-emerald-400/80 italic">Aucune tâche en attente</p>
-                            `}
-                        </div>
-                        <div class="mt-4 pt-2 border-t border-slate-700/50 flex justify-end">
-                            <button onclick="filterKanbanByModule('${mod}')" class="text-[11px] text-brand-400 hover:text-brand-300 font-semibold flex items-center space-x-1">
-                                <span>Voir au Kanban</span>
-                                <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                modulesGrid.insertAdjacentHTML('beforeend', modCard);
-            });
-        }
-
-        // --- KANBAN RENDERER & DRAG/DROP ---
-        function renderKanban() {
-            const filterMod = document.getElementById('filter-module').value;
-            const filterType = document.getElementById('filter-type').value;
-
-            const cols = {
-                'TODO': document.getElementById('col-todo'),
-                'IN_PROGRESS': document.getElementById('col-in_progress'),
-                'REVIEW': document.getElementById('col-review'),
-                'DONE': document.getElementById('col-done')
-            };
-
-            // Reset columns
-            Object.keys(cols).forEach(key => cols[key].innerHTML = '');
-
-            const counts = { 'TODO': 0, 'IN_PROGRESS': 0, 'REVIEW': 0, 'DONE': 0 };
-
-            // Filter tasks
-            const filteredTasks = tasks.filter(t => {
-                const matchMod = filterMod === 'ALL' || t.module === filterMod;
-                const matchType = filterType === 'ALL' || t.type === filterType;
-                return matchMod && matchType;
-            });
-
-            filteredTasks.forEach(task => {
-                const colTarget = cols[task.status] || cols['TODO'];
-                counts[task.status] = (counts[task.status] || 0) + 1;
-
-                let typeColor = "bg-slate-800 text-slate-300 border-slate-700";
-                if (task.type === 'Livrable') typeColor = "bg-red-500/10 text-red-400 border-red-500/20";
-                if (task.type === 'Lecture') typeColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-                if (task.type === 'Devoir') typeColor = "bg-amber-500/10 text-amber-400 border-amber-500/20";
-                if (task.type === 'Projet Groupe') typeColor = "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
-
-                const cardHtml = `
-                    <div id="${task.id}" draggable="true" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)" class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 hover:border-slate-700 shadow-sm cursor-grab active:cursor-grabbing transition group relative">
-                        
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border ${typeColor}">
-                                ${task.type}
-                            </span>
-                            <div class="opacity-0 group-hover:opacity-100 transition flex items-center space-x-1">
-                                <button onclick="deleteTask('${task.id}')" class="text-slate-500 hover:text-red-400 p-1 text-xs">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <h5 class="text-xs font-bold text-slate-100 mb-1.5 leading-snug">${escapeHtml(task.title)}</h5>
-                        
-                        <p class="text-[10px] font-medium text-brand-400 mb-2">${escapeHtml(task.module)}</p>
-
-                        ${task.notes ? `
-                            <p class="text-[11px] text-slate-400 mb-3 bg-slate-950/50 p-2 rounded-lg border border-slate-800/80 leading-relaxed">${escapeHtml(task.notes)}</p>
-                        ` : ''}
-
-                        <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[10px] text-slate-400">
-                            <span class="font-mono"><i class="fa-regular fa-calendar mr-1"></i>${task.dueDate || 'Sans date'}</span>
-                            ${task.duration ? `<span><i class="fa-regular fa-clock mr-1"></i>${task.duration}h</span>` : ''}
-                        </div>
-                    </div>
-                `;
-                colTarget.insertAdjacentHTML('beforeend', cardHtml);
-            });
-
-            // Update column badges
-            document.getElementById('count-todo').textContent = counts['TODO'] || 0;
-            document.getElementById('count-in_progress').textContent = counts['IN_PROGRESS'] || 0;
-            document.getElementById('count-review').textContent = counts['REVIEW'] || 0;
-            document.getElementById('count-done').textContent = counts['DONE'] || 0;
-        }
-
-        // Drag and Drop Logic
-        let draggedTaskId = null;
-
-        function handleDragStart(e) {
-            draggedTaskId = e.target.id;
-            e.target.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-        }
-
-        function handleDragEnd(e) {
-            e.target.classList.remove('dragging');
-            document.querySelectorAll('.kanban-col').forEach(col => col.classList.remove('bg-slate-800/40'));
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            const col = e.currentTarget;
-            col.classList.add('bg-slate-800/40');
-        }
-
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('bg-slate-800/40');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            const col = e.currentTarget;
-            col.classList.remove('bg-slate-800/40');
-            const targetStatus = col.getAttribute('data-status');
-
-            if (draggedTaskId && targetStatus) {
-                const task = tasks.find(t => t.id === draggedTaskId);
-                if (task) {
-                    task.status = targetStatus;
-                    saveToStorage();
-                }
-            }
-        }
-
-        function quickMoveTask(taskId, newStatus) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                task.status = newStatus;
-                saveToStorage();
-            }
-        }
-
-        function deleteTask(taskId) {
-            if (confirm("Supprimer cette tâche ?")) {
-                tasks = tasks.filter(t => t.id !== taskId);
-                saveToStorage();
-            }
-        }
-
-        function filterKanbanByModule(moduleName) {
-            document.getElementById('filter-module').value = moduleName;
-            switchTab('kanban');
-        }
-
-        // --- RESSOURCES RENDERER ---
-        function renderResources() {
-            const container = document.getElementById('resources-grid');
-            container.innerHTML = '';
-
-            const filteredResources = resources.filter(r => {
-                if (currentResourceFilter === 'ALL') return true;
-                return r.format === currentResourceFilter;
-            });
-
-            if (filteredResources.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full bg-slate-800/40 p-8 rounded-2xl text-center border border-slate-700/50 text-slate-400 text-xs">
-                        Aucune ressource dans cette catégorie.
-                    </div>
-                `;
-                return;
-            }
-
-            filteredResources.forEach(res => {
-                const isPhysical = res.format === 'PHY';
-                const formatBadge = isPhysical 
-                    ? `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-book mr-1"></i>📕 Livre Physique</span>`
-                    : `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-laptop mr-1"></i>💻 Numérique / PDF</span>`;
-
-                let statusBadge = "bg-slate-800 text-slate-400";
-                let statusLabel = "Non lu";
-                if (res.readStatus === 'EN_COURS') { statusBadge = "bg-amber-500/10 text-amber-400 border border-amber-500/20"; statusLabel = "En cours"; }
-                if (res.readStatus === 'FICHE') { statusBadge = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"; statusLabel = "Fiché / Lu"; }
-
-                const cardHtml = `
-                    <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/60 hover:bg-slate-800 transition flex flex-col justify-between group">
-                        <div>
-                            <div class="flex items-center justify-between mb-3">
-                                ${formatBadge}
-                                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusBadge}">${statusLabel}</span>
-                            </div>
-
-                            <h4 class="font-bold text-sm text-slate-100 mb-1 leading-snug">${escapeHtml(res.title)}</h4>
-                            <p class="text-xs text-slate-400 italic mb-2"><i class="fa-solid fa-user-pen text-[10px] mr-1"></i>${escapeHtml(res.author || 'Auteur non renseigné')}</p>
-                            <span class="inline-block text-[10px] font-medium text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded mb-3">${escapeHtml(res.module)}</span>
-
-                            ${res.notes ? `
-                                <p class="text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 mb-3 leading-relaxed">${escapeHtml(res.notes)}</p>
-                            ` : ''}
-                        </div>
-
-                        <div class="pt-3 border-t border-slate-700/50 flex items-center justify-between text-xs">
-                            <span class="text-slate-400 text-[11px] truncate max-w-[180px]"><i class="fa-solid fa-location-dot mr-1 text-slate-500"></i>${escapeHtml(res.link || 'BU / Perso')}</span>
-                            <button onclick="deleteResource('${res.id}')" class="text-slate-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition">
-                                <i class="fa-solid fa-trash text-xs"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', cardHtml);
-            });
-        }
-
-        function filterResources(fmt) {
-            currentResourceFilter = fmt;
-            ['all', 'phy', 'num'].forEach(f => {
-                const btn = document.getElementById(`res-filter-${f}`);
-                if (btn) {
-                    if (f.toUpperCase() === fmt || (f === 'all' && fmt === 'ALL')) {
-                        btn.className = "px-3 py-1 rounded-lg font-medium bg-brand-600 text-white";
-                    } else {
-                        btn.className = "px-3 py-1 rounded-lg font-medium text-slate-400 hover:text-slate-200";
-                    }
-                }
-            });
-            renderResources();
-        }
-
-        function deleteResource(resId) {
-            if (confirm("Supprimer cette ressource de votre bibliothèque ?")) {
-                resources = resources.filter(r => r.id !== resId);
-                saveToStorage();
-            }
-        }
-
-        /* -------------------------------------------------------------------
-           4. MODALS & FORMS ENGINE
-           ------------------------------------------------------------------- */
-        function openModal(mode = 'task') {
-            currentModalMode = mode;
-            setModalMode(mode);
-            document.getElementById('creation-modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('creation-modal').classList.add('hidden');
-            document.getElementById('modal-form').reset();
-        }
-
-        function setModalMode(mode) {
-            currentModalMode = mode;
-            const taskFields = document.getElementById('form-task-fields');
-            const resourceFields = document.getElementById('form-resource-fields');
-            const tabTask = document.getElementById('modal-tab-task');
-            const tabRes = document.getElementById('modal-tab-resource');
-            const titleEl = document.getElementById('modal-title');
-            const indicator = document.getElementById('modal-type-indicator');
-
-            if (mode === 'task') {
-                taskFields.classList.remove('hidden');
-                resourceFields.classList.add('hidden');
-                tabTask.className = "flex-1 py-2 font-semibold rounded-lg bg-brand-600 text-white transition";
-                tabRes.className = "flex-1 py-2 font-semibold rounded-lg text-slate-400 hover:text-white transition";
-                titleEl.textContent = "Ajouter une Tâche / Devoir";
-                indicator.className = "w-2 h-2 rounded-full bg-brand-500";
-            } else {
-                taskFields.classList.add('hidden');
-                resourceFields.classList.remove('hidden');
-                tabRes.className = "flex-1 py-2 font-semibold rounded-lg bg-emerald-600 text-white transition";
-                tabTask.className = "flex-1 py-2 font-semibold rounded-lg text-slate-400 hover:text-white transition";
-                titleEl.textContent = "Ajouter une Ressource (Livre / Article)";
-                indicator.className = "w-2 h-2 rounded-full bg-emerald-500";
-            }
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-
-            const title = document.getElementById('input-title').value.trim();
-            const module = document.getElementById('input-module').value;
-            const notes = document.getElementById('input-notes').value.trim();
-
-            if (!title) return;
-
-            if (currentModalMode === 'task') {
-                const newTask = {
-                    id: 'task-' + Date.now(),
-                    title,
-                    module,
-                    notes,
-                    type: document.getElementById('input-type').value,
-                    dueDate: document.getElementById('input-duedate').value,
-                    status: document.getElementById('input-status').value,
-                    duration: document.getElementById('input-duration').value
-                };
-                tasks.unshift(newTask);
-            } else {
-                const newRes = {
-                    id: 'res-' + Date.now(),
-                    title,
-                    module,
-                    notes,
-                    author: document.getElementById('input-author').value.trim(),
-                    format: document.getElementById('input-format').value,
-                    readStatus: document.getElementById('input-readstatus').value,
-                    link: document.getElementById('input-link').value.trim()
-                };
-                resources.unshift(newRes);
-            }
-
-            saveToStorage();
-            closeModal();
-        }
-
-        /* -------------------------------------------------------------------
-           5. DATA IMPORT / EXPORT UTILITIES
-           ------------------------------------------------------------------- */
-        function exportData() {
-            const data = {
-                tasks,
-                resources,
-                exportDate: new Date().toISOString()
-            };
-            const jsonStr = JSON.stringify(data, null, 2);
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `master_planner_backup_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function importDataTrigger() {
-            document.getElementById('import-file').click();
-        }
-
-        function importData(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    const parsed = JSON.parse(event.target.result);
-                    if (parsed.tasks && parsed.resources) {
-                        tasks = parsed.tasks;
-                        resources = parsed.resources;
-                        saveToStorage();
-                        alert("Sauvegarde restaurée avec succès !");
-                    } else {
-                        alert("Format de fichier de sauvegarde invalide.");
-                    }
-                } catch (err) {
-                    alert("Erreur lors de la lecture du fichier JSON.");
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        // Helper string escaper
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-    </script>
+        <!-- Logo & Titre -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400 font-bold text-xl shadow-lg shadow-indigo-950">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-lg text-white leading-tight">Master Planner</h1>
+            <p class="text-xs text-slate-400">Ergonomie & Facteurs Humains</p>
+          </div>
+        </div>
+
+        <!-- Onglets de Navigation -->
+        <nav class="flex space-x-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-indigo-400 bg-slate-800 border border-slate-700/50 shadow-sm transition">
+            <i class="fa-solid fa-chart-pie mr-1.5"></i>Dashboard
+          </button>
+          <button onclick="switchTab('agenda')" id="tab-agenda" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
+            <i class="fa-solid fa-calendar-days mr-1.5"></i>Agenda <span id="next-course-badge" class="ml-1 px-1.5 py-0.5 text-[10px] bg-indigo-500 text-white font-bold rounded-full">Prochain</span>
+          </button>
+          <button onclick="switchTab('kanban')" id="tab-kanban" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
+            <i class="fa-solid fa-border-all mr-1.5"></i>Kanban
+          </button>
+          <button onclick="switchTab('ressources')" id="tab-ressources" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
+            <i class="fa-solid fa-book-bookmark mr-1.5"></i>Ressources
+          </button>
+        </nav>
+
+        <!-- Actions rapides -->
+        <div class="flex items-center gap-3">
+          <button onclick="openModal('task')" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium shadow-lg shadow-indigo-950 transition flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            <span class="hidden sm:inline">Ajouter</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-900">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- ================= 1. DASHBOARD ================= -->
+      <section id="view-dashboard" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Urgences Imminentes</h3>
+            <p class="text-2xl font-bold text-rose-400 mt-2">2 Rendus (J-2)</p>
+            <p class="text-xs text-slate-500 mt-1">Livrable Ergonomie IHM & Synthèse</p>
+          </div>
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lectures de la Semaine</h3>
+            <p class="text-2xl font-bold text-indigo-400 mt-2">3 Articles</p>
+            <p class="text-xs text-slate-500 mt-1">1 Fiché / 2 à lire</p>
+          </div>
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Progrès Globaux</h3>
+            <p class="text-2xl font-bold text-emerald-400 mt-2">65% Effectué</p>
+            <p class="text-xs text-slate-500 mt-1">12/18 tâches validées ce semestre</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
+          <h2 class="text-base font-bold text-white mb-4">Focus Échéances Proches</h2>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800">
+              <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 bg-rose-950 text-rose-400 border border-rose-800/50 text-xs font-bold rounded-lg">Livrable</span>
+                <div>
+                  <h4 class="text-sm font-semibold text-white">Rapport d'Évaluation Ergonomique</h4>
+                  <p class="text-xs text-slate-400">UE Ergonomie des IHM</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-rose-400 bg-rose-950/40 px-2.5 py-1 rounded-lg border border-rose-900/50">J-2</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800">
+              <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 bg-amber-950 text-amber-400 border border-amber-800/50 text-xs font-bold rounded-lg">Lecture</span>
+                <div>
+                  <h4 class="text-sm font-semibold text-white">Chapitre 4 : Charge Mentale et Ergonomie Cognitive</h4>
+                  <p class="text-xs text-slate-400">UE Psychologie Cognitive</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-amber-400 bg-amber-950/40 px-2.5 py-1 rounded-lg border border-amber-900/50">J-4</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. AGENDA (iCal) ================= -->
+      <section id="view-agenda" class="space-y-6 hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-regular fa-calendar-check text-indigo-400"></i> Emploi du Temps Universitaire
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Synchronisé avec ton flux d'agenda iCal (.ics)</p>
+          </div>
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <input type="text" placeholder="Lien du flux iCal (URL .ics)..." class="w-full md:w-80 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+            <button class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition">Sync</button>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 p-6 rounded-2xl border border-indigo-500/30 shadow-xl">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold rounded-full flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> PROCHAIN COURS À VENIR
+            </span>
+            <span class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">Dans 2h</span>
+          </div>
+          <h3 class="text-2xl font-bold text-white">Méthodologie de l'Évaluation Ergonomique</h3>
+          <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-2">
+            <span><i class="fa-regular fa-clock text-indigo-400 mr-1"></i> Aujourd'hui — 14:00 - 17:00</span>
+            <span><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i> Amphi B - Bât. Olympe de Gouges</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. KANBAN ================= -->
+      <section id="view-kanban" class="space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- À faire -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+              <span>À Faire</span> <span class="bg-slate-900 px-2 py-0.5 rounded text-slate-300">2</span>
+            </h3>
+            <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+              <span class="px-2 py-0.5 bg-rose-950 text-rose-400 border border-rose-800/50 text-[10px] font-bold rounded">Livrable</span>
+              <h4 class="text-xs font-bold text-white">Analyse des flux d'activité</h4>
+              <p class="text-[11px] text-slate-400">UE Ergonomie</p>
+            </div>
+          </div>
+          <!-- En cours -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+              <span>En cours</span> <span class="bg-slate-900 px-2 py-0.5 rounded text-slate-300">1</span>
+            </h3>
+            <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+              <span class="px-2 py-0.5 bg-amber-950 text-amber-400 border border-amber-800/50 text-[10px] font-bold rounded">Lecture</span>
+              <h4 class="text-xs font-bold text-white">Lecture Fiche Usabilité Vinted</h4>
+              <p class="text-[11px] text-slate-400">UE Facteurs Humains</p>
+            </div>
+          </div>
+          <!-- En relecture -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Relecture</span> <span class="bg-slate-900 px-2 py-0.5 rounded text-slate-300">0</span>
+            </h3>
+          </div>
+          <!-- Terminé -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Terminé</span> <span class="bg-slate-900 px-2 py-0.5 rounded text-slate-300">1</span>
+            </h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. RESSOURCES ================= -->
+      <section id="view-ressources" class="space-y-6 hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800/50 text-[10px] font-bold rounded">📕 Livre Physique</span>
+              <h4 class="text-sm font-bold text-white mt-1">Ergonomie des interfaces</h4>
+              <p class="text-xs text-slate-400">Jean-François Rouet</p>
+            </div>
+            <span class="text-xs text-slate-500">Exemplaire perso</span>
+          </div>
+          <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="px-2 py-0.5 bg-sky-950 text-sky-400 border border-sky-800/50 text-[10px] font-bold rounded">💻 Numérique (PDF)</span>
+              <h4 class="text-sm font-bold text-white mt-1">Usability Engineering</h4>
+              <p class="text-xs text-slate-400">Jakob Nielsen</p>
+            </div>
+            <a href="#" class="text-xs text-indigo-400 hover:underline">Ouvrir PDF</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Script pour basculer d'onglet -->
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('main > div > section').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-800', 'text-indigo-400', 'border', 'border-slate-700/50', 'shadow-sm');
+        btn.classList.add('text-slate-400');
+      });
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      activeBtn.classList.add('bg-slate-800', 'text-indigo-400', 'border', 'border-slate-700/50', 'shadow-sm');
+      activeBtn.classList.remove('text-slate-400');
+    }
+  </script>
 </body>
 </html>
