@@ -10,6 +10,31 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- ICAL Parser CDN pour la lecture des flux .ics -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.5.0/ical.min.js"></script>
+
+  <!-- Firebase SDKs (v10) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Ta configuration Firebase personnelle
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGBF_F9ATLwZdq9NYY8SS9NB-Q7R75pfc",
+      authDomain: "masterergo-planner.firebaseapp.com",
+      projectId: "masterergo-planner",
+      storageBucket: "masterergo-planner.firebasestorage.app",
+      messagingSenderId: "169447145171",
+      appId: "1:169447145171:web:4529a924f3ab3e778b9e26"
+    };
+
+    // Initialisation
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Rendre les méthodes Firebase accessibles globalement
+    window.db = db;
+    window.fb = { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc };
+  </script>
+
   <style>
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
@@ -33,7 +58,10 @@
           </div>
           <div>
             <h1 class="font-bold text-lg text-white leading-tight">Master Planner</h1>
-            <p class="text-xs text-slate-400">Ergonomie & Facteurs Humains</p>
+            <p class="text-xs text-slate-400 flex items-center gap-1.5">
+              <span>Ergonomie & Facteurs Humains</span>
+              <span id="cloud-status" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Synchronisé avec Firebase Cloud"></span>
+            </p>
           </div>
         </div>
 
@@ -53,16 +81,8 @@
           </button>
         </nav>
 
-        <!-- Actions rapides & Sauvegarde -->
+        <!-- Actions rapides -->
         <div class="flex items-center gap-2">
-          <button onclick="exportData()" title="Télécharger sauvegarde (Export JSON)" class="p-2 text-slate-400 hover:text-indigo-400 transition text-xs">
-            <i class="fa-solid fa-download"></i>
-          </button>
-          <button onclick="document.getElementById('import-file-input').click()" title="Restaurer une sauvegarde (Import JSON)" class="p-2 text-slate-400 hover:text-emerald-400 transition text-xs">
-            <i class="fa-solid fa-upload"></i>
-          </button>
-          <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="importData(event)">
-
           <button onclick="openModal('task')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-950 transition flex items-center gap-1.5">
             <i class="fa-solid fa-plus"></i> Tâche
           </button>
@@ -108,19 +128,21 @@
         </div>
       </section>
 
-      <!-- ================= 2. AGENDA (iCal Operationnel) ================= -->
+      <!-- ================= 2. AGENDA (iCal + Proxy CORS) ================= -->
       <section id="view-agenda" class="space-y-6 hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
           <div>
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
               <i class="fa-regular fa-calendar-check text-indigo-400"></i> Emploi du Temps Universitaire
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Synchronisé avec votre flux iCal (.ics)</p>
+            <p class="text-xs text-slate-400 mt-0.5">Synchronisé automatiquement via flux iCal (.ics)</p>
           </div>
           <div class="flex items-center gap-2 w-full md:w-auto">
-            <input type="text" id="ical-url-input" placeholder="Lien du flux iCal (URL .ics)..." class="w-full md:w-80 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-            <button onclick="syncICalFeed()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition">Sync</button>
-            <button onclick="document.getElementById('ical-file-input').click()" title="Importer .ics local" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition">
+            <input type="text" id="ical-url-input" placeholder="URL de votre flux iCal (.ics)..." class="w-full md:w-80 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+            <button onclick="syncICalFeed()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl text-white transition flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate"></i> Sync
+            </button>
+            <button onclick="document.getElementById('ical-file-input').click()" title="Importer un fichier .ics local" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition">
               <i class="fa-solid fa-file-import"></i>
             </button>
             <input type="file" id="ical-file-input" accept=".ics" class="hidden" onchange="handleICalFileUpload(event)">
@@ -157,35 +179,32 @@
       <!-- ================= 3. KANBAN ================= -->
       <section id="view-kanban" class="space-y-6 hidden">
         
-        <!-- Barre de Filtres et Tris Améliorée -->
+        <!-- Barre de Filtres et Tris -->
         <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-4">
             
             <!-- Recherche & Tris -->
             <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-              <!-- Recherche -->
               <div class="relative flex-1 sm:w-64">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-500"></i>
                 <input type="text" id="kanban-search" oninput="renderKanban()" placeholder="Chercher une tâche..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
               </div>
 
-              <!-- Tri -->
               <div class="flex items-center gap-2">
                 <span class="text-xs text-slate-400"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i>Trier :</span>
                 <select id="sort-order" onchange="renderKanban()" class="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500">
                   <option value="dueDate">📅 Date d'échéance</option>
-                  <option value="priority">🔥 Priorité / Type</option>
+                  <option value="priority">🔥 Note de Priorité (10 à 1)</option>
                   <option value="ue">📚 Par UE / Matière</option>
                   <option value="title">🔤 Nom (A-Z)</option>
                 </select>
               </div>
             </div>
 
-            <!-- Filtres Visuels (Cases à cocher) -->
+            <!-- Filtres Visuels -->
             <div class="flex flex-wrap items-center gap-3">
               <span class="text-xs font-semibold text-slate-400"><i class="fa-solid fa-filter mr-1"></i> Filtrer :</span>
               
-              <!-- Filtre Type (Cases Visuelles) -->
               <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
                 <label class="px-2 py-1 rounded-lg cursor-pointer transition flex items-center gap-1.5 hover:bg-slate-800">
                   <input type="checkbox" value="Livrable" onchange="toggleFilterType(this)" class="accent-indigo-500"> Livrables
@@ -198,7 +217,6 @@
                 </label>
               </div>
 
-              <!-- Filtre UE -->
               <select id="filter-ue" onchange="renderKanban()" class="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500">
                 <option value="all">Toutes les UE</option>
                 <option value="Ergonomie IHM">UE Ergonomie IHM</option>
@@ -289,6 +307,15 @@
         <div>
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Titre de la tâche *</label>
           <input type="text" id="task-title" required placeholder="Ex: Synthèse d'usabilité Vinted" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <!-- Échelle de Priorité 1 à 10 -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Degré d'Urgence / Priorité (1 à 10)</label>
+            <span id="priority-value-display" class="text-xs font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800/50">8/10</span>
+          </div>
+          <input type="range" id="task-priority" min="1" max="10" value="5" oninput="updatePrioritySliderDisplay(this.value)" class="w-full accent-indigo-500 cursor-pointer">
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -391,99 +418,42 @@
 
   <!-- ================= LOGIQUE JAVASCRIPT ================= -->
   <script>
-    const DEFAULT_TASKS = [
-      {
-        id: "task-1",
-        title: "Rapport d'Évaluation Ergonomique (Leboncoin vs Vinted)",
-        type: "Livrable",
-        ue: "Ergonomie IHM",
-        dueDate: "2026-09-28",
-        status: "in_progress",
-        notes: "Comparer l'ergonomie des filtres de recherche."
-      },
-      {
-        id: "task-2",
-        title: "Lecture Chapitre 1-5 : Sociologie des Organisations",
-        type: "Lecture",
-        ue: "Sociologie des Orga",
-        dueDate: "2026-10-02",
-        status: "todo",
-        notes: "Préparer la fiche de lecture pour l'enseignant."
-      }
-    ];
-
-    const DEFAULT_RESOURCES = [
-      {
-        id: "res-1",
-        title: "Ergonomie des interfaces",
-        author: "Jean-François Rouet",
-        format: "Physique",
-        domain: "Ergonomie",
-        status: "Fiché",
-        link: "Exemplaire personnel",
-        notes: "Principes fondamentaux de guidage et charge mentale."
-      }
-    ];
-
     let tasks = [];
     let resources = [];
     let selectedTypes = [];
 
+    // Attendre l'initialisation de Firebase
     document.addEventListener('DOMContentLoaded', () => {
-      loadData();
-      renderKanban();
-      renderRessources();
-      updateDashboard();
-      setupDragAndDrop();
+      const checkFirebase = setInterval(() => {
+        if (window.db && window.fb) {
+          clearInterval(checkFirebase);
+          setupFirebaseListeners();
+        }
+      }, 100);
+
+      // Charger l'URL iCal sauvegardée si elle existe
+      const savedIcalUrl = localStorage.getItem('master_planner_ical_url');
+      if (savedIcalUrl) {
+        document.getElementById('ical-url-input').value = savedIcalUrl;
+        syncICalFeed();
+      }
     });
 
-    function loadData() {
-      const savedTasks = localStorage.getItem('master_planner_tasks');
-      tasks = savedTasks ? JSON.parse(savedTasks) : [...DEFAULT_TASKS];
+    // SYNCHRONISATION CLOUD FIREBASE
+    function setupFirebaseListeners() {
+      // Écouteur temps réel pour les tâches
+      window.fb.onSnapshot(window.fb.collection(window.db, "tasks"), (snapshot) => {
+        tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderKanban();
+        updateDashboard();
+      });
 
-      const savedRes = localStorage.getItem('master_planner_resources');
-      resources = savedRes ? JSON.parse(savedRes) : [...DEFAULT_RESOURCES];
-    }
-
-    function saveTasks() {
-      localStorage.setItem('master_planner_tasks', JSON.stringify(tasks));
-      updateDashboard();
-    }
-
-    function saveResources() {
-      localStorage.setItem('master_planner_resources', JSON.stringify(resources));
-      updateDashboard();
-    }
-
-    function exportData() {
-      const data = { tasks, resources };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `master_planner_backup_${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-    }
-
-    function importData(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        try {
-          const data = JSON.parse(evt.target.result);
-          if (data.tasks) tasks = data.tasks;
-          if (data.resources) resources = data.resources;
-          saveTasks();
-          saveResources();
-          renderKanban();
-          renderRessources();
-          alert("Sauvegarde restaurée avec succès !");
-        } catch (err) {
-          alert("Erreur lors de l'importation du fichier JSON.");
-        }
-      };
-      reader.readAsText(file);
+      // Écouteur temps réel pour les ressources
+      window.fb.onSnapshot(window.fb.collection(window.db, "resources"), (snapshot) => {
+        resources = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderRessources();
+        updateDashboard();
+      });
     }
 
     function switchTab(tabId) {
@@ -499,25 +469,15 @@
       activeBtn.classList.remove('text-slate-400');
     }
 
-    // GESTION DES FILTRES ET TRIS
-    function toggleFilterType(checkbox) {
-      if (checkbox.checked) {
-        selectedTypes.push(checkbox.value);
-      } else {
-        selectedTypes = selectedTypes.filter(v => v !== checkbox.value);
-      }
-      renderKanban();
+    function updatePrioritySliderDisplay(val) {
+      const disp = document.getElementById('priority-value-display');
+      disp.innerText = `${val}/10`;
+      if (val >= 7) disp.className = 'text-xs font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800/50';
+      else if (val >= 4) disp.className = 'text-xs font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800/50';
+      else disp.className = 'text-xs font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/50';
     }
 
-    function clearFilters() {
-      selectedTypes = [];
-      document.querySelectorAll('#view-kanban input[type="checkbox"]').forEach(cb => cb.checked = false);
-      document.getElementById('filter-ue').value = 'all';
-      document.getElementById('kanban-search').value = '';
-      renderKanban();
-    }
-
-    // MODALS TÂCHES (Création & Édition)
+    // MODALS TÂCHES
     function openModal(type, taskId = null) {
       if (type === 'task') {
         const modalTitle = document.getElementById('modal-task-title');
@@ -528,6 +488,8 @@
           if (task) {
             document.getElementById('task-id').value = task.id;
             document.getElementById('task-title').value = task.title;
+            document.getElementById('task-priority').value = task.priority || 5;
+            updatePrioritySliderDisplay(task.priority || 5);
             document.getElementById('task-type').value = task.type;
             document.getElementById('task-ue').value = task.ue;
             document.getElementById('task-dueDate').value = task.dueDate;
@@ -539,6 +501,8 @@
         } else {
           document.getElementById('form-task').reset();
           document.getElementById('task-id').value = '';
+          document.getElementById('task-priority').value = 5;
+          updatePrioritySliderDisplay(5);
           modalTitle.innerText = "Nouvelle Tâche";
           submitBtn.innerText = "Créer la tâche";
         }
@@ -548,46 +512,49 @@
 
     function closeModal(type) { document.getElementById(`modal-${type}`).classList.add('hidden'); }
 
-    function handleSaveTask(e) {
+    async function handleSaveTask(e) {
       e.preventDefault();
       const id = document.getElementById('task-id').value;
+      const taskData = {
+        title: document.getElementById('task-title').value,
+        priority: parseInt(document.getElementById('task-priority').value),
+        type: document.getElementById('task-type').value,
+        ue: document.getElementById('task-ue').value,
+        dueDate: document.getElementById('task-dueDate').value,
+        notes: document.getElementById('task-notes').value
+      };
 
       if (id) {
-        const task = tasks.find(t => t.id === id);
-        if (task) {
-          task.title = document.getElementById('task-title').value;
-          task.type = document.getElementById('task-type').value;
-          task.ue = document.getElementById('task-ue').value;
-          task.dueDate = document.getElementById('task-dueDate').value;
-          task.notes = document.getElementById('task-notes').value;
-        }
+        await window.fb.updateDoc(window.fb.doc(window.db, "tasks", id), taskData);
       } else {
-        const newTask = {
-          id: 'task-' + Date.now(),
-          title: document.getElementById('task-title').value,
-          type: document.getElementById('task-type').value,
-          ue: document.getElementById('task-ue').value,
-          dueDate: document.getElementById('task-dueDate').value,
-          notes: document.getElementById('task-notes').value,
-          status: 'todo'
-        };
-        tasks.push(newTask);
+        taskData.status = 'todo';
+        await window.fb.addDoc(window.fb.collection(window.db, "tasks"), taskData);
       }
 
-      saveTasks();
-      renderKanban();
       closeModal('task');
     }
 
-    function deleteTask(id) {
+    async function deleteTask(id) {
       if (confirm("Supprimer cette tâche ?")) {
-        tasks = tasks.filter(t => t.id !== id);
-        saveTasks();
-        renderKanban();
+        await window.fb.deleteDoc(window.fb.doc(window.db, "tasks", id));
       }
     }
 
-    // RENDU KANBAN AVEC RECHERCHE ET TRI
+    // GESTION FILTRES ET TRIS
+    function toggleFilterType(checkbox) {
+      if (checkbox.checked) selectedTypes.push(checkbox.value);
+      else selectedTypes = selectedTypes.filter(v => v !== checkbox.value);
+      renderKanban();
+    }
+
+    function clearFilters() {
+      selectedTypes = [];
+      document.querySelectorAll('#view-kanban input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.getElementById('filter-ue').value = 'all';
+      document.getElementById('kanban-search').value = '';
+      renderKanban();
+    }
+
     function renderKanban() {
       const search = document.getElementById('kanban-search').value.toLowerCase();
       const filterUE = document.getElementById('filter-ue').value;
@@ -606,15 +573,11 @@
           return matchStatus && matchSearch && matchUE && matchType;
         });
 
-        // Application des Tris
         filtered.sort((a, b) => {
           if (sortBy === 'dueDate') return new Date(a.dueDate) - new Date(b.dueDate);
+          if (sortBy === 'priority') return (b.priority || 0) - (a.priority || 0);
           if (sortBy === 'title') return a.title.localeCompare(b.title);
           if (sortBy === 'ue') return a.ue.localeCompare(b.ue);
-          if (sortBy === 'priority') {
-            const weights = { 'Livrable': 1, 'Devoir': 2, 'Lecture': 3 };
-            return weights[a.type] - weights[b.type];
-          }
         });
 
         document.getElementById(`count-${status}`).innerText = filtered.length;
@@ -635,12 +598,20 @@
       if (task.type === 'Lecture') typeBadge = 'bg-amber-950/80 text-amber-300 border-amber-800/50';
       if (task.type === 'Devoir') typeBadge = 'bg-indigo-950/80 text-indigo-300 border-indigo-800/50';
 
+      const prio = task.priority || 5;
+      let prioBadge = 'bg-emerald-950 text-emerald-400 border-emerald-800/50';
+      if (prio >= 7) prioBadge = 'bg-rose-950 text-rose-400 border-rose-800/50';
+      else if (prio >= 4) prioBadge = 'bg-amber-950 text-amber-400 border-amber-800/50';
+
       const today = new Date().toISOString().split('T')[0];
       const isUrgent = task.dueDate <= today && task.status !== 'done';
 
       card.innerHTML = `
         <div class="flex items-center justify-between">
-          <span class="px-2 py-0.5 border text-[10px] font-bold rounded-md ${typeBadge}">${task.type}</span>
+          <div class="flex items-center gap-1.5">
+            <span class="px-2 py-0.5 border text-[10px] font-bold rounded-md ${typeBadge}">${task.type}</span>
+            <span class="px-1.5 py-0.5 border text-[10px] font-bold rounded-md ${prioBadge}" title="Degré d'urgence">🔥 ${prio}/10</span>
+          </div>
           <div class="flex items-center gap-1">
             <button onclick="openModal('task', '${task.id}')" title="Éditer" class="text-slate-500 hover:text-indigo-400 text-xs transition px-1">
               <i class="fa-regular fa-pen-to-square"></i>
@@ -677,22 +648,35 @@
       cols.forEach(col => {
         col.addEventListener('dragover', (e) => { e.preventDefault(); col.classList.add('drag-over'); });
         col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
-        col.addEventListener('drop', (e) => {
+        col.addEventListener('drop', async (e) => {
           e.preventDefault();
           col.classList.remove('drag-over');
           const id = e.dataTransfer.getData('text/plain');
           const newStatus = col.getAttribute('data-status');
-          const task = tasks.find(t => t.id === id);
-          if (task) {
-            task.status = newStatus;
-            saveTasks();
-            renderKanban();
-          }
+          await window.fb.updateDoc(window.fb.doc(window.db, "tasks", id), { status: newStatus });
         });
       });
     }
 
-    // TRAITEMENT ICAL / AGENDA
+    // SYNCHRONISATION AGENDA (PROXIED CORS)
+    async function syncICalFeed() {
+      const url = document.getElementById('ical-url-input').value.trim();
+      if (!url) return;
+
+      localStorage.setItem('master_planner_ical_url', url);
+
+      try {
+        // Utilisation du Proxy CORS AllOrigins
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error("Erreur réseau");
+        const text = await res.text();
+        parseICalData(text);
+      } catch (err) {
+        alert("Impossible de télécharger le flux iCal via le proxy CORS. Vérifiez l'URL.");
+      }
+    }
+
     function handleICalFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -755,11 +739,10 @@
       }
     }
 
-    // RESSOURCES ET DASHBOARD
-    function handleAddResource(e) {
+    // GESTION RESSOURCES ET DASHBOARD
+    async function handleAddResource(e) {
       e.preventDefault();
-      const newRes = {
-        id: 'res-' + Date.now(),
+      const resData = {
         title: document.getElementById('res-title').value,
         author: document.getElementById('res-author').value,
         format: document.getElementById('res-format').value,
@@ -767,10 +750,14 @@
         status: document.getElementById('res-status').value,
         link: document.getElementById('res-link').value
       };
-      resources.push(newRes);
-      saveResources();
-      renderRessources();
+      await window.fb.addDoc(window.fb.collection(window.db, "resources"), resData);
       closeModal('resource');
+    }
+
+    async function deleteResource(id) {
+      if (confirm("Supprimer cette ressource ?")) {
+        await window.fb.deleteDoc(window.fb.doc(window.db, "resources", id));
+      }
     }
 
     function renderRessources() {
@@ -781,14 +768,20 @@
       const filtered = resources.filter(r => filterFormat === 'all' || r.format === filterFormat);
       filtered.forEach(r => {
         const card = document.createElement('div');
-        card.className = 'bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2';
+        card.className = 'bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2 relative';
         card.innerHTML = `
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-emerald-400">${r.format}</span>
-            <span class="text-[10px] bg-slate-900 px-2 py-0.5 rounded text-slate-400">${r.status}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] bg-slate-900 px-2 py-0.5 rounded text-slate-400">${r.status}</span>
+              <button onclick="deleteResource('${r.id}')" class="text-slate-500 hover:text-rose-400 text-xs transition">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
           </div>
           <h4 class="text-sm font-bold text-white">${r.title}</h4>
-          <p class="text-xs text-slate-400">${r.author || ''}</p>
+          ${r.author ? `<p class="text-xs text-slate-400">${r.author}</p>` : ''}
+          ${r.link ? `<a href="${r.link}" target="_blank" class="text-xs text-indigo-400 hover:underline block truncate mt-2"><i class="fa-solid fa-link text-[10px] mr-1"></i>${r.link}</a>` : ''}
         `;
         grid.appendChild(card);
       });
@@ -807,6 +800,32 @@
 
       document.getElementById('dash-progress-percent').innerText = `${percent}% Effectué`;
       document.getElementById('dash-progress-ratio').innerText = `${doneCount}/${tasks.length} tâches terminées`;
+
+      const listContainer = document.getElementById('dash-urgent-list');
+      listContainer.innerHTML = '';
+
+      if (urgentTasks.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-500 py-2">Aucune échéance urgente dans les 7 prochains jours.</p>`;
+        return;
+      }
+
+      urgentTasks.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-3 bg-slate-900 rounded-xl border border-slate-800';
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="px-2 py-0.5 bg-rose-950 text-rose-400 border border-rose-800/50 text-[10px] font-bold rounded">${t.type}</span>
+            <div>
+              <h4 class="text-xs font-bold text-white">${t.title}</h4>
+              <p class="text-[10px] text-slate-400">${t.ue}</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-rose-400 bg-rose-950/40 px-2 py-1 rounded-lg border border-rose-900/50 flex items-center gap-1">
+            <i class="fa-regular fa-clock"></i> ${t.dueDate}
+          </span>
+        `;
+        listContainer.appendChild(item);
+      });
     }
   </script>
 </body>
