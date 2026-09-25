@@ -658,86 +658,45 @@
       });
     }
 
-    // SYNCHRONISATION AGENDA (PROXIED CORS)
-    async function syncICalFeed() {
-      const url = document.getElementById('ical-url-input').value.trim();
-      if (!url) return;
+// SYNCHRONISATION AGENDA (MULTI-PROXY CORS)
+async function syncICalFeed() {
+  const inputUrl = document.getElementById('ical-url-input').value.trim();
+  if (!inputUrl) return;
 
-      localStorage.setItem('master_planner_ical_url', url);
+  // Formater l'URL si elle commence par webcal://
+  let cleanUrl = inputUrl.replace(/^webcal:\/\//i, 'https://');
+  localStorage.setItem('master_planner_ical_url', cleanUrl);
 
-      try {
-        // Utilisation du Proxy CORS AllOrigins
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const res = await fetch(proxyUrl);
-        if (!res.ok) throw new Error("Erreur réseau");
+  // Liste de proxies CORS de secours
+  const proxies = [
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    url => `https://proxy.cors.sh/${url}`
+  ];
+
+  let success = false;
+
+  for (const getProxyUrl of proxies) {
+    try {
+      const targetUrl = getProxyUrl(cleanUrl);
+      const res = await fetch(targetUrl);
+      if (res.ok) {
         const text = await res.text();
-        parseICalData(text);
-      } catch (err) {
-        alert("Impossible de télécharger le flux iCal via le proxy CORS. Vérifiez l'URL.");
-      }
-    }
-
-    function handleICalFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) { parseICalData(e.target.result); };
-      reader.readAsText(file);
-    }
-
-    function parseICalData(icalText) {
-      try {
-        const jcalData = ICAL.parse(icalText);
-        const comp = new ICAL.Component(jcalData);
-        const vevents = comp.getAllSubcomponents('vevent');
-        
-        const events = vevents.map(vevent => {
-          const event = new ICAL.Event(vevent);
-          return {
-            summary: event.summary,
-            location: event.location,
-            start: event.startDate.toJSDate(),
-            end: event.endDate.toJSDate()
-          };
-        }).sort((a, b) => a.start - b.start);
-
-        renderAgenda(events);
-      } catch (err) {
-        alert("Erreur lors de la lecture du fichier iCal.");
-      }
-    }
-
-    function renderAgenda(events) {
-      const now = new Date();
-      const upcomingEvents = events.filter(e => e.start >= now);
-      
-      if (upcomingEvents.length > 0) {
-        const next = upcomingEvents[0];
-        document.getElementById('course-title').innerText = next.summary;
-        document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Salle non précisée'}`;
-        document.getElementById('course-time').innerHTML = `<i class="fa-regular fa-clock text-indigo-400"></i> ${next.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'})} — ${next.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-        
-        const diffHours = Math.floor((next.start - now) / (1000 * 60 * 60));
-        document.getElementById('course-countdown').innerText = `Dans ${diffHours}h`;
-        document.getElementById('next-course-badge').classList.remove('hidden');
-
-        // Liaison devoirs Kanban associés
-        const linkedTasks = tasks.filter(t => t.status !== 'done' && next.summary.toLowerCase().includes(t.ue.toLowerCase()));
-        const linkedContainer = document.getElementById('course-linked-tasks');
-        linkedContainer.innerHTML = '';
-
-        if (linkedTasks.length === 0) {
-          linkedContainer.innerHTML = `<span class="text-xs text-slate-500">Aucune tâche en attente pour cette UE.</span>`;
-        } else {
-          linkedTasks.forEach(t => {
-            linkedContainer.innerHTML += `
-              <span class="px-2.5 py-1 bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 text-xs rounded-lg flex items-center gap-1.5">
-                <i class="fa-solid fa-check text-[10px]"></i> ${t.title} (${t.dueDate})
-              </span>`;
-          });
+        if (text && text.includes('BEGIN:VCALENDAR')) {
+          parseICalData(text);
+          success = true;
+          break; // Succès ! On sort de la boucle
         }
       }
+    } catch (err) {
+      console.warn("Échec du proxy, tentative avec le suivant...");
     }
+  }
+
+  if (!success) {
+    alert("Impossible de synchroniser le flux iCal. Vérifiez que l'URL est bien un lien public ou d'adresse secrète .ics.");
+  }
+}
 
     // GESTION RESSOURCES ET DASHBOARD
     async function handleAddResource(e) {
