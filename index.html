@@ -16,7 +16,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Ta configuration Firebase personnelle
+    // Configuration Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDGBF_F9ATLwZdq9NYY8SS9NB-Q7R75pfc",
       authDomain: "masterergo-planner.firebaseapp.com",
@@ -30,7 +30,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Rendre les méthodes Firebase accessibles globalement
     window.db = db;
     window.fb = { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc };
   </script>
@@ -130,40 +129,71 @@
 
       <!-- ================= 2. AGENDA ================= -->
       <section id="view-agenda" class="space-y-6 hidden">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
+        
+        <!-- En-tête de l'Agenda avec Bouton d'Import -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
           <div>
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
               <i class="fa-regular fa-calendar-check text-indigo-400"></i> Emploi du Temps Universitaire
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Synchronisé via flux iCal (.ics)</p>
+            <p class="text-xs text-slate-400 mt-0.5">Vue dynamique des cours et agenda Google partagé</p>
           </div>
-          <div class="flex items-center gap-2 w-full md:w-auto">
-            <input type="text" id="ical-url-input" value="https://calendar.google.com/calendar/ical/2cvcoa06hb3elad541347e5mm4%40group.calendar.google.com/public/basic.ics" placeholder="URL de votre flux iCal (.ics)..." class="w-full md:w-80 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-            <button onclick="syncICalFeed()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl text-white transition flex items-center gap-1.5 shrink-0">
-              <i class="fa-solid fa-rotate"></i> Sync
-            </button>
-            <button onclick="document.getElementById('ical-file-input').click()" title="Importer un fichier .ics local" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition shrink-0">
-              <i class="fa-solid fa-file-import"></i>
+          <div>
+            <button onclick="document.getElementById('ical-file-input').click()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl text-white transition flex items-center gap-2 shadow-lg shadow-indigo-950">
+              <i class="fa-solid fa-file-import"></i> Importer fichier .ics
             </button>
             <input type="file" id="ical-file-input" accept=".ics" class="hidden" onchange="handleICalFileUpload(event)">
           </div>
         </div>
 
-        <!-- Widget Prochain Cours -->
-        <div class="bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 p-6 rounded-2xl border border-indigo-500/30 shadow-xl relative overflow-hidden">
-          <div class="flex items-center justify-between mb-4">
-            <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold rounded-full flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> PROCHAIN COURS / ÉVÉNEMENT
-            </span>
-            <span id="course-countdown" class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">--</span>
+        <!-- Widget Prochain Cours + 4 Cours Suivants -->
+        <div class="bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 p-6 rounded-2xl border border-indigo-500/30 shadow-xl space-y-6">
+          
+          <!-- Bloc Prochain Cours en Gros -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold rounded-full flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> PROCHAIN COURS
+              </span>
+              <span id="course-countdown" class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">--</span>
+            </div>
+
+            <h3 id="course-title" class="text-2xl font-bold text-white">Importez votre fichier .ics pour charger les cours</h3>
+            <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-2">
+              <span id="course-time" class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-indigo-400"></i> --:--</span>
+              <span id="course-location" class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-rose-400"></i> --</span>
+            </div>
           </div>
 
-          <h3 id="course-title" class="text-2xl font-bold text-white">Aucun cours chargé</h3>
-          <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-3">
-            <span id="course-time" class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-indigo-400"></i> --:--</span>
-            <span id="course-location" class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-rose-400"></i> --</span>
+          <!-- Section 4 Cours Suivants (Alignés Horizontalement) -->
+          <div class="pt-4 border-t border-slate-800/80">
+            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <i class="fa-solid fa-forward text-indigo-400"></i> Cours suivants :
+            </h4>
+            
+            <div id="next-courses-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <!-- Case par défaut -->
+              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-500">
+                Aucun cours suivant chargé.
+              </div>
+            </div>
           </div>
+
         </div>
+
+        <!-- Vue iFrame Google Calendar -->
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 overflow-hidden h-[600px]">
+          <iframe 
+            src="https://calendar.google.com/calendar/embed?src=2cvcoa06hb3elad541347e5mm4%40group.calendar.google.com&ctz=Europe%2FParis" 
+            style="border: 0;" 
+            width="100%" 
+            height="100%" 
+            frameborder="0" 
+            scrolling="no" 
+            class="rounded-xl">
+          </iframe>
+        </div>
+
       </section>
 
       <!-- ================= 3. KANBAN ================= -->
@@ -418,12 +448,6 @@
           setupFirebaseListeners();
         }
       }, 100);
-
-      const savedIcalUrl = localStorage.getItem('master_planner_ical_url');
-      if (savedIcalUrl) {
-        document.getElementById('ical-url-input').value = savedIcalUrl;
-      }
-      syncICalFeed();
     });
 
     // SYNCHRONISATION CLOUD FIREBASE
@@ -643,43 +667,7 @@
       });
     }
 
-    // SYNCHRONISATION AGENDA (MULTI-PROXY CORS SIMPLIFIÉE)
-    async function syncICalFeed() {
-      const inputUrl = document.getElementById('ical-url-input').value.trim();
-      if (!inputUrl) return;
-
-      let cleanUrl = inputUrl.replace(/^webcal:\/\//i, 'https://');
-      localStorage.setItem('master_planner_ical_url', cleanUrl);
-
-      const proxies = [
-        url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-      ];
-
-      let success = false;
-
-      for (const getProxyUrl of proxies) {
-        try {
-          const targetUrl = getProxyUrl(cleanUrl);
-          const res = await fetch(targetUrl);
-          if (res.ok) {
-            const text = await res.text();
-            if (text && text.includes('BEGIN:VCALENDAR')) {
-              parseICalData(text);
-              success = true;
-              break;
-            }
-          }
-        } catch (err) {
-          console.warn("Échec proxy, tentative suivante...");
-        }
-      }
-
-      if (!success) {
-        console.warn("Agenda inaccessible via proxy. Utilisez le bouton d'importation de fichier local .ics.");
-      }
-    }
-
+    // GESTION IMPORTATION ET PARSING AGENDA ICAL (.ICS)
     function handleICalFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -740,6 +728,7 @@
       const upcomingEvents = events.filter(e => e.start >= now);
       
       if (upcomingEvents.length > 0) {
+        // 1. Prochain Cours (En gros)
         const next = upcomingEvents[0];
         document.getElementById('course-title').innerText = next.summary || 'Sans titre';
         document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Lieu non spécifié'}`;
@@ -748,9 +737,33 @@
         const diffHours = Math.floor((next.start - now) / (1000 * 60 * 60));
         document.getElementById('course-countdown').innerText = diffHours > 0 ? `Dans ${diffHours}h` : 'Imminent';
         document.getElementById('next-course-badge').classList.remove('hidden');
+
+        // 2. Les 4 Cours Suivants (Case alignées horizontalement)
+        const followingEvents = upcomingEvents.slice(1, 5);
+        const grid = document.getElementById('next-courses-grid');
+        grid.innerHTML = '';
+
+        if (followingEvents.length === 0) {
+          grid.innerHTML = `<div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-500 col-span-4">Aucun autre cours programmé ensuite.</div>`;
+        } else {
+          followingEvents.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'bg-slate-900/80 p-3 rounded-xl border border-slate-800 hover:border-slate-700 transition space-y-1.5';
+            card.innerHTML = `
+              <h5 class="text-xs font-bold text-white truncate" title="${item.summary || 'Sans titre'}">${item.summary || 'Sans titre'}</h5>
+              <p class="text-[11px] text-indigo-400 flex items-center gap-1">
+                <i class="fa-regular fa-clock"></i> ${item.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric'})} à ${item.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              </p>
+              ${item.location ? `<p class="text-[10px] text-slate-400 truncate"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i>${item.location}</p>` : ''}
+            `;
+            grid.appendChild(card);
+          });
+        }
+
       } else {
         document.getElementById('course-title').innerText = "Aucun événement à venir";
         document.getElementById('course-countdown').innerText = "--";
+        document.getElementById('next-courses-grid').innerHTML = `<div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-500 col-span-4">Aucun cours à venir.</div>`;
       }
     }
 
