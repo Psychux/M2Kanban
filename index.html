@@ -654,107 +654,92 @@
       });
     }
 
-    // SYNCHRONISATION AGENDA (MULTI-PROXY CORS)
-    async function syncICalFeed() {
-      const inputUrl = document.getElementById('ical-url-input').value.trim();
-      if (!inputUrl) return;
+  // SYNCHRONISATION AGENDA (OPTIMISÉE GOOGLE CALENDAR)
+async function syncICalFeed() {
+  const inputUrl = document.getElementById('ical-url-input').value.trim();
+  if (!inputUrl) return;
 
-      let cleanUrl = inputUrl.replace(/^webcal:\/\//i, 'https://');
-      localStorage.setItem('master_planner_ical_url', cleanUrl);
+  let cleanUrl = inputUrl.replace(/^webcal:\/\//i, 'https://');
+  localStorage.setItem('master_planner_ical_url', cleanUrl);
 
-      const proxies = [
-        url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-      ];
+  const proxies = [
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+  ];
 
-      let success = false;
+  let success = false;
 
-      for (const getProxyUrl of proxies) {
-        try {
-          const targetUrl = getProxyUrl(cleanUrl);
-          const res = await fetch(targetUrl);
-          if (res.ok) {
-            const text = await res.text();
-            if (text && text.includes('BEGIN:VCALENDAR')) {
-              parseICalData(text);
-              success = true;
-              break;
-            }
-          }
-        } catch (err) {
-          console.warn("Échec proxy, tentative suivante...");
+  for (const getProxyUrl of proxies) {
+    try {
+      const targetUrl = getProxyUrl(cleanUrl);
+      const res = await fetch(targetUrl);
+      if (res.ok) {
+        const text = await res.text();
+        if (text && text.includes('BEGIN:VCALENDAR')) {
+          parseICalData(text);
+          success = true;
+          break;
         }
       }
-
-      if (!success) {
-        console.warn("L'agenda n'a pas pu être chargé automatiquement.");
-      }
+    } catch (err) {
+      console.warn("Échec proxy, tentative suivante...");
     }
+  }
 
-    function handleICalFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) { parseICalData(e.target.result); };
-      reader.readAsText(file);
-    }
+  if (!success) {
+    document.getElementById('course-title').innerText = "Impossible de charger le flux";
+  }
+}
 
-    function parseICalData(icalText) {
-      try {
-        const jcalData = ICAL.parse(icalText);
-        const comp = new ICAL.Component(jcalData);
-        const vevents = comp.getAllSubcomponents('vevent');
-        
-        const events = vevents.map(vevent => {
-          const event = new ICAL.Event(vevent);
-          return {
-            summary: event.summary,
-            location: event.location,
-            start: event.startDate.toJSDate(),
-            end: event.endDate.toJSDate()
-          };
-        }).sort((a, b) => a.start - b.start);
+function parseICalData(icalText) {
+  try {
+    const jcalData = ICAL.parse(icalText);
+    const comp = new ICAL.Component(jcalData);
+    const vevents = comp.getAllSubcomponents('vevent');
+    const now = new Date();
+    
+    let events = [];
 
-        renderAgenda(events);
-      } catch (err) {
-        console.error("Erreur parsing iCal:", err);
-      }
-    }
-
-    function renderAgenda(events) {
-      const now = new Date();
-      const upcomingEvents = events.filter(e => e.start >= now);
+    vevents.forEach(vevent => {
+      const event = new ICAL.Event(vevent);
       
-      if (upcomingEvents.length > 0) {
-        const next = upcomingEvents[0];
-        document.getElementById('course-title').innerText = next.summary || 'Sans titre';
-        document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Lieu non spécifié'}`;
-        document.getElementById('course-time').innerHTML = `<i class="fa-regular fa-clock text-indigo-400"></i> ${next.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'})} — ${next.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-        
-        const diffHours = Math.floor((next.start - now) / (1000 * 60 * 60));
-        document.getElementById('course-countdown').innerText = diffHours > 0 ? `Dans ${diffHours}h` : 'Imminent';
-        document.getElementById('next-course-badge').classList.remove('hidden');
-
-        // Liaison devoirs Kanban associés
-        const linkedTasks = tasks.filter(t => t.status !== 'done' && (next.summary || '').toLowerCase().includes((t.ue || '').toLowerCase()));
-        const linkedContainer = document.getElementById('course-linked-tasks');
-        linkedContainer.innerHTML = '';
-
-        if (linkedTasks.length === 0) {
-          linkedContainer.innerHTML = `<span class="text-xs text-slate-500">Aucune tâche en attente pour cette UE.</span>`;
-        } else {
-          linkedTasks.forEach(t => {
-            linkedContainer.innerHTML += `
-              <span class="px-2.5 py-1 bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 text-xs rounded-lg flex items-center gap-1.5">
-                <i class="fa-solid fa-check text-[10px]"></i> ${t.title} (${t.dueDate})
-              </span>`;
-          });
+      // Gestion des événements simples et récurrents
+      if (event.isRecurring()) {
+        const expand = event.iterator();
+        let next;
+        // Chercher les occurrences dans les 30 prochains jours
+        while ((next = expand.next()) && events.length < 50) {
+          const jsDate = next.toJSDate();
+          if (jsDate >= now) {
+            events.push({
+              summary: event.summary,
+              location: event.location,
+              start: jsDate,
+              end: new Date(jsDate.getTime() + event.duration.toSeconds() * 1000)
+            });
+            break; // Prendre la prochaine occurrence la plus proche
+          }
         }
       } else {
-        document.getElementById('course-title').innerText = "Aucun événement à venir";
-        document.getElementById('course-countdown').innerText = "--";
+        const startDate = event.startDate.toJSDate();
+        if (startDate >= now) {
+          events.push({
+            summary: event.summary,
+            location: event.location,
+            start: startDate,
+            end: event.endDate.toJSDate()
+          });
+        }
       }
-    }
+    });
+
+    events.sort((a, b) => a.start - b.start);
+    renderAgenda(events);
+  } catch (err) {
+    console.error("Erreur parsing iCal:", err);
+    document.getElementById('course-title').innerText = "Format d'agenda non reconnu";
+  }
+}
 
     // GESTION RESSOURCES ET DASHBOARD
     async function handleAddResource(e) {
