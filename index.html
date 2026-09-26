@@ -111,10 +111,10 @@
   <main class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-900">
     <div class="max-w-7xl mx-auto">
 
-      <!-- ================= 1. DASHBOARD & TAVERNE ================= -->
+      <!-- ================= 1. DASHBOARD ================= -->
       <section id="view-dashboard" class="space-y-6">
         
-        <!-- Bannière Quête Réflexive (Étape 5) -->
+        <!-- Bannière Quête Réflexive -->
         <div class="bg-gradient-to-r from-amber-950/40 via-slate-950 to-indigo-950/40 p-6 rounded-2xl border border-amber-500/30 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="space-y-1">
             <span id="quest-status-pill" class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold rounded-full uppercase tracking-wider">
@@ -350,11 +350,9 @@
         <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ================= 5. HÉROS / PJ (Étape 4 & 6) ================= -->
+      <!-- ================= 5. HÉROS / PJ ================= -->
       <section id="view-hero" class="space-y-6 hidden">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          <!-- Carte Fiche de Personnage -->
           <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-6">
             <div class="flex items-center gap-4">
               <div id="hero-avatar" class="w-16 h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-500/50 flex items-center justify-center text-amber-400 text-3xl shadow-xl">
@@ -362,7 +360,7 @@
               </div>
               <div>
                 <h2 id="hero-name" class="text-xl font-bold text-white">Héros</h2>
-                <p id="hero-archetype-full" class="text-xs text-indigo-400 font-semibold">Voie des Artisans (Forgeron)</p>
+                <p id="hero-archetype-full" class="text-xs text-indigo-400 font-semibold">Voie des Artisans</p>
                 <div class="flex items-center gap-2 mt-1">
                   <span id="hero-level-badge" class="px-2 py-0.5 bg-amber-950 text-amber-400 border border-amber-800/50 text-xs font-bold rounded">Niveau 1</span>
                   <span id="hero-energy-badge" class="px-2 py-0.5 bg-indigo-950 text-indigo-300 border border-indigo-800/50 text-xs font-bold rounded">10/10 Énergie</span>
@@ -370,13 +368,11 @@
               </div>
             </div>
 
-            <!-- Stats & Points -->
             <div class="space-y-3 pt-4 border-t border-slate-800">
               <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
                 <span>Caractéristiques</span>
                 <span id="hero-stat-points" class="text-amber-400 font-mono">0 Pt(s) dispo</span>
               </h3>
-
               <div class="grid grid-cols-2 gap-3 text-xs">
                 <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
                   <span class="text-slate-400"><i class="fa-solid fa-hand-fist text-rose-400 mr-1.5"></i>Force</span>
@@ -404,7 +400,6 @@
             </div>
           </div>
 
-          <!-- Sac & Inventaire (Généré par les tâches Kanban) -->
           <div class="lg:col-span-2 bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
@@ -415,19 +410,17 @@
               </div>
               <span id="inventory-count" class="text-xs font-mono bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">0 / 20 Objets</span>
             </div>
-
             <div id="inventory-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div class="text-xs text-slate-500 col-span-full py-6 text-center">Votre sac est vide. Effectuez des tâches dans le Kanban pour gagner du matériel !</div>
             </div>
           </div>
-
         </div>
       </section>
 
     </div>
   </main>
 
-  <!-- ================= MODAL CREATION HÉROS (Étape 4) ================= -->
+  <!-- ================= MODAL CREATION HÉROS ================= -->
   <div id="modal-create-hero" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
       <div class="text-center space-y-1">
@@ -474,10 +467,9 @@
     </div>
   </div>
 
-  <!-- ================= MODAL DIALOGUE PNJ & QUÊTE DU JOUR (Étape 5) ================= -->
+  <!-- ================= MODAL DIALOGUE PNJ & QUÊTE DU JOUR ================= -->
   <div id="modal-pnj" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-5 relative">
-      
       <div class="flex items-start gap-4 border-b border-slate-800 pb-4">
         <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-2xl shrink-0">
           <i class="fa-solid fa-user-ninja"></i>
@@ -491,12 +483,10 @@
         <button onclick="closeModal('pnj')" class="text-slate-400 hover:text-white ml-auto"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
-      <!-- Questionnaire Réflexif Guidé -->
       <form id="form-pnj-quest" onsubmit="handleFinishDailyQuest(event)" class="space-y-4">
-        
         <div>
           <label class="block text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">1. Trois choses/enseignements retenus de la veille :</label>
-          <textarea id="pnj-q1" required rows="2" placeholder="Ex: Découverte de la grille d'évaluation Bastien & Scapin, bon échange avec le tuteur..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
+          <textarea id="pnj-q1" required rows="2" placeholder="Ex: Découverte de la grille d'évaluation Bastien & Scapin..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -517,10 +507,9 @@
 
         <div>
           <label class="block text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">4. Projections & intentions réalistes pour aujourd'hui :</label>
-          <textarea id="pnj-q4" required rows="2" placeholder="Ex: Avancer sur le rapport UX, 30 min de veille, sans surcharger la soirée..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
+          <textarea id="pnj-q4" required rows="2" placeholder="Ex: Avancer sur le rapport UX..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
         </div>
 
-        <!-- Récompense au Choix -->
         <div class="pt-3 border-t border-slate-800 space-y-2">
           <label class="block text-xs font-bold text-white uppercase tracking-wider">Choisissez votre Récompense du Jour :</label>
           <div class="grid grid-cols-3 gap-2 text-xs">
@@ -546,7 +535,7 @@
     </div>
   </div>
 
-  <!-- MODALS CLASSIQUES (Tâche, Ressource, Favori, Contact) -->
+  <!-- MODALS AUXILIAIRES -->
   <div id="modal-task" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -732,7 +721,7 @@
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Notes / Historique des échanges</label>
-          <textarea id="contact-notes" rows="2" placeholder="Échanges, opportunités, recommandations..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+          <textarea id="contact-notes" rows="2" placeholder="Échanges, opportunités..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
         </div>
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
           <button type="button" onclick="closeModal('contact')" class="px-3 py-1.5 text-xs text-slate-400 hover:text-white">Annuler</button>
@@ -761,7 +750,6 @@
       autoLoadRepoICal();
     });
 
-    // CHARGEMENT AUTOMATIQUE ICAL
     async function autoLoadRepoICal() {
       try {
         const response = await fetch('./basic.ics?v=' + new Date().getTime());
@@ -774,7 +762,6 @@
       }
     }
 
-    // FIREBASE LISTENERS
     function setupFirebaseListeners() {
       window.fb.onSnapshot(window.fb.collection(window.db, "tasks"), (snapshot) => {
         tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -798,7 +785,6 @@
         renderNetwork();
       });
 
-      // Synchronisation du Héros (Collection character / main)
       window.fb.onSnapshot(window.fb.doc(window.db, "character", "main"), (docSnap) => {
         if (docSnap.exists()) {
           hero = docSnap.data();
@@ -809,7 +795,6 @@
       });
     }
 
-    // NAVIGATION
     function switchTab(tabId) {
       document.querySelectorAll('main > div > section').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${tabId}`).classList.remove('hidden');
@@ -859,10 +844,9 @@
     }
 
     function closeModal(type) { document.getElementById(`modal-${type}`).classList.add('hidden'); }
-
     function openPnjModal() { document.getElementById('modal-pnj').classList.remove('hidden'); }
 
-    // HÉROS & RPG (Étape 4)
+    // HÉROS
     async function handleSaveHero(e) {
       e.preventDefault();
       const heroData = {
@@ -874,9 +858,7 @@
         statPoints: 0,
         talentPoints: 0,
         stats: { str: 10, int: 10, cha: 12, dex: 10 },
-        inventory: [
-          { title: 'Trousse d\'Ergonome', type: 'Outil', qty: 1, icon: 'fa-briefcase' }
-        ],
+        inventory: [{ title: 'Trousse d\'Ergonome', type: 'Outil', qty: 1, icon: 'fa-briefcase' }],
         lastQuestDate: ''
       };
       await window.fb.setDoc(window.fb.doc(window.db, "character", "main"), heroData);
@@ -902,7 +884,6 @@
       document.getElementById('stat-cha').innerText = hero.stats?.cha || 10;
       document.getElementById('stat-dex').innerText = hero.stats?.dex || 10;
 
-      // Icone selon l'archétype
       let icon = 'fa-user-shield';
       if (['Guerrier', 'Archer', 'Mage'].includes(hero.archetype)) icon = 'fa-shield-halved';
       if (['Barde', 'Stratège', 'Négociateur'].includes(hero.archetype)) icon = 'fa-handshake';
@@ -912,7 +893,6 @@
       document.getElementById('mini-hero-icon').className = `fa-solid ${icon}`;
       document.getElementById('hero-avatar').innerHTML = `<i class="fa-solid ${icon}"></i>`;
 
-      // Statut Quête du Jour
       const today = new Date().toISOString().split('T')[0];
       const isQuestDone = hero.lastQuestDate === today;
       const questBadge = document.getElementById('mini-daily-quest-badge');
@@ -924,7 +904,6 @@
         questBadge.innerHTML = `<i class="fa-solid fa-scroll"></i> <span>Quête !</span>`;
       }
 
-      // Rendu de l'inventaire
       renderInventory();
     }
 
@@ -932,7 +911,6 @@
       const grid = document.getElementById('inventory-grid');
       grid.innerHTML = '';
       const items = hero.inventory || [];
-      
       document.getElementById('inventory-count').innerText = `${items.length} / 20 Objets`;
 
       if (items.length === 0) {
@@ -956,28 +934,69 @@
       });
     }
 
-    // PNJ & QUÊTE DU JOUR (Étape 5)
+    // =========================================================================
+    // MODULE D'ANONYMISATION LOCAL (CONFIDENTIALITÉ RGPD)
+    // =========================================================================
+    class DataAnonymizer {
+      constructor(sensitiveNames = []) {
+        this.sensitiveTerms = sensitiveNames.filter(Boolean);
+      }
+
+      static emailRegex = /[a-zA-C0-9._%+-]+@[a-zA-C0-9.-]+\.[a-zA-C]{2,}/gi;
+      static phoneRegex = /(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}/g;
+
+      sanitize(text) {
+        if (!text) return "";
+        let sanitized = text;
+
+        sanitized = sanitized.replace(DataAnonymizer.emailRegex, "[EMAIL_ANONYME]");
+        sanitized = sanitized.replace(DataAnonymizer.phoneRegex, "[TÉL_ANONYME]");
+
+        this.sensitiveTerms.forEach(term => {
+          if (term && term.length > 1) {
+            const regex = new RegExp(`\\b${term}\\b`, 'gi');
+            sanitized = sanitized.replace(regex, "[INDIVIDU]");
+          }
+        });
+
+        return sanitized;
+      }
+    }
+
+    // PNJ & QUÊTE DU JOUR
     async function handleFinishDailyQuest(e) {
       e.preventDefault();
       const today = new Date().toISOString().split('T')[0];
       const rewardChoice = document.querySelector('input[name="reward-choice"]:checked').value;
 
+      const rawQ1 = document.getElementById('pnj-q1').value;
+      const rawQ4 = document.getElementById('pnj-q4').value;
+
+      const sensitiveList = [hero?.name, "Tom"];
+      const anonymizer = new DataAnonymizer(sensitiveList);
+
+      const anonymizedPayloadForAI = {
+        teachings: anonymizer.sanitize(rawQ1),
+        mood: document.getElementById('pnj-q2').value,
+        satisfaction: parseInt(document.getElementById('pnj-q3').value),
+        projections: anonymizer.sanitize(rawQ4)
+      };
+
       const journalData = {
         date: today,
         timestamp: new Date().toISOString(),
-        teachings: document.getElementById('pnj-q1').value,
+        teachings: rawQ1,
         mood: document.getElementById('pnj-q2').value,
         satisfaction: parseInt(document.getElementById('pnj-q3').value),
-        projections: document.getElementById('pnj-q4').value,
-        reward: rewardChoice
+        projections: rawQ4,
+        reward: rewardChoice,
+        anonymizedPayloadSentToAI: anonymizedPayloadForAI
       };
 
       await window.fb.addDoc(window.fb.collection(window.db, "daily_journals"), journalData);
 
-      // Récompense appliquée au Héros
       if (hero) {
         let updatedHero = { ...hero, lastQuestDate: today };
-        
         if (rewardChoice === 'stat') updatedHero.statPoints = (updatedHero.statPoints || 0) + 1;
         if (rewardChoice === 'talent') updatedHero.talentPoints = (updatedHero.talentPoints || 0) + 1;
         if (rewardChoice === 'item') {
@@ -989,15 +1008,14 @@
           const randomItem = rareItems[Math.floor(Math.random() * rareItems.length)];
           updatedHero.inventory = [...(updatedHero.inventory || []), randomItem];
         }
-
         await window.fb.setDoc(window.fb.doc(window.db, "character", "main"), updatedHero);
       }
 
       closeModal('pnj');
-      alert("Quête quotidienne enregistrée ! Vos récompenses ont été attribuées à votre Héros.");
+      alert("Quête quotidienne enregistrée ! Vos données ont été anonymisées en local avant traitement.");
     }
 
-    // KANBAN & INTERCONNECTION (Étape 6)
+    // KANBAN & INTERCONNEXION
     async function handleSaveTask(e) {
       e.preventDefault();
       const id = document.getElementById('task-id').value;
@@ -1123,7 +1141,6 @@
           
           await window.fb.updateDoc(window.fb.doc(window.db, "tasks", id), { status: newStatus });
 
-          // Interconnexion : Terminer une tâche octroie un matériau d'artisan au Héros !
           if (newStatus === 'done' && hero) {
             const materials = [
               { title: 'Minerai de Fer', icon: 'fa-cubes', qty: 1 },
