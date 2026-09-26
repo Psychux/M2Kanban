@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Master Planner - Ergonomie & Facteurs Humains</title>
+  <title>Master Planner & Ergonomics Hub</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons CDN -->
@@ -48,46 +48,63 @@
   <!-- ================= NAVBAR ================= -->
   <header class="bg-slate-950 border-b border-slate-800 shrink-0 z-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
+      <div class="flex items-center justify-between h-16 gap-2">
         
-        <!-- Logo & Titre -->
+        <!-- Logo & Titre du Hub -->
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400 font-bold text-xl shadow-lg shadow-indigo-950">
-            <i class="fa-solid fa-graduation-cap"></i>
+            <i class="fa-solid fa-compass-drafting"></i>
           </div>
-          <div>
-            <h1 class="font-bold text-lg text-white leading-tight">Master Planner</h1>
+          <div class="hidden sm:block">
+            <h1 class="font-bold text-lg text-white leading-tight">Ergo Hub</h1>
             <p class="text-xs text-slate-400 flex items-center gap-1.5">
-              <span>Ergonomie & Facteurs Humains</span>
-              <span id="cloud-status" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Synchronisé avec Firebase Cloud"></span>
+              <span>Master Planner & RPG</span>
+              <span id="cloud-status" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Synchronisé avec Cloud Firestore"></span>
             </p>
           </div>
         </div>
 
-        <!-- Onglets de Navigation -->
-        <nav class="flex space-x-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
-          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-indigo-400 bg-slate-800 border border-slate-700/50 shadow-sm transition">
-            <i class="fa-solid fa-chart-pie mr-1.5"></i>Dashboard
+        <!-- Onglets de Navigation Principaux (5 Modules) -->
+        <nav class="flex space-x-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800 overflow-x-auto custom-scrollbar">
+          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-3 py-2 text-xs sm:text-sm font-medium rounded-lg text-indigo-400 bg-slate-800 border border-slate-700/50 shadow-sm transition whitespace-nowrap">
+            <i class="fa-solid fa-house-user mr-1.5"></i>Dashboard
           </button>
-          <button onclick="switchTab('agenda')" id="tab-agenda" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-calendar-days mr-1.5"></i>Agenda <span id="next-course-badge" class="ml-1 px-1.5 py-0.5 text-[10px] bg-indigo-500 text-white font-bold rounded-full hidden">Prochain</span>
+          <button onclick="switchTab('kanban')" id="tab-kanban" class="tab-btn px-3 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition whitespace-nowrap">
+            <i class="fa-solid fa-briefcase mr-1.5"></i>Workspace
           </button>
-          <button onclick="switchTab('kanban')" id="tab-kanban" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
-            <i class="fa-solid fa-border-all mr-1.5"></i>Kanban
+          <button onclick="switchTab('network')" id="tab-network" class="tab-btn px-3 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition whitespace-nowrap">
+            <i class="fa-solid fa-address-book mr-1.5"></i>Réseau Pro
           </button>
-          <button onclick="switchTab('ressources')" id="tab-ressources" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition">
+          <button onclick="switchTab('ressources')" id="tab-ressources" class="tab-btn px-3 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition whitespace-nowrap">
             <i class="fa-solid fa-book-bookmark mr-1.5"></i>Ressources
+          </button>
+          <button onclick="switchTab('hero')" id="tab-hero" class="tab-btn px-3 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition whitespace-nowrap">
+            <i class="fa-solid fa-shield-halved mr-1.5"></i>Héros
           </button>
         </nav>
 
-        <!-- Actions rapides -->
-        <div class="flex items-center gap-2">
-          <button onclick="openModal('task')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-950 transition flex items-center gap-1.5">
-            <i class="fa-solid fa-plus"></i> Tâche
-          </button>
-          <button onclick="openModal('resource')" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-950 transition flex items-center gap-1.5">
-            <i class="fa-solid fa-plus"></i> Ressource
-          </button>
+        <!-- Widget de Statut du Héros (Header Compact) -->
+        <div id="hero-mini-status" class="hidden lg:flex items-center gap-3 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-sm">
+            <i class="fa-solid fa-user-ninja"></i>
+          </div>
+          <div class="text-left">
+            <div class="flex items-center gap-2">
+              <span id="mini-hero-archetype" class="text-xs font-bold text-white">Non Défini</span>
+              <span id="mini-hero-level" class="text-[10px] bg-amber-950 text-amber-400 border border-amber-800/50 px-1.5 py-0.5 rounded font-mono font-bold">Niv. 1</span>
+            </div>
+            <!-- Barre d'Énergie -->
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <div class="w-20 bg-slate-800 h-1.5 rounded-full overflow-hidden border border-slate-700/50">
+                <div id="mini-hero-energy-bar" class="bg-indigo-500 h-full w-full transition-all"></div>
+              </div>
+              <span id="mini-hero-energy-text" class="text-[9px] font-mono text-slate-400">10/10 ÉL</span>
+            </div>
+          </div>
+          <!-- Badge Quête Quotidienne -->
+          <div id="mini-daily-quest-badge" title="Quête réflexive quotidienne en attente" class="ml-1 px-2 py-1 bg-rose-950/80 border border-rose-800/50 text-rose-300 text-[10px] font-bold rounded-lg flex items-center gap-1 animate-pulse cursor-pointer" onclick="switchTab('dashboard')">
+            <i class="fa-solid fa-scroll"></i> <span>Quête !</span>
+          </div>
         </div>
 
       </div>
@@ -98,16 +115,34 @@
   <main class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-900">
     <div class="max-w-7xl mx-auto">
 
-      <!-- ================= 1. DASHBOARD ================= -->
+      <!-- ================= 1. DASHBOARD & TAVERNE ================= -->
       <section id="view-dashboard" class="space-y-6">
+        
+        <!-- Bannière Quête Réflexive (Aperçu) -->
+        <div class="bg-gradient-to-r from-amber-950/40 via-slate-950 to-indigo-950/40 p-6 rounded-2xl border border-amber-500/30 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <span class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold rounded-full uppercase tracking-wider">
+              <i class="fa-solid fa-comment-dots mr-1"></i> Conseil du Guide & Journal Quotidien
+            </span>
+            <h2 class="text-xl font-bold text-white">Quête du Jour : Le Bilan Réflexif</h2>
+            <p class="text-xs text-slate-300 max-w-2xl">
+              Prenez un moment pour consigner vos 3 enseignements de la veille, évaluer votre état général et fixer des intentions réalistes pour aujourd'hui.
+            </p>
+          </div>
+          <button onclick="alert('Le module PNJ / Dialogue IA sera activé à l\'Étape 5 !')" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-amber-950 shrink-0 flex items-center gap-2">
+            <i class="fa-solid fa-comments"></i> Parler au PNJ
+          </button>
+        </div>
+
+        <!-- Métriques Rapides -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
-            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Urgences Imminentes</h3>
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Urgences Kanban</h3>
             <p id="dash-urgent-count" class="text-2xl font-bold text-rose-400 mt-2">0 Tâche(s)</p>
             <p class="text-xs text-slate-500 mt-1">Échéance dans les 7 prochains jours</p>
           </div>
           <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800">
-            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bibliothèque</h3>
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bibliothèque & Savoirs</h3>
             <p id="dash-resource-count" class="text-2xl font-bold text-emerald-400 mt-2">0 Ouvrage(s)</p>
             <p id="dash-resource-detail" class="text-xs text-slate-500 mt-1">Livres & articles répertoriés</p>
           </div>
@@ -118,6 +153,7 @@
           </div>
         </div>
 
+        <!-- Focus Échéances Imminentes -->
         <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800">
           <h2 class="text-base font-bold text-white mb-4 flex items-center justify-between">
             <span>Focus Échéances Imminentes</span>
@@ -127,82 +163,42 @@
         </div>
       </section>
 
-      <!-- ================= 2. AGENDA ================= -->
-      <section id="view-agenda" class="space-y-6 hidden">
+      <!-- ================= 2. WORKSPACE (KANBAN & AGENDA) ================= -->
+      <section id="view-kanban" class="space-y-6 hidden">
         
-        <!-- En-tête de l'Agenda avec Bouton d'Import -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
-          <div>
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fa-regular fa-calendar-check text-indigo-400"></i> Emploi du Temps Universitaire
+        <!-- Agenda Compact (Widget + iFrame) -->
+        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-regular fa-calendar-check text-indigo-400"></i> Planning Universitaire (basic.ics)
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Chargement automatique (basic.ics) & vue Google Calendar</p>
-          </div>
-          <div>
-            <button onclick="document.getElementById('ical-file-input').click()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl text-white transition flex items-center gap-2 shadow-lg shadow-indigo-950">
-              <i class="fa-solid fa-file-import"></i> Mettre à jour (fichier .ics)
+            <button onclick="document.getElementById('ical-file-input').click()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold rounded-xl text-slate-200 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-import"></i> MaJ Agenda .ics
             </button>
             <input type="file" id="ical-file-input" accept=".ics" class="hidden" onchange="handleICalFileUpload(event)">
           </div>
-        </div>
 
-        <!-- Widget Prochain Cours + 4 Cours Suivants -->
-        <div class="bg-gradient-to-r from-indigo-950/80 via-slate-950 to-slate-950 p-6 rounded-2xl border border-indigo-500/30 shadow-xl space-y-6">
-          
-          <!-- Bloc Prochain Cours en Gros -->
-          <div>
-            <div class="flex items-center justify-between mb-3">
-              <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-semibold rounded-full flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> PROCHAIN COURS
-              </span>
-              <span id="course-countdown" class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">--</span>
-            </div>
-
-            <h3 id="course-title" class="text-2xl font-bold text-white">Chargement du fichier basic.ics...</h3>
-            <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-2">
-              <span id="course-time" class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-indigo-400"></i> --:--</span>
-              <span id="course-location" class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-rose-400"></i> --</span>
-            </div>
-          </div>
-
-          <!-- Section 4 Cours Suivants (Alignés Horizontalement) -->
-          <div class="pt-4 border-t border-slate-800/80">
-            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <i class="fa-solid fa-forward text-indigo-400"></i> Cours suivants :
-            </h4>
-            
-            <div id="next-courses-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-500">
-                En attente du fichier d'agenda.
+          <!-- Affichage Prochain Cours -->
+          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span id="course-countdown" class="text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-wider">PROCHAIN COURS</span>
+              <h3 id="course-title" class="text-lg font-bold text-white mt-0.5">Chargement de l'agenda...</h3>
+              <div class="flex flex-wrap items-center gap-4 text-xs text-slate-400 mt-1">
+                <span id="course-time"><i class="fa-regular fa-clock text-indigo-400 mr-1"></i> --:--</span>
+                <span id="course-location"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i> --</span>
               </div>
             </div>
           </div>
 
+          <!-- Grid des 4 cours suivants -->
+          <div id="next-courses-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-500">En attente de l'agenda...</div>
+          </div>
         </div>
 
-        <!-- Vue iFrame Google Calendar -->
-        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 overflow-hidden h-[600px]">
-          <iframe 
-            src="https://calendar.google.com/calendar/embed?src=2cvcoa06hb3elad541347e5mm4%40group.calendar.google.com&ctz=Europe%2FParis" 
-            style="border: 0;" 
-            width="100%" 
-            height="100%" 
-            frameborder="0" 
-            scrolling="no" 
-            class="rounded-xl">
-          </iframe>
-        </div>
-
-      </section>
-
-      <!-- ================= 3. KANBAN ================= -->
-      <section id="view-kanban" class="space-y-6 hidden">
-        
-        <!-- Barre de Filtres et Tris -->
+        <!-- Barre de Filtres et Tris Kanban -->
         <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-4">
-            
-            <!-- Recherche & Tris -->
             <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
               <div class="relative flex-1 sm:w-64">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-500"></i>
@@ -220,41 +216,17 @@
               </div>
             </div>
 
-            <!-- Filtres Visuels -->
             <div class="flex flex-wrap items-center gap-3">
-              <span class="text-xs font-semibold text-slate-400"><i class="fa-solid fa-filter mr-1"></i> Filtrer :</span>
-              
-              <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
-                <label class="px-2 py-1 rounded-lg cursor-pointer transition flex items-center gap-1.5 hover:bg-slate-800">
-                  <input type="checkbox" value="Livrable" onchange="toggleFilterType(this)" class="accent-indigo-500"> Livrables
-                </label>
-                <label class="px-2 py-1 rounded-lg cursor-pointer transition flex items-center gap-1.5 hover:bg-slate-800">
-                  <input type="checkbox" value="Lecture" onchange="toggleFilterType(this)" class="accent-indigo-500"> Lectures
-                </label>
-                <label class="px-2 py-1 rounded-lg cursor-pointer transition flex items-center gap-1.5 hover:bg-slate-800">
-                  <input type="checkbox" value="Devoir" onchange="toggleFilterType(this)" class="accent-indigo-500"> Devoirs
-                </label>
-              </div>
-
-              <select id="filter-ue" onchange="renderKanban()" class="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500">
-                <option value="all">Toutes les UE</option>
-                <option value="Ergonomie IHM">UE Ergonomie IHM</option>
-                <option value="Psychologie Cognitive">UE Psychologie Cognitive</option>
-                <option value="Sociologie des Orga">UE Sociologie des Orga</option>
-                <option value="Facteurs Humains">UE Facteurs Humains</option>
-              </select>
-
-              <button onclick="clearFilters()" class="text-xs text-slate-400 hover:text-rose-400 transition ml-1" title="Réinitialiser filtres">
-                <i class="fa-solid fa-rotate-left"></i>
+              <button onclick="openModal('task')" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-md shadow-indigo-950">
+                <i class="fa-solid fa-plus"></i> Nouvelle Tâche
               </button>
             </div>
-
           </div>
         </div>
 
         <!-- Colonnes du Kanban -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[650px]">
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[600px]">
             <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
               <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">À Faire</h3>
               <span id="count-todo" class="bg-slate-900 text-slate-300 text-xs px-2 py-0.5 rounded-md border border-slate-800 font-mono">0</span>
@@ -262,7 +234,7 @@
             <div id="col-todo" data-status="todo" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1"></div>
           </div>
 
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[650px]">
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[600px]">
             <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
               <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">En Cours</h3>
               <span id="count-in_progress" class="bg-indigo-950/50 text-indigo-300 text-xs px-2 py-0.5 rounded-md border border-indigo-800/50 font-mono">0</span>
@@ -270,7 +242,7 @@
             <div id="col-in_progress" data-status="in_progress" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1"></div>
           </div>
 
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[650px]">
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[600px]">
             <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
               <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Relecture</h3>
               <span id="count-review" class="bg-amber-950/50 text-amber-300 text-xs px-2 py-0.5 rounded-md border border-amber-800/50 font-mono">0</span>
@@ -278,13 +250,29 @@
             <div id="col-review" data-status="review" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1"></div>
           </div>
 
-          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[650px]">
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[600px]">
             <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
               <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Terminé</h3>
               <span id="count-done" class="bg-emerald-950/50 text-emerald-300 text-xs px-2 py-0.5 rounded-md border border-emerald-800/50 font-mono">0</span>
             </div>
             <div id="col-done" data-status="done" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1"></div>
           </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. RÉSEAU PRO (MODULE PRÉPARATOIRE) ================= -->
+      <section id="view-network" class="space-y-6 hidden">
+        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center py-12 space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto text-xl">
+            <i class="fa-solid fa-address-book"></i>
+          </div>
+          <h2 class="text-lg font-bold text-white">Annuaire des Contacts & Entreprises</h2>
+          <p class="text-xs text-slate-400 max-w-md mx-auto">
+            Ce module permettra d'enregistrer et de classer vos contacts professionnels de l'ergonomie (entreprises, ergonomes, tuteurs, laboratoires) sous forme de fiches personnalisées.
+          </p>
+          <span class="inline-block px-3 py-1 bg-slate-900 border border-slate-800 text-slate-400 text-xs rounded-full font-mono">
+            À venir à l'Étape 3
+          </span>
         </div>
       </section>
 
@@ -307,6 +295,22 @@
         </div>
 
         <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </section>
+
+      <!-- ================= 5. HÉROS / PJ (MODULE PRÉPARATOIRE) ================= -->
+      <section id="view-hero" class="space-y-6 hidden">
+        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center py-12 space-y-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center mx-auto text-xl">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h2 class="text-lg font-bold text-white">Feuille de Personnage & RPG</h2>
+          <p class="text-xs text-slate-400 max-w-md mx-auto">
+            Consultez votre Archétype (Combattant, Social, Spirituel, Artisan), débloquez vos talents, attribuez vos points de caractéristiques et gérez votre sac d'objets.
+          </p>
+          <span class="inline-block px-3 py-1 bg-slate-900 border border-slate-800 text-slate-400 text-xs rounded-full font-mono">
+            À venir à l'Étape 4
+          </span>
+        </div>
       </section>
 
     </div>
@@ -441,7 +445,7 @@
     let selectedTypes = [];
 
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Initialiser la connexion Firebase
+      // Initialiser la connexion Firebase
       const checkFirebase = setInterval(() => {
         if (window.db && window.fb) {
           clearInterval(checkFirebase);
@@ -449,11 +453,11 @@
         }
       }, 100);
 
-      // 2. Charger automatiquement le fichier basic.ics du dépôt GitHub
+      // Charger l'agenda automatique basic.ics
       autoLoadRepoICal();
     });
 
-    // CHARGEMENT AUTOMATIQUE DU FICHIER BASIC.ICS DU DÉPÔT
+    // CHARGEMENT AUTOMATIQUE DU FICHIER BASIC.ICS
     async function autoLoadRepoICal() {
       try {
         const response = await fetch('./basic.ics?v=' + new Date().getTime());
@@ -567,7 +571,7 @@
       }
     }
 
-    // GESTION FILTRES ET TRIS
+    // GESTION FILTRES ET TRIS KANBAN
     function toggleFilterType(checkbox) {
       if (checkbox.checked) selectedTypes.push(checkbox.value);
       else selectedTypes = selectedTypes.filter(v => v !== checkbox.value);
@@ -685,7 +689,7 @@
       });
     }
 
-    // GESTION MANUELLE OU AUTOMATIQUE ICAL
+    // GESTION ICAL (.ICS)
     function handleICalFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -746,17 +750,14 @@
       const upcomingEvents = events.filter(e => e.start >= now);
       
       if (upcomingEvents.length > 0) {
-        // 1. Prochain Cours
         const next = upcomingEvents[0];
         document.getElementById('course-title').innerText = next.summary || 'Sans titre';
         document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Lieu non spécifié'}`;
         document.getElementById('course-time').innerHTML = `<i class="fa-regular fa-clock text-indigo-400"></i> ${next.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'})} — ${next.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
         
         const diffHours = Math.floor((next.start - now) / (1000 * 60 * 60));
-        document.getElementById('course-countdown').innerText = diffHours > 0 ? `Dans ${diffHours}h` : 'Imminent';
-        document.getElementById('next-course-badge').classList.remove('hidden');
+        document.getElementById('course-countdown').innerText = diffHours > 0 ? `PROCHAIN COURS (DANS ${diffHours}H)` : 'PROCHAIN COURS (IMMINENT)';
 
-        // 2. Les 4 Cours Suivants
         const followingEvents = upcomingEvents.slice(1, 5);
         const grid = document.getElementById('next-courses-grid');
         grid.innerHTML = '';
@@ -780,12 +781,12 @@
 
       } else {
         document.getElementById('course-title').innerText = "Aucun événement à venir";
-        document.getElementById('course-countdown').innerText = "--";
+        document.getElementById('course-countdown').innerText = "PROCHAIN COURS";
         document.getElementById('next-courses-grid').innerHTML = `<div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-500 col-span-4">Aucun cours à venir.</div>`;
       }
     }
 
-    // GESTION RESSOURCES ET DASHBOARD
+    // RESSOURCES & DASHBOARD
     async function handleAddResource(e) {
       e.preventDefault();
       const resData = {
