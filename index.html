@@ -14,9 +14,8 @@
   <!-- Firebase SDKs (v10) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, addDoc, updateDoc, setDoc, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Configuration Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDGBF_F9ATLwZdq9NYY8SS9NB-Q7R75pfc",
       authDomain: "masterergo-planner.firebaseapp.com",
@@ -30,7 +29,7 @@
     const db = getFirestore(app);
 
     window.db = db;
-    window.fb = { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc };
+    window.fb = { collection, onSnapshot, addDoc, updateDoc, setDoc, deleteDoc, doc, getDoc };
   </script>
 
   <style>
@@ -49,7 +48,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 gap-2">
         
-        <!-- Logo & Titre du Hub -->
+        <!-- Logo & Titre -->
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400 font-bold text-xl shadow-lg shadow-indigo-950">
             <i class="fa-solid fa-compass-drafting"></i>
@@ -63,7 +62,7 @@
           </div>
         </div>
 
-        <!-- Onglets de Navigation Principaux -->
+        <!-- Onglets Principaux -->
         <nav class="flex space-x-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800 overflow-x-auto custom-scrollbar">
           <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-3 py-2 text-xs sm:text-sm font-medium rounded-lg text-indigo-400 bg-slate-800 border border-slate-700/50 shadow-sm transition whitespace-nowrap">
             <i class="fa-solid fa-house-user mr-1.5"></i>Dashboard
@@ -82,14 +81,14 @@
           </button>
         </nav>
 
-        <!-- Widget de Statut du Héros -->
+        <!-- Widget Header Héros -->
         <div id="hero-mini-status" class="hidden lg:flex items-center gap-3 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800">
           <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-sm">
-            <i class="fa-solid fa-user-ninja"></i>
+            <i id="mini-hero-icon" class="fa-solid fa-user-shield"></i>
           </div>
           <div class="text-left">
             <div class="flex items-center gap-2">
-              <span id="mini-hero-archetype" class="text-xs font-bold text-white">Non Défini</span>
+              <span id="mini-hero-archetype" class="text-xs font-bold text-white">Création...</span>
               <span id="mini-hero-level" class="text-[10px] bg-amber-950 text-amber-400 border border-amber-800/50 px-1.5 py-0.5 rounded font-mono font-bold">Niv. 1</span>
             </div>
             <div class="flex items-center gap-1.5 mt-0.5">
@@ -99,7 +98,7 @@
               <span id="mini-hero-energy-text" class="text-[9px] font-mono text-slate-400">10/10 ÉL</span>
             </div>
           </div>
-          <div id="mini-daily-quest-badge" title="Quête réflexive quotidienne en attente" class="ml-1 px-2 py-1 bg-rose-950/80 border border-rose-800/50 text-rose-300 text-[10px] font-bold rounded-lg flex items-center gap-1 animate-pulse cursor-pointer" onclick="switchTab('dashboard')">
+          <div id="mini-daily-quest-badge" title="Quête réflexive quotidienne" class="ml-1 px-2 py-1 bg-rose-950/80 border border-rose-800/50 text-rose-300 text-[10px] font-bold rounded-lg flex items-center gap-1 animate-pulse cursor-pointer" onclick="openPnjModal()">
             <i class="fa-solid fa-scroll"></i> <span>Quête !</span>
           </div>
         </div>
@@ -115,23 +114,23 @@
       <!-- ================= 1. DASHBOARD & TAVERNE ================= -->
       <section id="view-dashboard" class="space-y-6">
         
-        <!-- Bannière Quête Réflexive -->
+        <!-- Bannière Quête Réflexive (Étape 5) -->
         <div class="bg-gradient-to-r from-amber-950/40 via-slate-950 to-indigo-950/40 p-6 rounded-2xl border border-amber-500/30 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="space-y-1">
-            <span class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold rounded-full uppercase tracking-wider">
+            <span id="quest-status-pill" class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold rounded-full uppercase tracking-wider">
               <i class="fa-solid fa-comment-dots mr-1"></i> Conseil du Guide & Journal Quotidien
             </span>
             <h2 class="text-xl font-bold text-white">Quête du Jour : Le Bilan Réflexif</h2>
             <p class="text-xs text-slate-300 max-w-2xl">
-              Prenez un moment pour consigner vos 3 enseignements de la veille, évaluer votre état général et fixer des intentions réalistes pour aujourd'hui.
+              Consignez vos 3 apprentissages de la veille, évaluez votre état général et fixez des intentions réalistes pour aujourd'hui avec votre PNJ guide.
             </p>
           </div>
-          <button onclick="alert('Le module PNJ / Dialogue IA sera activé à l\'Étape 5 !')" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-amber-950 shrink-0 flex items-center gap-2">
+          <button onclick="openPnjModal()" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-amber-950 shrink-0 flex items-center gap-2">
             <i class="fa-solid fa-comments"></i> Parler au PNJ
           </button>
         </div>
 
-        <!-- Launchpad / Favoris Utiles (Étape 2) -->
+        <!-- Launchpad / Favoris -->
         <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
@@ -177,8 +176,6 @@
 
       <!-- ================= 2. WORKSPACE ================= -->
       <section id="view-workspace" class="space-y-6 hidden">
-        
-        <!-- Sous-onglets Workspace -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-3">
           <div class="flex items-center gap-2">
             <button onclick="switchWorkspaceSubTab('agenda')" id="subtab-agenda" class="subtab-btn px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white transition flex items-center gap-2 shadow-lg shadow-indigo-950">
@@ -188,13 +185,11 @@
               <i class="fa-solid fa-border-all"></i> Tableau Kanban
             </button>
           </div>
-
           <button onclick="openModal('task')" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-md shadow-indigo-950">
             <i class="fa-solid fa-plus"></i> Nouvelle Tâche
           </button>
         </div>
 
-        <!-- VUE A : AGENDA -->
         <div id="workspace-agenda" class="space-y-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
             <div>
@@ -219,7 +214,6 @@
                 </span>
                 <span id="course-countdown" class="text-xs font-mono font-semibold text-indigo-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">--</span>
               </div>
-
               <h3 id="course-title" class="text-2xl font-bold text-white">Chargement du fichier basic.ics...</h3>
               <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-2">
                 <span id="course-time" class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-indigo-400"></i> --:--</span>
@@ -238,19 +232,10 @@
           </div>
 
           <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 overflow-hidden h-[600px]">
-            <iframe 
-              src="https://calendar.google.com/calendar/embed?src=2cvcoa06hb3elad541347e5mm4%40group.calendar.google.com&ctz=Europe%2FParis" 
-              style="border: 0;" 
-              width="100%" 
-              height="100%" 
-              frameborder="0" 
-              scrolling="no" 
-              class="rounded-xl">
-            </iframe>
+            <iframe src="https://calendar.google.com/calendar/embed?src=2cvcoa06hb3elad541347e5mm4%40group.calendar.google.com&ctz=Europe%2FParis" style="border: 0;" width="100%" height="100%" frameborder="0" scrolling="no" class="rounded-xl"></iframe>
           </div>
         </div>
 
-        <!-- VUE B : KANBAN -->
         <div id="workspace-kanban" class="space-y-6 hidden">
           <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-4">
@@ -259,7 +244,6 @@
                   <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-500"></i>
                   <input type="text" id="kanban-search" oninput="renderKanban()" placeholder="Chercher une tâche..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                 </div>
-
                 <div class="flex items-center gap-2">
                   <span class="text-xs text-slate-400"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i>Trier :</span>
                   <select id="sort-order" onchange="renderKanban()" class="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500">
@@ -270,7 +254,6 @@
                   </select>
                 </div>
               </div>
-
               <div class="flex flex-wrap items-center gap-3">
                 <span class="text-xs font-semibold text-slate-400"><i class="fa-solid fa-filter mr-1"></i> Filtrer :</span>
                 <select id="filter-ue" onchange="renderKanban()" class="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500">
@@ -292,7 +275,6 @@
               </div>
               <div id="col-todo" data-status="todo" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1"></div>
             </div>
-
             <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[600px]">
               <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
                 <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">En Cours</h3>
@@ -300,7 +282,6 @@
               </div>
               <div id="col-in_progress" data-status="in_progress" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1"></div>
             </div>
-
             <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[600px]">
               <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
                 <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Relecture</h3>
@@ -308,7 +289,6 @@
               </div>
               <div id="col-review" data-status="review" class="kanban-col flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-1 rounded-xl p-1"></div>
             </div>
-
             <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col h-[600px]">
               <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 shrink-0">
                 <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Terminé</h3>
@@ -318,10 +298,9 @@
             </div>
           </div>
         </div>
-
       </section>
 
-      <!-- ================= 3. RÉSEAU PRO (Étape 3) ================= -->
+      <!-- ================= 3. RÉSEAU PRO ================= -->
       <section id="view-network" class="space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
           <div>
@@ -330,14 +309,11 @@
             </h2>
             <p class="text-xs text-slate-400 mt-0.5">Centralisation des contacts ergonomes, tuteurs et entreprises du secteur</p>
           </div>
-          <div class="flex items-center gap-2">
-            <button onclick="openModal('contact')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl text-white transition flex items-center gap-2 shadow-lg shadow-indigo-950">
-              <i class="fa-solid fa-user-plus"></i> Nouveau Contact / Entreprise
-            </button>
-          </div>
+          <button onclick="openModal('contact')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl text-white transition flex items-center gap-2 shadow-lg shadow-indigo-950">
+            <i class="fa-solid fa-user-plus"></i> Nouveau Contact / Entreprise
+          </button>
         </div>
 
-        <!-- Filtres Réseau -->
         <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3">
           <div class="relative flex-1 sm:w-64">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-500"></i>
@@ -350,7 +326,6 @@
           </select>
         </div>
 
-        <!-- Grille de Contacts -->
         <div id="network-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="text-xs text-slate-500 col-span-full py-4 text-center">Aucun contact enregistré.</div>
         </div>
@@ -368,50 +343,222 @@
               <option value="Web">🌐 Web & BDD Académiques</option>
             </select>
           </div>
-
           <button onclick="openModal('resource')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5">
             <i class="fa-solid fa-plus"></i> Ajouter une ressource
           </button>
         </div>
-
         <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       </section>
 
-      <!-- ================= 5. HÉROS / PJ ================= -->
+      <!-- ================= 5. HÉROS / PJ (Étape 4 & 6) ================= -->
       <section id="view-hero" class="space-y-6 hidden">
-        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center py-12 space-y-3">
-          <div class="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center mx-auto text-xl">
-            <i class="fa-solid fa-shield-halved"></i>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Carte Fiche de Personnage -->
+          <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-6">
+            <div class="flex items-center gap-4">
+              <div id="hero-avatar" class="w-16 h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-500/50 flex items-center justify-center text-amber-400 text-3xl shadow-xl">
+                <i class="fa-solid fa-user-shield"></i>
+              </div>
+              <div>
+                <h2 id="hero-name" class="text-xl font-bold text-white">Héros</h2>
+                <p id="hero-archetype-full" class="text-xs text-indigo-400 font-semibold">Voie des Artisans (Forgeron)</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <span id="hero-level-badge" class="px-2 py-0.5 bg-amber-950 text-amber-400 border border-amber-800/50 text-xs font-bold rounded">Niveau 1</span>
+                  <span id="hero-energy-badge" class="px-2 py-0.5 bg-indigo-950 text-indigo-300 border border-indigo-800/50 text-xs font-bold rounded">10/10 Énergie</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats & Points -->
+            <div class="space-y-3 pt-4 border-t border-slate-800">
+              <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                <span>Caractéristiques</span>
+                <span id="hero-stat-points" class="text-amber-400 font-mono">0 Pt(s) dispo</span>
+              </h3>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                  <span class="text-slate-400"><i class="fa-solid fa-hand-fist text-rose-400 mr-1.5"></i>Force</span>
+                  <span id="stat-str" class="font-bold text-white font-mono">10</span>
+                </div>
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                  <span class="text-slate-400"><i class="fa-solid fa-brain text-indigo-400 mr-1.5"></i>Intell.</span>
+                  <span id="stat-int" class="font-bold text-white font-mono">10</span>
+                </div>
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                  <span class="text-slate-400"><i class="fa-solid fa-comments text-emerald-400 mr-1.5"></i>Charisme</span>
+                  <span id="stat-cha" class="font-bold text-white font-mono">10</span>
+                </div>
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                  <span class="text-slate-400"><i class="fa-solid fa-hammer text-amber-400 mr-1.5"></i>Maîtrise</span>
+                  <span id="stat-dex" class="font-bold text-white font-mono">10</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <button onclick="openModal('create-hero')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-semibold rounded-xl transition">
+                <i class="fa-solid fa-rotate mr-1.5"></i> Réinitialiser / Changer de Voie
+              </button>
+            </div>
           </div>
-          <h2 class="text-lg font-bold text-white">Feuille de Personnage & RPG</h2>
-          <p class="text-xs text-slate-400 max-w-md mx-auto">
-            Consultez votre Archétype (Combattant, Social, Spirituel, Artisan), débloquez vos talents, attribuez vos points de caractéristiques et gérez votre sac d'objets.
-          </p>
-          <span class="inline-block px-3 py-1 bg-slate-900 border border-slate-800 text-slate-400 text-xs rounded-full font-mono">
-            À venir à l'Étape 4
-          </span>
+
+          <!-- Sac & Inventaire (Généré par les tâches Kanban) -->
+          <div class="lg:col-span-2 bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                  <i class="fa-solid fa-box-archive text-amber-400"></i> Sac & Matériaux de Fabrication
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5">Accomplissez vos tâches Kanban réelles pour récolter du butin</p>
+              </div>
+              <span id="inventory-count" class="text-xs font-mono bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 text-slate-300">0 / 20 Objets</span>
+            </div>
+
+            <div id="inventory-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="text-xs text-slate-500 col-span-full py-6 text-center">Votre sac est vide. Effectuez des tâches dans le Kanban pour gagner du matériel !</div>
+            </div>
+          </div>
+
         </div>
       </section>
 
     </div>
   </main>
 
-  <!-- ================= MODAL TÂCHE ================= -->
+  <!-- ================= MODAL CREATION HÉROS (Étape 4) ================= -->
+  <div id="modal-create-hero" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
+      <div class="text-center space-y-1">
+        <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-shield-halved text-amber-400 mr-2"></i>Choisissez votre Voie</h3>
+        <p class="text-xs text-slate-400">Sélectionnez l'archétype qui accompagnera votre quotidien d'ergonome.</p>
+      </div>
+
+      <form onsubmit="handleSaveHero(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Nom du Héros *</label>
+          <input type="text" id="create-hero-name" required value="Tom" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Voie & Archétype *</label>
+          <select id="create-hero-archetype" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+            <optgroup label="1. Les Combattants">
+              <option value="Guerrier">⚔️ Guerrier</option>
+              <option value="Archer">🏹 Archer</option>
+              <option value="Mage">🔮 Mage</option>
+            </optgroup>
+            <optgroup label="2. Les Sociaux">
+              <option value="Barde">🎵 Barde</option>
+              <option value="Stratège">♟️ Stratège</option>
+              <option value="Négociateur" selected>🤝 Négociateur / Diplomate</option>
+            </optgroup>
+            <optgroup label="3. Les Spirituels">
+              <option value="Chaman">🌿 Chaman</option>
+              <option value="Oracle">👁️ Oracle</option>
+              <option value="Clerc">✨ Clerc</option>
+            </optgroup>
+            <optgroup label="4. Les Artisans">
+              <option value="Forgeron">🔨 Forgeron</option>
+              <option value="Menuisier">🪵 Menuisier</option>
+              <option value="Tanneur">🧵 Tanneur</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex justify-end">
+          <button type="submit" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-amber-950">Incarner ce Héros</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DIALOGUE PNJ & QUÊTE DU JOUR (Étape 5) ================= -->
+  <div id="modal-pnj" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-5 relative">
+      
+      <div class="flex items-start gap-4 border-b border-slate-800 pb-4">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-2xl shrink-0">
+          <i class="fa-solid fa-user-ninja"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            Le Sage Guide <span class="text-[10px] bg-amber-950 text-amber-400 border border-amber-800/50 px-2 py-0.5 rounded font-mono">PNJ</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">"Un esprit structuré transforme chaque journée en victoire."</p>
+        </div>
+        <button onclick="closeModal('pnj')" class="text-slate-400 hover:text-white ml-auto"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <!-- Questionnaire Réflexif Guidé -->
+      <form id="form-pnj-quest" onsubmit="handleFinishDailyQuest(event)" class="space-y-4">
+        
+        <div>
+          <label class="block text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">1. Trois choses/enseignements retenus de la veille :</label>
+          <textarea id="pnj-q1" required rows="2" placeholder="Ex: Découverte de la grille d'évaluation Bastien & Scapin, bon échange avec le tuteur..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">2. Humeur globale :</label>
+            <select id="pnj-q2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+              <option value="Serein / Enthousiaste">😊 Serein / Enthousiaste</option>
+              <option value="Concentré / Déterminé">🎯 Concentré / Déterminé</option>
+              <option value="Fatigué / Énergies basses">😴 Fatigué / Énergies basses</option>
+              <option value="Surchargé / Stressé">🌧️ Surchargé / Stressé</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">3. Satisfaction (1 à 10) :</label>
+            <input type="number" id="pnj-q3" min="1" max="10" value="7" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">4. Projections & intentions réalistes pour aujourd'hui :</label>
+          <textarea id="pnj-q4" required rows="2" placeholder="Ex: Avancer sur le rapport UX, 30 min de veille, sans surcharger la soirée..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
+        </div>
+
+        <!-- Récompense au Choix -->
+        <div class="pt-3 border-t border-slate-800 space-y-2">
+          <label class="block text-xs font-bold text-white uppercase tracking-wider">Choisissez votre Récompense du Jour :</label>
+          <div class="grid grid-cols-3 gap-2 text-xs">
+            <label class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 cursor-pointer flex flex-col items-center text-center gap-1 hover:border-amber-500">
+              <input type="radio" name="reward-choice" value="stat" checked class="accent-amber-500">
+              <span class="font-bold text-amber-400">+1 Caractéristique</span>
+            </label>
+            <label class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 cursor-pointer flex flex-col items-center text-center gap-1 hover:border-indigo-500">
+              <input type="radio" name="reward-choice" value="talent" class="accent-indigo-500">
+              <span class="font-bold text-indigo-400">+1 Talent</span>
+            </label>
+            <label class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 cursor-pointer flex flex-col items-center text-center gap-1 hover:border-emerald-500">
+              <input type="radio" name="reward-choice" value="item" class="accent-emerald-500">
+              <span class="font-bold text-emerald-400">+1 Matériau Rare</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button type="submit" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-amber-950">Valider la Quête & Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODALS CLASSIQUES (Tâche, Ressource, Favori, Contact) -->
   <div id="modal-task" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 id="modal-task-title" class="text-lg font-bold text-white">Nouvelle Tâche</h3>
         <button onclick="closeModal('task')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
       <form id="form-task" onsubmit="handleSaveTask(event)" class="space-y-4">
         <input type="hidden" id="task-id">
-
         <div>
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Titre de la tâche *</label>
           <input type="text" id="task-title" required placeholder="Ex: Synthèse d'usabilité Vinted" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
         </div>
-
         <div>
           <div class="flex items-center justify-between mb-1">
             <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Degré d'Urgence / Priorité (1 à 10)</label>
@@ -419,7 +566,6 @@
           </div>
           <input type="range" id="task-priority" min="1" max="10" value="5" oninput="updatePrioritySliderDisplay(this.value)" class="w-full accent-indigo-500 cursor-pointer">
         </div>
-
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Type de travail</label>
@@ -429,7 +575,6 @@
               <option value="Devoir">Devoir / Exercice</option>
             </select>
           </div>
-
           <div>
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Unité d'Enseignement (UE)</label>
             <select id="task-ue" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
@@ -440,17 +585,14 @@
             </select>
           </div>
         </div>
-
         <div>
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Date d'échéance *</label>
           <input type="date" id="task-dueDate" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
         </div>
-
         <div>
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Notes / Description</label>
           <textarea id="task-notes" rows="3" placeholder="Consignes, liens..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
         </div>
-
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
           <button type="button" onclick="closeModal('task')" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition">Annuler</button>
           <button type="submit" id="task-submit-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-indigo-950">Créer la tâche</button>
@@ -459,14 +601,12 @@
     </div>
   </div>
 
-  <!-- ================= MODAL RESSOURCE ================= -->
   <div id="modal-resource" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-book-bookmark text-emerald-400 mr-2"></i>Nouvelle Ressource</h3>
         <button onclick="closeModal('resource')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
       <form id="form-resource" onsubmit="handleAddResource(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Titre *</label>
@@ -518,14 +658,12 @@
     </div>
   </div>
 
-  <!-- ================= MODAL FAVORIS (Étape 2) ================= -->
   <div id="modal-favorite" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-white"><i class="fa-solid fa-star text-amber-400 mr-2"></i>Nouveau Favori</h3>
         <button onclick="closeModal('favorite')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
       <form onsubmit="handleAddFavorite(event)" class="space-y-3">
         <div>
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Titre du raccourci *</label>
@@ -536,7 +674,7 @@
           <input type="url" id="fav-url" required placeholder="https://drive.google.com/..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Icône (FontAwesome)</label>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Icône</label>
           <select id="fav-icon" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
             <option value="fa-folder-open">📁 Dossier / Drive</option>
             <option value="fa-graduation-cap">🎓 Université / ENT</option>
@@ -552,14 +690,12 @@
     </div>
   </div>
 
-  <!-- ================= MODAL CONTACT (Étape 3) ================= -->
   <div id="modal-contact" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-white"><i class="fa-solid fa-address-book text-indigo-400 mr-2"></i>Nouveau Contact Réseau</h3>
         <button onclick="closeModal('contact')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
       <form onsubmit="handleAddContact(event)" class="space-y-3">
         <div class="grid grid-cols-2 gap-3">
           <div>
@@ -574,7 +710,6 @@
             <input type="text" id="contact-name" required placeholder="Ex: Jean Dupont ou Capgemini" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
           </div>
         </div>
-
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Fonction / Rôle</label>
@@ -585,7 +720,6 @@
             <input type="text" id="contact-company" placeholder="Ex: Airbus / Université" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
           </div>
         </div>
-
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">E-mail</label>
@@ -596,12 +730,10 @@
             <input type="text" id="contact-link" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
           </div>
         </div>
-
         <div>
           <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Notes / Historique des échanges</label>
           <textarea id="contact-notes" rows="2" placeholder="Échanges, opportunités, recommandations..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
         </div>
-
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
           <button type="button" onclick="closeModal('contact')" class="px-3 py-1.5 text-xs text-slate-400 hover:text-white">Annuler</button>
           <button type="submit" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-950">Ajouter</button>
@@ -616,6 +748,7 @@
     let resources = [];
     let favorites = [];
     let contacts = [];
+    let hero = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       const checkFirebase = setInterval(() => {
@@ -628,22 +761,20 @@
       autoLoadRepoICal();
     });
 
-    // CHARGEMENT AUTOMATIQUE DU FICHIER BASIC.ICS
+    // CHARGEMENT AUTOMATIQUE ICAL
     async function autoLoadRepoICal() {
       try {
         const response = await fetch('./basic.ics?v=' + new Date().getTime());
         if (response.ok) {
           const text = await response.text();
-          if (text && text.includes('BEGIN:VCALENDAR')) {
-            parseICalData(text);
-          }
+          if (text && text.includes('BEGIN:VCALENDAR')) parseICalData(text);
         }
       } catch (err) {
-        console.warn("Fichier basic.ics non trouvé à la racine.");
+        console.warn("Fichier basic.ics non trouvé.");
       }
     }
 
-    // SYNCHRONISATION CLOUD FIREBASE
+    // FIREBASE LISTENERS
     function setupFirebaseListeners() {
       window.fb.onSnapshot(window.fb.collection(window.db, "tasks"), (snapshot) => {
         tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -666,9 +797,19 @@
         contacts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderNetwork();
       });
+
+      // Synchronisation du Héros (Collection character / main)
+      window.fb.onSnapshot(window.fb.doc(window.db, "character", "main"), (docSnap) => {
+        if (docSnap.exists()) {
+          hero = docSnap.data();
+          renderHero();
+        } else {
+          openModal('create-hero');
+        }
+      });
     }
 
-    // NAVIGATION ONGLETS PRINCIPAUX
+    // NAVIGATION
     function switchTab(tabId) {
       document.querySelectorAll('main > div > section').forEach(el => el.classList.add('hidden'));
       document.getElementById(`view-${tabId}`).classList.remove('hidden');
@@ -684,11 +825,9 @@
       }
     }
 
-    // NAVIGATION SOUS-ONGLETS WORKSPACE
     function switchWorkspaceSubTab(subTab) {
       document.getElementById('workspace-agenda').classList.add('hidden');
       document.getElementById('workspace-kanban').classList.add('hidden');
-      
       document.querySelectorAll('.subtab-btn').forEach(btn => {
         btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-950');
         btn.classList.add('bg-slate-800', 'text-slate-400');
@@ -697,50 +836,23 @@
       if (subTab === 'agenda') {
         document.getElementById('workspace-agenda').classList.remove('hidden');
         document.getElementById('subtab-agenda').classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-950');
-        document.getElementById('subtab-agenda').classList.remove('bg-slate-800', 'text-slate-400');
       } else {
         document.getElementById('workspace-kanban').classList.remove('hidden');
         document.getElementById('subtab-kanban').classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-950');
-        document.getElementById('subtab-kanban').classList.remove('bg-slate-800', 'text-slate-400');
       }
     }
 
-    function updatePrioritySliderDisplay(val) {
-      const disp = document.getElementById('priority-value-display');
-      disp.innerText = `${val}/10`;
-      if (val >= 7) disp.className = 'text-xs font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800/50';
-      else if (val >= 4) disp.className = 'text-xs font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800/50';
-      else disp.className = 'text-xs font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/50';
-    }
-
-    // MODALS
     function openModal(type, taskId = null) {
-      if (type === 'task') {
-        const modalTitle = document.getElementById('modal-task-title');
-        const submitBtn = document.getElementById('task-submit-btn');
-
-        if (taskId) {
-          const task = tasks.find(t => t.id === taskId);
-          if (task) {
-            document.getElementById('task-id').value = task.id;
-            document.getElementById('task-title').value = task.title;
-            document.getElementById('task-priority').value = task.priority || 5;
-            updatePrioritySliderDisplay(task.priority || 5);
-            document.getElementById('task-type').value = task.type;
-            document.getElementById('task-ue').value = task.ue;
-            document.getElementById('task-dueDate').value = task.dueDate;
-            document.getElementById('task-notes').value = task.notes || '';
-
-            modalTitle.innerText = "Modifier la Tâche";
-            submitBtn.innerText = "Enregistrer les modifications";
-          }
-        } else {
-          document.getElementById('form-task').reset();
-          document.getElementById('task-id').value = '';
-          document.getElementById('task-priority').value = 5;
-          updatePrioritySliderDisplay(5);
-          modalTitle.innerText = "Nouvelle Tâche";
-          submitBtn.innerText = "Créer la tâche";
+      if (type === 'task' && taskId) {
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+          document.getElementById('task-id').value = task.id;
+          document.getElementById('task-title').value = task.title;
+          document.getElementById('task-priority').value = task.priority || 5;
+          document.getElementById('task-type').value = task.type;
+          document.getElementById('task-ue').value = task.ue;
+          document.getElementById('task-dueDate').value = task.dueDate;
+          document.getElementById('task-notes').value = task.notes || '';
         }
       }
       document.getElementById(`modal-${type}`).classList.remove('hidden');
@@ -748,116 +860,144 @@
 
     function closeModal(type) { document.getElementById(`modal-${type}`).classList.add('hidden'); }
 
-    // FAVORIS (Étape 2)
-    async function handleAddFavorite(e) {
+    function openPnjModal() { document.getElementById('modal-pnj').classList.remove('hidden'); }
+
+    // HÉROS & RPG (Étape 4)
+    async function handleSaveHero(e) {
       e.preventDefault();
-      const favData = {
-        title: document.getElementById('fav-title').value,
-        url: document.getElementById('fav-url').value,
-        icon: document.getElementById('fav-icon').value
+      const heroData = {
+        name: document.getElementById('create-hero-name').value,
+        archetype: document.getElementById('create-hero-archetype').value,
+        level: 1,
+        energy: 10,
+        maxEnergy: 10,
+        statPoints: 0,
+        talentPoints: 0,
+        stats: { str: 10, int: 10, cha: 12, dex: 10 },
+        inventory: [
+          { title: 'Trousse d\'Ergonome', type: 'Outil', qty: 1, icon: 'fa-briefcase' }
+        ],
+        lastQuestDate: ''
       };
-      await window.fb.addDoc(window.fb.collection(window.db, "favorites"), favData);
-      closeModal('favorite');
+      await window.fb.setDoc(window.fb.doc(window.db, "character", "main"), heroData);
+      closeModal('create-hero');
     }
 
-    async function deleteFavorite(id) {
-      if (confirm("Supprimer ce favori ?")) {
-        await window.fb.deleteDoc(window.fb.doc(window.db, "favorites", id));
+    function renderHero() {
+      if (!hero) return;
+      document.getElementById('hero-name').innerText = hero.name;
+      document.getElementById('hero-archetype-full').innerText = `Voie : ${hero.archetype}`;
+      document.getElementById('mini-hero-archetype').innerText = hero.archetype;
+      document.getElementById('mini-hero-level').innerText = `Niv. ${hero.level}`;
+      document.getElementById('hero-level-badge').innerText = `Niveau ${hero.level}`;
+      
+      document.getElementById('mini-hero-energy-text').innerText = `${hero.energy}/${hero.maxEnergy} ÉL`;
+      document.getElementById('hero-energy-badge').innerText = `${hero.energy}/${hero.maxEnergy} Énergie`;
+      const energyPct = Math.round((hero.energy / hero.maxEnergy) * 100);
+      document.getElementById('mini-hero-energy-bar').style.width = `${energyPct}%`;
+
+      document.getElementById('hero-stat-points').innerText = `${hero.statPoints || 0} Pt(s) dispo`;
+      document.getElementById('stat-str').innerText = hero.stats?.str || 10;
+      document.getElementById('stat-int').innerText = hero.stats?.int || 10;
+      document.getElementById('stat-cha').innerText = hero.stats?.cha || 10;
+      document.getElementById('stat-dex').innerText = hero.stats?.dex || 10;
+
+      // Icone selon l'archétype
+      let icon = 'fa-user-shield';
+      if (['Guerrier', 'Archer', 'Mage'].includes(hero.archetype)) icon = 'fa-shield-halved';
+      if (['Barde', 'Stratège', 'Négociateur'].includes(hero.archetype)) icon = 'fa-handshake';
+      if (['Chaman', 'Oracle', 'Clerc'].includes(hero.archetype)) icon = 'fa-wand-magic-sparkles';
+      if (['Forgeron', 'Menuisier', 'Tanneur'].includes(hero.archetype)) icon = 'fa-hammer';
+      
+      document.getElementById('mini-hero-icon').className = `fa-solid ${icon}`;
+      document.getElementById('hero-avatar').innerHTML = `<i class="fa-solid ${icon}"></i>`;
+
+      // Statut Quête du Jour
+      const today = new Date().toISOString().split('T')[0];
+      const isQuestDone = hero.lastQuestDate === today;
+      const questBadge = document.getElementById('mini-daily-quest-badge');
+      if (isQuestDone) {
+        questBadge.className = "ml-1 px-2 py-1 bg-emerald-950/80 border border-emerald-800/50 text-emerald-300 text-[10px] font-bold rounded-lg flex items-center gap-1 cursor-pointer";
+        questBadge.innerHTML = `<i class="fa-solid fa-check"></i> <span>Quête faite</span>`;
+      } else {
+        questBadge.className = "ml-1 px-2 py-1 bg-rose-950/80 border border-rose-800/50 text-rose-300 text-[10px] font-bold rounded-lg flex items-center gap-1 animate-pulse cursor-pointer";
+        questBadge.innerHTML = `<i class="fa-solid fa-scroll"></i> <span>Quête !</span>`;
       }
+
+      // Rendu de l'inventaire
+      renderInventory();
     }
 
-    function renderFavorites() {
-      const grid = document.getElementById('favorites-grid');
+    function renderInventory() {
+      const grid = document.getElementById('inventory-grid');
       grid.innerHTML = '';
+      const items = hero.inventory || [];
+      
+      document.getElementById('inventory-count').innerText = `${items.length} / 20 Objets`;
 
-      if (favorites.length === 0) {
-        grid.innerHTML = `<div class="text-xs text-slate-500 col-span-full py-2">Aucun favori enregistré.</div>`;
+      if (items.length === 0) {
+        grid.innerHTML = `<div class="text-xs text-slate-500 col-span-full py-6 text-center">Votre sac est vide. Effectuez des tâches dans le Kanban pour gagner du matériel !</div>`;
         return;
       }
 
-      favorites.forEach(f => {
-        const item = document.createElement('div');
-        item.className = 'group relative bg-slate-900 border border-slate-800 hover:border-slate-700 p-3 rounded-xl flex flex-col items-center justify-center text-center gap-1.5 transition';
-        item.innerHTML = `
-          <a href="${f.url}" target="_blank" class="flex flex-col items-center gap-1.5 w-full">
-            <i class="fa-solid ${f.icon || 'fa-globe'} text-amber-400 text-base"></i>
-            <span class="text-xs font-semibold text-white truncate w-full" title="${f.title}">${f.title}</span>
-          </a>
-          <button onclick="deleteFavorite('${f.id}')" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 text-[10px] transition px-1">
-            <i class="fa-regular fa-trash-can"></i>
-          </button>
-        `;
-        grid.appendChild(item);
-      });
-    }
-
-    // CONTACTS RÉSEAU (Étape 3)
-    async function handleAddContact(e) {
-      e.preventDefault();
-      const contactData = {
-        type: document.getElementById('contact-type').value,
-        name: document.getElementById('contact-name').value,
-        role: document.getElementById('contact-role').value,
-        company: document.getElementById('contact-company').value,
-        email: document.getElementById('contact-email').value,
-        link: document.getElementById('contact-link').value,
-        notes: document.getElementById('contact-notes').value
-      };
-      await window.fb.addDoc(window.fb.collection(window.db, "contacts"), contactData);
-      closeModal('contact');
-    }
-
-    async function deleteContact(id) {
-      if (confirm("Supprimer ce contact ?")) {
-        await window.fb.deleteDoc(window.fb.doc(window.db, "contacts", id));
-      }
-    }
-
-    function renderNetwork() {
-      const search = document.getElementById('network-search').value.toLowerCase();
-      const filterType = document.getElementById('filter-network-type').value;
-      const grid = document.getElementById('network-grid');
-      grid.innerHTML = '';
-
-      const filtered = contacts.filter(c => {
-        const matchSearch = c.name.toLowerCase().includes(search) || (c.company && c.company.toLowerCase().includes(search)) || (c.role && c.role.toLowerCase().includes(search));
-        const matchType = filterType === 'all' || c.type === filterType;
-        return matchSearch && matchType;
-      });
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `<div class="text-xs text-slate-500 col-span-full py-4 text-center">Aucun contact trouvé.</div>`;
-        return;
-      }
-
-      filtered.forEach(c => {
+      items.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5 relative';
+        card.className = 'bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center gap-3 relative';
         card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="px-2 py-0.5 bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 text-[10px] font-bold rounded-md">
-              <i class="fa-solid ${c.type === 'Entreprise' ? 'fa-building' : 'fa-user'} mr-1"></i>${c.type}
-            </span>
-            <button onclick="deleteContact('${c.id}')" class="text-slate-500 hover:text-rose-400 text-xs transition">
-              <i class="fa-regular fa-trash-can"></i>
-            </button>
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-sm">
+            <i class="fa-solid ${item.icon || 'fa-box'}"></i>
           </div>
           <div>
-            <h4 class="text-sm font-bold text-white">${c.name}</h4>
-            ${c.role ? `<p class="text-xs text-indigo-400 font-medium">${c.role}</p>` : ''}
-            ${c.company ? `<p class="text-xs text-slate-400">${c.company}</p>` : ''}
-          </div>
-          ${c.notes ? `<p class="text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">${c.notes}</p>` : ''}
-          <div class="flex items-center gap-3 pt-1 text-xs">
-            ${c.email ? `<a href="mailto:${c.email}" class="text-indigo-400 hover:underline"><i class="fa-regular fa-envelope mr-1"></i>E-mail</a>` : ''}
-            ${c.link ? `<a href="${c.link}" target="_blank" class="text-indigo-400 hover:underline"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Lien</a>` : ''}
+            <h5 class="text-xs font-bold text-white leading-tight">${item.title}</h5>
+            <p class="text-[10px] text-slate-400">Qté : ${item.qty || 1}</p>
           </div>
         `;
         grid.appendChild(card);
       });
     }
 
-    // GESTION TÂCHES KANBAN
+    // PNJ & QUÊTE DU JOUR (Étape 5)
+    async function handleFinishDailyQuest(e) {
+      e.preventDefault();
+      const today = new Date().toISOString().split('T')[0];
+      const rewardChoice = document.querySelector('input[name="reward-choice"]:checked').value;
+
+      const journalData = {
+        date: today,
+        timestamp: new Date().toISOString(),
+        teachings: document.getElementById('pnj-q1').value,
+        mood: document.getElementById('pnj-q2').value,
+        satisfaction: parseInt(document.getElementById('pnj-q3').value),
+        projections: document.getElementById('pnj-q4').value,
+        reward: rewardChoice
+      };
+
+      await window.fb.addDoc(window.fb.collection(window.db, "daily_journals"), journalData);
+
+      // Récompense appliquée au Héros
+      if (hero) {
+        let updatedHero = { ...hero, lastQuestDate: today };
+        
+        if (rewardChoice === 'stat') updatedHero.statPoints = (updatedHero.statPoints || 0) + 1;
+        if (rewardChoice === 'talent') updatedHero.talentPoints = (updatedHero.talentPoints || 0) + 1;
+        if (rewardChoice === 'item') {
+          const rareItems = [
+            { title: 'Parchemin d\'Analyse UX', icon: 'fa-scroll', qty: 1 },
+            { title: 'Amulette de Focus', icon: 'fa-gem', qty: 1 },
+            { title: 'Cristal de Synthèse', icon: 'fa-crystal-ball', qty: 1 }
+          ];
+          const randomItem = rareItems[Math.floor(Math.random() * rareItems.length)];
+          updatedHero.inventory = [...(updatedHero.inventory || []), randomItem];
+        }
+
+        await window.fb.setDoc(window.fb.doc(window.db, "character", "main"), updatedHero);
+      }
+
+      closeModal('pnj');
+      alert("Quête quotidienne enregistrée ! Vos récompenses ont été attribuées à votre Héros.");
+    }
+
+    // KANBAN & INTERCONNECTION (Étape 6)
     async function handleSaveTask(e) {
       e.preventDefault();
       const id = document.getElementById('task-id').value;
@@ -876,14 +1016,11 @@
         taskData.status = 'todo';
         await window.fb.addDoc(window.fb.collection(window.db, "tasks"), taskData);
       }
-
       closeModal('task');
     }
 
     async function deleteTask(id) {
-      if (confirm("Supprimer cette tâche ?")) {
-        await window.fb.deleteDoc(window.fb.doc(window.db, "tasks", id));
-      }
+      if (confirm("Supprimer cette tâche ?")) await window.fb.deleteDoc(window.fb.doc(window.db, "tasks", id));
     }
 
     function renderKanban() {
@@ -940,7 +1077,7 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5">
             <span class="px-2 py-0.5 border text-[10px] font-bold rounded-md ${typeBadge}">${task.type}</span>
-            <span class="px-1.5 py-0.5 border text-[10px] font-bold rounded-md ${prioBadge}" title="Degré d'urgence">🔥 ${prio}/10</span>
+            <span class="px-1.5 py-0.5 border text-[10px] font-bold rounded-md ${prioBadge}">🔥 ${prio}/10</span>
           </div>
           <div class="flex items-center gap-1">
             <button onclick="openModal('task', '${task.id}')" title="Éditer" class="text-slate-500 hover:text-indigo-400 text-xs transition px-1">
@@ -983,127 +1120,137 @@
           col.classList.remove('drag-over');
           const id = e.dataTransfer.getData('text/plain');
           const newStatus = col.getAttribute('data-status');
+          
           await window.fb.updateDoc(window.fb.doc(window.db, "tasks", id), { status: newStatus });
+
+          // Interconnexion : Terminer une tâche octroie un matériau d'artisan au Héros !
+          if (newStatus === 'done' && hero) {
+            const materials = [
+              { title: 'Minerai de Fer', icon: 'fa-cubes', qty: 1 },
+              { title: 'Bois d\'Érable', icon: 'fa-tree', qty: 1 },
+              { title: 'Cuir Brut', icon: 'fa-rug', qty: 1 }
+            ];
+            const rewardMat = materials[Math.floor(Math.random() * materials.length)];
+            
+            let updatedInv = [...(hero.inventory || [])];
+            const existingIndex = updatedInv.findIndex(i => i.title === rewardMat.title);
+            if (existingIndex >= 0) updatedInv[existingIndex].qty = (updatedInv[existingIndex].qty || 1) + 1;
+            else updatedInv.push(rewardMat);
+
+            await window.fb.setDoc(window.fb.doc(window.db, "character", "main"), { ...hero, inventory: updatedInv });
+          }
         });
       });
     }
 
-    // GESTION ICAL (.ICS)
-    function handleICalFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) { parseICalData(e.target.result); };
-      reader.readAsText(file);
+    // FAVORIS & CONTACTS
+    async function handleAddFavorite(e) {
+      e.preventDefault();
+      const favData = { title: document.getElementById('fav-title').value, url: document.getElementById('fav-url').value, icon: document.getElementById('fav-icon').value };
+      await window.fb.addDoc(window.fb.collection(window.db, "favorites"), favData);
+      closeModal('favorite');
     }
 
-    function parseICalData(icalText) {
-      try {
-        const jcalData = ICAL.parse(icalText);
-        const comp = new ICAL.Component(jcalData);
-        const vevents = comp.getAllSubcomponents('vevent');
-        const now = new Date();
-        
-        let events = [];
-
-        vevents.forEach(vevent => {
-          const event = new ICAL.Event(vevent);
-          
-          if (event.isRecurring()) {
-            const expand = event.iterator();
-            let next;
-            while ((next = expand.next()) && events.length < 50) {
-              const jsDate = next.toJSDate();
-              if (jsDate >= now) {
-                events.push({
-                  summary: event.summary,
-                  location: event.location,
-                  start: jsDate,
-                  end: new Date(jsDate.getTime() + event.duration.toSeconds() * 1000)
-                });
-                break;
-              }
-            }
-          } else {
-            const startDate = event.startDate.toJSDate();
-            if (startDate >= now) {
-              events.push({
-                summary: event.summary,
-                location: event.location,
-                start: startDate,
-                end: event.endDate.toJSDate()
-              });
-            }
-          }
-        });
-
-        events.sort((a, b) => a.start - b.start);
-        renderAgenda(events);
-      } catch (err) {
-        console.error("Erreur parsing iCal:", err);
-      }
+    async function deleteFavorite(id) {
+      if (confirm("Supprimer ce favori ?")) await window.fb.deleteDoc(window.fb.doc(window.db, "favorites", id));
     }
 
-    function renderAgenda(events) {
-      const now = new Date();
-      const upcomingEvents = events.filter(e => e.start >= now);
-      
-      if (upcomingEvents.length > 0) {
-        const next = upcomingEvents[0];
-        document.getElementById('course-title').innerText = next.summary || 'Sans titre';
-        document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Lieu non spécifié'}`;
-        document.getElementById('course-time').innerHTML = `<i class="fa-regular fa-clock text-indigo-400"></i> ${next.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'})} — ${next.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-        
-        const diffHours = Math.floor((next.start - now) / (1000 * 60 * 60));
-        document.getElementById('course-countdown').innerText = diffHours > 0 ? `PROCHAIN COURS (DANS ${diffHours}H)` : 'PROCHAIN COURS (IMMINENT)';
-
-        const followingEvents = upcomingEvents.slice(1, 5);
-        const grid = document.getElementById('next-courses-grid');
-        grid.innerHTML = '';
-
-        if (followingEvents.length === 0) {
-          grid.innerHTML = `<div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-500 col-span-4">Aucun autre cours programmé ensuite.</div>`;
-        } else {
-          followingEvents.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'bg-slate-900/80 p-3 rounded-xl border border-slate-800 hover:border-slate-700 transition space-y-1.5';
-            card.innerHTML = `
-              <h5 class="text-xs font-bold text-white truncate" title="${item.summary || 'Sans titre'}">${item.summary || 'Sans titre'}</h5>
-              <p class="text-[11px] text-indigo-400 flex items-center gap-1">
-                <i class="fa-regular fa-clock"></i> ${item.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric'})} à ${item.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-              </p>
-              ${item.location ? `<p class="text-[10px] text-slate-400 truncate"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i>${item.location}</p>` : ''}
-            `;
-            grid.appendChild(card);
-          });
-        }
-
-      } else {
-        document.getElementById('course-title').innerText = "Aucun événement à venir";
-        document.getElementById('course-countdown').innerText = "PROCHAIN COURS";
-        document.getElementById('next-courses-grid').innerHTML = `<div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-500 col-span-4">Aucun cours à venir.</div>`;
+    function renderFavorites() {
+      const grid = document.getElementById('favorites-grid');
+      grid.innerHTML = '';
+      if (favorites.length === 0) {
+        grid.innerHTML = `<div class="text-xs text-slate-500 col-span-full py-2">Aucun favori enregistré.</div>`;
+        return;
       }
+      favorites.forEach(f => {
+        const item = document.createElement('div');
+        item.className = 'group relative bg-slate-900 border border-slate-800 hover:border-slate-700 p-3 rounded-xl flex flex-col items-center justify-center text-center gap-1.5 transition';
+        item.innerHTML = `
+          <a href="${f.url}" target="_blank" class="flex flex-col items-center gap-1.5 w-full">
+            <i class="fa-solid ${f.icon || 'fa-globe'} text-amber-400 text-base"></i>
+            <span class="text-xs font-semibold text-white truncate w-full" title="${f.title}">${f.title}</span>
+          </a>
+          <button onclick="deleteFavorite('${f.id}')" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 text-[10px] transition px-1">
+            <i class="fa-regular fa-trash-can"></i>
+          </button>
+        `;
+        grid.appendChild(item);
+      });
+    }
+
+    async function handleAddContact(e) {
+      e.preventDefault();
+      const contactData = {
+        type: document.getElementById('contact-type').value,
+        name: document.getElementById('contact-name').value,
+        role: document.getElementById('contact-role').value,
+        company: document.getElementById('contact-company').value,
+        email: document.getElementById('contact-email').value,
+        link: document.getElementById('contact-link').value,
+        notes: document.getElementById('contact-notes').value
+      };
+      await window.fb.addDoc(window.fb.collection(window.db, "contacts"), contactData);
+      closeModal('contact');
+    }
+
+    async function deleteContact(id) {
+      if (confirm("Supprimer ce contact ?")) await window.fb.deleteDoc(window.fb.doc(window.db, "contacts", id));
+    }
+
+    function renderNetwork() {
+      const search = document.getElementById('network-search').value.toLowerCase();
+      const filterType = document.getElementById('filter-network-type').value;
+      const grid = document.getElementById('network-grid');
+      grid.innerHTML = '';
+
+      const filtered = contacts.filter(c => {
+        const matchSearch = c.name.toLowerCase().includes(search) || (c.company && c.company.toLowerCase().includes(search)) || (c.role && c.role.toLowerCase().includes(search));
+        const matchType = filterType === 'all' || c.type === filterType;
+        return matchSearch && matchType;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="text-xs text-slate-500 col-span-full py-4 text-center">Aucun contact trouvé.</div>`;
+        return;
+      }
+
+      filtered.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5 relative';
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 bg-indigo-950/80 text-indigo-300 border border-indigo-800/50 text-[10px] font-bold rounded-md">
+              <i class="fa-solid ${c.type === 'Entreprise' ? 'fa-building' : 'fa-user'} mr-1"></i>${c.type}
+            </span>
+            <button onclick="deleteContact('${c.id}')" class="text-slate-500 hover:text-rose-400 text-xs transition">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-white">${c.name}</h4>
+            ${c.role ? `<p class="text-xs text-indigo-400 font-medium">${c.role}</p>` : ''}
+            ${c.company ? `<p class="text-xs text-slate-400">${c.company}</p>` : ''}
+          </div>
+          ${c.notes ? `<p class="text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">${c.notes}</p>` : ''}
+          <div class="flex items-center gap-3 pt-1 text-xs">
+            ${c.email ? `<a href="mailto:${c.email}" class="text-indigo-400 hover:underline"><i class="fa-regular fa-envelope mr-1"></i>E-mail</a>` : ''}
+            ${c.link ? `<a href="${c.link}" target="_blank" class="text-indigo-400 hover:underline"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Lien</a>` : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
     }
 
     // RESSOURCES & DASHBOARD
     async function handleAddResource(e) {
       e.preventDefault();
-      const resData = {
-        title: document.getElementById('res-title').value,
-        author: document.getElementById('res-author').value,
-        format: document.getElementById('res-format').value,
-        domain: document.getElementById('res-domain').value,
-        status: document.getElementById('res-status').value,
-        link: document.getElementById('res-link').value
-      };
+      const resData = { title: document.getElementById('res-title').value, author: document.getElementById('res-author').value, format: document.getElementById('res-format').value, domain: document.getElementById('res-domain').value, status: document.getElementById('res-status').value, link: document.getElementById('res-link').value };
       await window.fb.addDoc(window.fb.collection(window.db, "resources"), resData);
       closeModal('resource');
     }
 
     async function deleteResource(id) {
-      if (confirm("Supprimer cette ressource ?")) {
-        await window.fb.deleteDoc(window.fb.doc(window.db, "resources", id));
-      }
+      if (confirm("Supprimer cette ressource ?")) await window.fb.deleteDoc(window.fb.doc(window.db, "resources", id));
     }
 
     function renderRessources() {
@@ -1172,6 +1319,77 @@
         `;
         listContainer.appendChild(item);
       });
+    }
+
+    function parseICalData(icalText) {
+      try {
+        const jcalData = ICAL.parse(icalText);
+        const comp = new ICAL.Component(jcalData);
+        const vevents = comp.getAllSubcomponents('vevent');
+        const now = new Date();
+        let events = [];
+
+        vevents.forEach(vevent => {
+          const event = new ICAL.Event(vevent);
+          if (event.isRecurring()) {
+            const expand = event.iterator();
+            let next;
+            while ((next = expand.next()) && events.length < 50) {
+              const jsDate = next.toJSDate();
+              if (jsDate >= now) {
+                events.push({ summary: event.summary, location: event.location, start: jsDate, end: new Date(jsDate.getTime() + event.duration.toSeconds() * 1000) });
+                break;
+              }
+            }
+          } else {
+            const startDate = event.startDate.toJSDate();
+            if (startDate >= now) events.push({ summary: event.summary, location: event.location, start: startDate, end: event.endDate.toJSDate() });
+          }
+        });
+
+        events.sort((a, b) => a.start - b.start);
+        renderAgenda(events);
+      } catch (err) {
+        console.error("Erreur parsing iCal:", err);
+      }
+    }
+
+    function renderAgenda(events) {
+      const now = new Date();
+      const upcomingEvents = events.filter(e => e.start >= now);
+      if (upcomingEvents.length > 0) {
+        const next = upcomingEvents[0];
+        document.getElementById('course-title').innerText = next.summary || 'Sans titre';
+        document.getElementById('course-location').innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${next.location || 'Lieu non spécifié'}`;
+        document.getElementById('course-time').innerHTML = `<i class="fa-regular fa-clock text-indigo-400"></i> ${next.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric', month: 'short'})} — ${next.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        
+        const diffHours = Math.floor((next.start - now) / (1000 * 60 * 60));
+        document.getElementById('course-countdown').innerText = diffHours > 0 ? `DANS ${diffHours}H` : 'IMMINENT';
+
+        const followingEvents = upcomingEvents.slice(1, 5);
+        const grid = document.getElementById('next-courses-grid');
+        grid.innerHTML = '';
+        followingEvents.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'bg-slate-900/80 p-3 rounded-xl border border-slate-800 hover:border-slate-700 transition space-y-1.5';
+          card.innerHTML = `
+            <h5 class="text-xs font-bold text-white truncate" title="${item.summary || 'Sans titre'}">${item.summary || 'Sans titre'}</h5>
+            <p class="text-[11px] text-indigo-400 flex items-center gap-1">
+              <i class="fa-regular fa-clock"></i> ${item.start.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric'})} à ${item.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+            </p>
+            ${item.location ? `<p class="text-[10px] text-slate-400 truncate"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i>${item.location}</p>` : ''}
+          `;
+          grid.appendChild(card);
+        });
+      }
+    }
+
+    function handleICalFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) { parseICalData(e.target.result); };
+      reader.readAsText(file);
     }
   </script>
 </body>
