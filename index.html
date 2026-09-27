@@ -21,20 +21,20 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-  <!-- Header Navigation restauré -->
+  <!-- Header Navigation -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
       
       <!-- Logo & Navigation -->
       <div class="flex items-center space-x-6">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
-          <span class="text-2xl">🧠</span>
+        <div class="cursor-pointer" onclick="switchTab('dashboard')">
           <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">Ergo Hub</h1>
         </div>
         <nav class="flex space-x-1 bg-slate-900 p-1 rounded-lg border border-slate-700">
           <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white">Dashboard</button>
           <button onclick="switchTab('workspace')" id="tab-workspace" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white">Workspace</button>
           <button onclick="switchTab('crm')" id="tab-crm" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white">Réseau Pro</button>
+          <button onclick="switchTab('voyageur')" id="tab-voyageur" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white">Voyageur & JdB</button>
         </nav>
       </div>
 
@@ -122,64 +122,81 @@
       <p class="text-slate-400 text-sm">Annuaire CRM disponible.</p>
     </section>
 
-    <!-- TAB 4: VOYAGEUR & JOURNAL DE BORD -->
-    <section id="sec-voyageur" class="hidden space-y-8">
+    <!-- TAB 4: VOYAGEUR & JOURNAL DE BORD (Restructuré en 3 Sous-Onglets) -->
+    <section id="sec-voyageur" class="hidden space-y-6">
       
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Fiche Personnage Voyageur (Spécialité Verrouillable RP) -->
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🛡️ Le Voyageur</h2>
-            <span id="hero-level-badge" class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-xs font-bold">Niveau 1</span>
-          </div>
+      <!-- Sous-Barre de Navigation interne Voyageur -->
+      <div class="flex space-x-2 border-b border-slate-700 pb-3">
+        <button onclick="switchVoyageurSubTab('gamification')" id="vsubtab-gamification" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">
+          🛡️ Fiche Personnage
+        </button>
+        <button onclick="switchVoyageurSubTab('quest')" id="vsubtab-quest" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
+          📜 Quête Journalière & Archives
+        </button>
+        <button onclick="switchVoyageurSubTab('analytics')" id="vsubtab-analytics" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
+          📊 Dashboard JdB & Filtrage Sport
+        </button>
+      </div>
 
-          <div id="archetype-selection-box"></div>
-
-          <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-bold text-slate-300">Points à attribuer :</span>
-              <span id="stat-points-pool" class="text-emerald-400 font-bold">0</span>
+      <!-- SOUS-ONGLET 1: GAMIFICATION (FICHE DE PERSONNAGE) -->
+      <div id="vsub-gamification" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+            <div class="flex justify-between items-center">
+              <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🛡️ Statut du Voyageur</h2>
+              <span id="hero-level-badge" class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-xs font-bold">Niveau 1</span>
             </div>
-            <div id="stats-container" class="space-y-1 text-xs"></div>
-          </div>
 
-          <div>
-            <h3 class="text-sm font-bold text-slate-300 mb-2">Sac d'Inventaire</h3>
-            <div id="inventory-list" class="flex flex-wrap gap-2 p-3 bg-slate-900 rounded-lg border border-slate-700 min-h-[60px]"></div>
-          </div>
+            <div id="archetype-selection-box"></div>
 
-          <div class="pt-2 border-t border-slate-700">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Arbre de Compétences (Passif)</h3>
-            <div class="space-y-1.5 text-xs">
-              <div class="p-2 bg-slate-900/60 rounded border border-slate-700 flex justify-between items-center opacity-75">
-                <span>🔍 Focus Observation</span>
-                <span class="text-[10px] text-slate-500">Niv. 2</span>
+            <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-bold text-slate-300">Points à attribuer :</span>
+                <span id="stat-points-pool" class="text-emerald-400 font-bold">0</span>
               </div>
-              <div class="p-2 bg-slate-900/60 rounded border border-slate-700 flex justify-between items-center opacity-50">
-                <span>🛡️ Résilience Cognitive</span>
-                <span class="text-[10px] text-slate-500">Niv. 4</span>
+              <div id="stats-container" class="space-y-2 text-xs"></div>
+            </div>
+          </div>
+
+          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+            <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">📦 Sac d'Inventaire</h3>
+            <div id="inventory-list" class="flex flex-wrap gap-2 p-3 bg-slate-900 rounded-lg border border-slate-700 min-h-[80px]"></div>
+
+            <div class="pt-3 border-t border-slate-700">
+              <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">🌳 Arbre de Compétences (Passif)</h3>
+              <div class="space-y-2 text-xs">
+                <div class="p-2.5 bg-slate-900/60 rounded-lg border border-slate-700 flex justify-between items-center">
+                  <span>🔍 Focus Observation</span>
+                  <span class="text-[10px] text-emerald-400 font-bold">Niv. 2</span>
+                </div>
+                <div class="p-2.5 bg-slate-900/60 rounded-lg border border-slate-700 flex justify-between items-center opacity-60">
+                  <span>🛡️ Résilience Cognitive</span>
+                  <span class="text-[10px] text-slate-500">Niv. 4</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Quête Journalière (Bilan) -->
-        <div class="lg:col-span-2 bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+      <!-- SOUS-ONGLET 2: QUÊTE JOURNALIÈRE ET ARCHIVES -->
+      <div id="vsub-quest" class="hidden space-y-6">
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2">
-            <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">📜 Quête Journalière (Bilan)</h2>
+            <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">📜 Saisie de la Quête Journalière</h2>
             <span id="quest-status-badge" class="text-xs px-2.5 py-1 rounded bg-slate-700 text-slate-300">Saisie active</span>
           </div>
           
           <div class="flex space-x-2 border-b border-slate-700 pb-2">
-            <button onclick="switchFormTab(1)" id="ftab-1" class="px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white">1. Réflexivité & Date</button>
-            <button onclick="switchFormTab(2)" id="ftab-2" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">2. SAE (Efficacité)</button>
-            <button onclick="switchFormTab(3)" id="ftab-3" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">3. Sport (Optionnel)</button>
+            <button onclick="switchFormTab(1)" id="ftab-1" class="px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white">1. Réflexivité & Mood</button>
+            <button onclick="switchFormTab(2)" id="ftab-2" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">2. Sommeil</button>
+            <button onclick="switchFormTab(3)" id="ftab-3" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">3. SAE (Efficacité)</button>
+            <button onclick="switchFormTab(4)" id="ftab-4" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">4. Sport (Optionnel)</button>
           </div>
 
           <form id="form-jdb" onsubmit="saveJdbEntry(event)" class="space-y-4">
             
-            <!-- Section 1 -->
+            <!-- Section 1 : Réflexivité & Humeur -->
             <div id="fsec-1" class="space-y-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-300 mb-1">Date du bilan (Antidatage possible)</label>
@@ -189,27 +206,61 @@
                 <label class="block text-xs font-semibold text-slate-300 mb-1">Enseignements & Observations</label>
                 <textarea id="jdb-teachings" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Qu'as-tu appris ou observé..."></textarea>
               </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1">Humeur globale</label>
-                  <select id="jdb-mood" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
-                    <option value="5">⚡ Excellente (5/5)</option>
-                    <option value="4">😊 Bonne (4/5)</option>
-                    <option value="3" selected>😐 Neutre (3/5)</option>
-                    <option value="2">🔋 Fatigué(e) (2/5)</option>
-                    <option value="1">☁️ Difficile (1/5)</option>
-                  </select>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-1">
+                  <label class="block text-xs font-semibold text-slate-300">Humeur du jour : <span id="val-jdb-mood" class="text-amber-400 font-bold">5/10</span></label>
+                  <input type="range" id="jdb-mood" min="1" max="10" value="5" oninput="updateMoodLabel(this.value)" class="w-full accent-amber-500">
+                  <p id="lbl-mood-desc" class="text-[10px] text-slate-400 italic">😐 Neutre</p>
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1">Satisfaction générale (1-10)</label>
-                  <input type="number" id="jdb-satisfaction" min="1" max="10" value="7" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
+                  <label class="block text-xs font-semibold text-slate-300 mb-1">Satisfaction générale</label>
+                  <select id="jdb-satisfaction" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200">
+                    <option value="10">10 / 10 - Parfaite</option>
+                    <option value="9">9 / 10 - Excellente</option>
+                    <option value="8">8 / 10 - Très bonne</option>
+                    <option value="7" selected>7 / 10 - Bonne</option>
+                    <option value="6">6 / 10 - Correcte</option>
+                    <option value="5">5 / 10 - Moyenne</option>
+                    <option value="4">4 / 10 - Passable</option>
+                    <option value="3">3 / 10 - Insatisfaisante</option>
+                    <option value="2">2 / 10 - Difficile</option>
+                    <option value="1">1 / 10 - Très mauvaise</option>
+                  </select>
                 </div>
               </div>
             </div>
 
-            <!-- Section 2 -->
-            <div id="fsec-2" class="hidden space-y-3">
-              <p class="text-xs text-slate-400">Sentiment d'auto-efficacité (SAE) (1 à 10) :</p>
+            <!-- Section 2 : Sommeil -->
+            <div id="fsec-2" class="hidden space-y-4">
+              <p class="text-xs text-slate-400 font-semibold uppercase">Évaluation de la nuit & récupération (1 à 10) :</p>
+              <div class="space-y-3 bg-slate-900 p-4 rounded-lg border border-slate-700">
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span class="text-slate-300">Qualité d'endormissement</span>
+                    <span id="val-sleep-onset" class="text-emerald-400 font-bold">7/10</span>
+                  </div>
+                  <input type="range" id="sleep-onset" min="1" max="10" value="7" oninput="document.getElementById('val-sleep-onset').innerText=this.value+'/10'" class="w-full accent-emerald-500">
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span class="text-slate-300">Qualité du réveil</span>
+                    <span id="val-sleep-wake" class="text-emerald-400 font-bold">6/10</span>
+                  </div>
+                  <input type="range" id="sleep-wake" min="1" max="10" value="6" oninput="document.getElementById('val-sleep-wake').innerText=this.value+'/10'" class="w-full accent-emerald-500">
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs mb-1">
+                    <span class="text-slate-300">Qualité de sommeil globale perçue</span>
+                    <span id="val-sleep-quality" class="text-emerald-400 font-bold">7/10</span>
+                  </div>
+                  <input type="range" id="sleep-quality" min="1" max="10" value="7" oninput="document.getElementById('val-sleep-quality').innerText=this.value+'/10'" class="w-full accent-emerald-500">
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3 : SAE -->
+            <div id="fsec-3" class="hidden space-y-3">
+              <p class="text-xs text-slate-400 font-semibold uppercase">Sentiment d'auto-efficacité (SAE) (1 à 10) :</p>
               <div>
                 <label class="block text-xs font-semibold text-slate-300 mb-1">Travail exécuté : <span id="val-sae-work">7</span>/10</label>
                 <input type="range" id="sae-work" min="1" max="10" value="7" oninput="document.getElementById('val-sae-work').innerText=this.value" class="w-full accent-emerald-500">
@@ -224,8 +275,8 @@
               </div>
             </div>
 
-            <!-- Section 3 : Multi-Séances Sport -->
-            <div id="fsec-3" class="hidden space-y-4">
+            <!-- Section 4 : Multi-Séances Sport -->
+            <div id="fsec-4" class="hidden space-y-4">
               <div class="flex justify-between items-center">
                 <span class="text-xs font-bold text-slate-300">Séances effectuées</span>
                 <button type="button" onclick="addSportBlock()" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-emerald-400 font-bold border border-slate-600">+ Ajouter une séance</button>
@@ -238,31 +289,40 @@
           </form>
         </div>
 
-      </div>
-
-      <!-- TABLEAU DE BORD JDB -->
-      <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-6">
-        <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">📊 Tableau de Bord du Journal de Bord</h2>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-            <span class="text-xs text-slate-400 font-semibold uppercase">Humeur Moyenne</span>
-            <p id="kpi-mood" class="text-2xl font-black text-emerald-400 mt-1">- / 5</p>
-          </div>
-          <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-            <span class="text-xs text-slate-400 font-semibold uppercase">Moyenne SAE (7J / 30J)</span>
-            <div class="text-xs mt-2 space-y-1">
-              <p>Travail : <b id="sae-w-7" class="text-emerald-400">-</b> | <span id="sae-w-30" class="text-slate-400">-</span></p>
-              <p>Sport : <b id="sae-s-7" class="text-emerald-400">-</b> | <span id="sae-s-30" class="text-slate-400">-</span></p>
-              <p>Social : <b id="sae-p-7" class="text-emerald-400">-</b> | <span id="sae-p-30" class="text-slate-400">-</span></p>
+        <!-- Archives des bilans -->
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+          <div class="flex justify-between items-center flex-wrap gap-2">
+            <h2 class="text-xl font-bold text-slate-200">🗂️ Archives des Bilans</h2>
+            <div class="flex gap-2">
+              <button onclick="downloadCSVTemplate()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-amber-400 border border-slate-600">📄 Modèle CSV</button>
+              <label for="csv-file-input" class="cursor-pointer px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-emerald-400 border border-slate-600 inline-block">📥 Importer CSV</label>
+              <input type="file" id="csv-file-input" accept=".csv" onchange="importCSV(event)" class="hidden">
             </div>
           </div>
-          <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
+          <div id="jdb-archives-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <p class="text-xs text-slate-500 italic col-span-full">Aucun bilan archivé pour le moment.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOUS-ONGLET 3: DASHBOARD ANALYTIQUE & FILTRAGE SPORT -->
+      <div id="vsub-analytics" class="hidden space-y-6">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+            <span class="text-xs text-slate-400 font-semibold uppercase">Humeur Moyenne</span>
+            <p id="kpi-mood" class="text-2xl font-black text-emerald-400 mt-1">- / 10</p>
+          </div>
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+            <span class="text-xs text-slate-400 font-semibold uppercase">Sommeil Perçu (Moy)</span>
+            <p id="kpi-sleep" class="text-2xl font-black text-teal-400 mt-1">- / 10</p>
+          </div>
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
             <span class="text-xs text-slate-400 font-semibold uppercase">Volume Sport Global</span>
             <p id="kpi-sport-hours" class="text-2xl font-black text-amber-400 mt-1">0h00</p>
             <p id="kpi-course-km" class="text-xs text-slate-400 mt-1">Course : 0 km</p>
           </div>
-          <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
             <span class="text-xs text-slate-400 font-semibold uppercase">Disciplines (Cumul)</span>
             <div class="text-xs mt-2 space-y-1 text-slate-300">
               <p>🥋 Arts Martiaux : <b id="kpi-am-h">0h</b></p>
@@ -272,31 +332,64 @@
           </div>
         </div>
 
-        <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
-          <h3 class="text-sm font-bold text-slate-300 mb-4">Évolution Hebdomadaire du SAE</h3>
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+          <h3 class="text-sm font-bold text-slate-300">Évolution Hebdomadaire du SAE</h3>
           <div class="h-64 relative">
             <canvas id="chart-sae"></canvas>
           </div>
         </div>
-      </div>
 
-      <!-- ARCHIVES & IMPORT/EXPORT CSV -->
-      <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-        <div class="flex justify-between items-center flex-wrap gap-2">
-          <h2 class="text-xl font-bold text-slate-200">🗂️ Archives des Bilans</h2>
-          <div class="flex gap-2">
-            <button onclick="downloadCSVTemplate()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-amber-400 border border-slate-600">
-              📄 Modèle CSV
-            </button>
-            <label for="csv-file-input" class="cursor-pointer px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-emerald-400 border border-slate-600 inline-block">
-              📥 Importer CSV
-            </label>
-            <input type="file" id="csv-file-input" accept=".csv" onchange="importCSV(event)" class="hidden">
+        <!-- Centre d'Analyse Sportive avec Filtres Dynamiques -->
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+          <div class="flex justify-between items-center flex-wrap gap-2">
+            <h3 class="text-base font-bold text-amber-400 flex items-center gap-2">🔍 Centre d'Analyse des Séances Sportives</h3>
+            <span class="text-xs text-slate-400">Filtrage dynamique de la pratique</span>
+          </div>
+
+          <!-- Barre de filtres -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-slate-900 rounded-lg border border-slate-700 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1 font-semibold">Discipline</label>
+              <select id="filter-sport-type" onchange="applySportFilters()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
+                <option value="all">Toutes les disciplines</option>
+                <option value="course">Course à pied</option>
+                <option value="renforcement">Renforcement</option>
+                <option value="arts_martiaux">Arts Martiaux</option>
+                <option value="mobilite">Mobilité</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1 font-semibold">Volume session min (min)</label>
+              <input type="number" id="filter-sport-dur" placeholder="ex: 30" oninput="applySportFilters()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1 font-semibold">Seuil FC Min (BPM)</label>
+              <input type="number" id="filter-sport-hr" placeholder="ex: 130" oninput="applySportFilters()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
+            </div>
+          </div>
+
+          <!-- Table filtrée -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300 border-collapse">
+              <thead>
+                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 uppercase text-[10px]">
+                  <th class="p-2">Date</th>
+                  <th class="p-2">Séance</th>
+                  <th class="p-2">Discipline</th>
+                  <th class="p-2">Durée</th>
+                  <th class="p-2">Volume / Pace</th>
+                  <th class="p-2">FC Moyenne</th>
+                  <th class="p-2">Cadence / RPM</th>
+                  <th class="p-2">Intensité (RPE)</th>
+                </tr>
+              </thead>
+              <tbody id="sport-filtered-tbody" class="divide-y divide-slate-800">
+                <tr><td colspan="8" class="p-3 text-center text-slate-500 italic">Aucune séance enregistrée.</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div id="jdb-archives-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <p class="text-xs text-slate-500 italic col-span-full">Aucun bilan archivé pour le moment.</p>
-        </div>
+
       </div>
 
     </section>
@@ -395,8 +488,22 @@
       if (tabId === 'voyageur') renderVoyageur();
     }
 
+    function switchVoyageurSubTab(subId) {
+      ['gamification', 'quest', 'analytics'].forEach(s => {
+        const div = document.getElementById(`vsub-${s}`);
+        const btn = document.getElementById(`vsubtab-${s}`);
+        if (div) div.classList.add('hidden');
+        if (btn) btn.className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700";
+      });
+      const activeDiv = document.getElementById(`vsub-${subId}`);
+      const activeBtn = document.getElementById(`vsubtab-${subId}`);
+      if (activeDiv) activeDiv.classList.remove('hidden');
+      if (activeBtn) activeBtn.className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white";
+      if (subId === 'analytics') renderJdbDashboard();
+    }
+
     function switchFormTab(idx) {
-      [1, 2, 3].forEach(i => {
+      [1, 2, 3, 4].forEach(i => {
         const fsec = document.getElementById(`fsec-${i}`);
         const ftab = document.getElementById(`ftab-${i}`);
         if (fsec) fsec.classList.add('hidden');
@@ -406,6 +513,21 @@
       const targetTab = document.getElementById(`ftab-${idx}`);
       if (targetSec) targetSec.classList.remove('hidden');
       if (targetTab) targetTab.className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
+    }
+
+    function updateMoodLabel(val) {
+      const el = document.getElementById('val-jdb-mood');
+      const desc = document.getElementById('lbl-mood-desc');
+      if (el) el.innerText = `${val}/10`;
+      
+      const v = parseInt(val);
+      let t = "😐 Neutre";
+      if (v <= 2) t = "☁️ Difficile / Épuisé";
+      else if (v <= 4) t = "🔋 Fatigué";
+      else if (v <= 6) t = "😐 Neutre / Correct";
+      else if (v <= 8) t = "😊 Bonne forme";
+      else t = "⚡ Excellente forme !";
+      if (desc) desc.innerText = t;
     }
 
     function addSportBlock(data = {}) {
@@ -478,13 +600,17 @@
               <input type="text" id="sp-pace-${id}" value="${data.pace || ''}" oninput="calcRunningPaceOrDuration(${id}, 'pace')" placeholder="6:00" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs font-mono">
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-3 gap-2">
             <div>
               <label class="block text-[10px] text-slate-400">FC Moyenne (BPM)</label>
               <input type="number" id="sp-hr-${id}" value="${data.hr || 145}" placeholder="145" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
             </div>
             <div>
-              <label class="block text-[10px] text-slate-400">Intensité ressentie (RPE)</label>
+              <label class="block text-[10px] text-slate-400">Cadence (RPM)</label>
+              <input type="number" id="sp-rpm-${id}" value="${data.rpm || ''}" placeholder="165" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400">Intensité (RPE)</label>
               <select id="sp-rpe-${id}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
                 <option value="1">1 - Très facile</option>
                 <option value="2">2 - Facile</option>
@@ -503,28 +629,21 @@
         if (data.workType) document.getElementById(`sp-run-work-${id}`).value = data.workType;
         if (data.rpe) document.getElementById(`sp-rpe-${id}`).value = data.rpe;
         calcRunningPaceOrDuration(id, 'init');
-      } else if (type === 'arts_martiaux') {
-        target.innerHTML = `
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] text-slate-400">Style</label>
-              <select id="sp-am-style-${id}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-                <option value="Tai Ji">Tai Ji</option>
-                <option value="Wing Chun">Wing Chun</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400">Durée (min)</label>
-              <input type="number" id="sp-dur-${id}" value="${data.duration || 60}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-            </div>
-          </div>
-        `;
-        if (data.amStyle) document.getElementById(`sp-am-style-${id}`).value = data.amStyle;
       } else {
         target.innerHTML = `
-          <div>
-            <label class="block text-[10px] text-slate-400">Durée (min)</label>
-            <input type="number" id="sp-dur-${id}" value="${data.duration || 45}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-400">Durée (min)</label>
+              <input type="number" id="sp-dur-${id}" value="${data.duration || 45}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400">FC Moyenne (BPM)</label>
+              <input type="number" id="sp-hr-${id}" value="${data.hr || 120}" placeholder="120" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400">Cadence / RPM (Opt)</label>
+              <input type="number" id="sp-rpm-${id}" value="${data.rpm || ''}" placeholder="-" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
           </div>
         `;
       }
@@ -565,20 +684,19 @@
         const title = document.getElementById(`sp-title-${id}`)?.value || 'Séance de Sport';
         const type = document.getElementById(`sp-type-${id}`)?.value || 'autre';
         const duration = parseInt(document.getElementById(`sp-dur-${id}`)?.value || 0);
+        const hr = parseInt(document.getElementById(`sp-hr-${id}`)?.value || 0);
+        const rpm = parseInt(document.getElementById(`sp-rpm-${id}`)?.value || 0);
 
         if (type === 'course') {
           sports.push({
-            title, type, duration,
+            title, type, duration, hr, rpm,
             workType: document.getElementById(`sp-run-work-${id}`)?.value,
             km: parseFloat(document.getElementById(`sp-km-${id}`)?.value || 0),
             pace: document.getElementById(`sp-pace-${id}`)?.value,
-            hr: parseInt(document.getElementById(`sp-hr-${id}`)?.value || 0),
             rpe: parseInt(document.getElementById(`sp-rpe-${id}`)?.value || 6)
           });
-        } else if (type === 'arts_martiaux') {
-          sports.push({ title, type, duration, amStyle: document.getElementById(`sp-am-style-${id}`)?.value });
         } else {
-          sports.push({ title, type, duration });
+          sports.push({ title, type, duration, hr, rpm });
         }
       });
       return sports;
@@ -736,6 +854,9 @@
         teachings: document.getElementById('jdb-teachings').value,
         mood: parseInt(document.getElementById('jdb-mood').value),
         satisfaction: parseInt(document.getElementById('jdb-satisfaction').value),
+        sleepOnset: parseInt(document.getElementById('sleep-onset').value),
+        sleepWake: parseInt(document.getElementById('sleep-wake').value),
+        sleepQuality: parseInt(document.getElementById('sleep-quality').value),
         saeWork: parseInt(document.getElementById('sae-work').value),
         saeSport: parseInt(document.getElementById('sae-sport').value),
         saeSocial: parseInt(document.getElementById('sae-social').value),
@@ -763,7 +884,7 @@
     }
 
     function downloadCSVTemplate() {
-      const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail\",4,8,8,6,7";
+      const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,sleepQuality,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail\",8,8,7,8,6,7";
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
@@ -786,7 +907,7 @@
         lines.forEach((line, idx) => {
           if (idx === 0 || !line.trim()) return;
           const parts = line.includes(';') ? line.split(';') : line.split(',');
-          if (parts.length >= 7) {
+          if (parts.length >= 8) {
             const rawDate = parts[0].replace(/"/g, '').trim();
             const entry = {
               id: Date.now() + idx,
@@ -794,11 +915,12 @@
               rawDate: rawDate,
               timestamp: new Date(rawDate).getTime(),
               teachings: parts[1].replace(/"/g, '').trim(),
-              mood: parseInt(parts[2].trim()) || 3,
+              mood: parseInt(parts[2].trim()) || 5,
               satisfaction: parseInt(parts[3].trim()) || 7,
-              saeWork: parseInt(parts[4].trim()) || 7,
-              saeSport: parseInt(parts[5].trim()) || 5,
-              saeSocial: parseInt(parts[6].trim()) || 7,
+              sleepQuality: parseInt(parts[4].trim()) || 7,
+              saeWork: parseInt(parts[5].trim()) || 7,
+              saeSport: parseInt(parts[6].trim()) || 5,
+              saeSocial: parseInt(parts[7].trim()) || 7,
               sports: []
             };
             jdbEntries.push(entry);
@@ -818,20 +940,10 @@
       if (!jdbEntries || jdbEntries.length === 0) return;
 
       const avgMood = (jdbEntries.reduce((acc, e) => acc + (e.mood || 0), 0) / jdbEntries.length).toFixed(1);
-      const moodEl = document.getElementById('kpi-mood');
-      if (moodEl) moodEl.innerText = `${avgMood} / 5`;
+      const avgSleep = (jdbEntries.reduce((acc, e) => acc + (e.sleepQuality || 0), 0) / jdbEntries.length).toFixed(1);
 
-      const now = Date.now();
-      const j7 = jdbEntries.filter(e => now - e.timestamp <= 7 * 86400000);
-      const j30 = jdbEntries.filter(e => now - e.timestamp <= 30 * 86400000);
-      const calcAvg = (arr, key) => arr.length ? (arr.reduce((a, b) => a + (b[key] || 0), 0) / arr.length).toFixed(1) : '-';
-
-      const sw7 = document.getElementById('sae-w-7'); if (sw7) sw7.innerText = calcAvg(j7, 'saeWork');
-      const sw30 = document.getElementById('sae-w-30'); if (sw30) sw30.innerText = calcAvg(j30, 'saeWork');
-      const ss7 = document.getElementById('sae-s-7'); if (ss7) ss7.innerText = calcAvg(j7, 'saeSport');
-      const ss30 = document.getElementById('sae-s-30'); if (ss30) ss30.innerText = calcAvg(j30, 'saeSport');
-      const sp7 = document.getElementById('sae-p-7'); if (sp7) sp7.innerText = calcAvg(j7, 'saeSocial');
-      const sp30 = document.getElementById('sae-p-30'); if (sp30) sp30.innerText = calcAvg(j30, 'saeSocial');
+      const moodEl = document.getElementById('kpi-mood'); if (moodEl) moodEl.innerText = `${avgMood} / 10`;
+      const sleepEl = document.getElementById('kpi-sleep'); if (sleepEl) sleepEl.innerText = `${avgSleep} / 10`;
 
       let totalMin = 0, totalKm = 0, amMin = 0, renfMin = 0, mobMin = 0;
       jdbEntries.forEach(e => {
@@ -852,6 +964,43 @@
 
       renderChart();
       renderArchives();
+      applySportFilters();
+    }
+
+    function applySportFilters() {
+      const typeFilter = document.getElementById('filter-sport-type')?.value || 'all';
+      const durFilter = parseInt(document.getElementById('filter-sport-dur')?.value || 0);
+      const hrFilter = parseInt(document.getElementById('filter-sport-hr')?.value || 0);
+
+      const tbody = document.getElementById('sport-filtered-tbody');
+      if (!tbody) return;
+
+      let rowsHtml = '';
+      let matchCount = 0;
+
+      jdbEntries.forEach(e => {
+        (e.sports || []).forEach(s => {
+          if (typeFilter !== 'all' && s.type !== typeFilter) return;
+          if (durFilter > 0 && (s.duration || 0) < durFilter) return;
+          if (hrFilter > 0 && (s.hr || 0) < hrFilter) return;
+
+          matchCount++;
+          rowsHtml += `
+            <tr class="hover:bg-slate-800/50 transition">
+              <td class="p-2 font-mono text-emerald-400">${e.date}</td>
+              <td class="p-2 font-bold">${s.title || 'Séance sans titre'}</td>
+              <td class="p-2 capitalize">${s.type}</td>
+              <td class="p-2">${s.duration || 0} min</td>
+              <td class="p-2">${s.km ? s.km + ' km (' + (s.pace || '-') + ')' : '-'}</td>
+              <td class="p-2">${s.hr ? s.hr + ' BPM' : '-'}</td>
+              <td class="p-2">${s.rpm ? s.rpm + ' RPM' : '-'}</td>
+              <td class="p-2">${s.rpe ? s.rpe + '/10' : '-'}</td>
+            </tr>
+          `;
+        });
+      });
+
+      tbody.innerHTML = matchCount > 0 ? rowsHtml : `<tr><td colspan="8" class="p-3 text-center text-slate-500 italic">Aucune séance ne correspond aux critères.</td></tr>`;
     }
 
     function renderChart() {
@@ -883,13 +1032,13 @@
           <div>
             <div class="flex justify-between items-center mb-1">
               <span class="text-xs font-bold text-emerald-400">📅 ${e.date}</span>
-              <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-300">Humeur: ${e.mood}/5</span>
+              <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-300">Humeur: ${e.mood || '-'}/10</span>
             </div>
             <p class="text-xs text-slate-300 line-clamp-2 italic">"${e.teachings}"</p>
             ${(e.sports && e.sports.length) ? `<div class="mt-2 flex flex-wrap gap-1">${e.sports.map(s => `<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.title || s.type} (${s.duration}m)</span>`).join('')}</div>` : ''}
           </div>
           <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-            <span class="text-slate-500">SAE: ${(((e.saeWork || 0) + (e.saeSport || 0) + (e.saeSocial || 0))/3).toFixed(1)}</span>
+            <span class="text-slate-500">Sommeil: ${e.sleepQuality || '-'}/10</span>
             <div class="space-x-2">
               <button onclick="editEntry(${e.id})" class="text-emerald-400 hover:underline">Éditer</button>
               <button onclick="deleteEntry(${e.id})" class="text-rose-400 hover:underline">Supprimer</button>
@@ -905,15 +1054,25 @@
       currentEditingId = id;
       if (item.rawDate) document.getElementById('jdb-custom-date').value = item.rawDate;
       document.getElementById('jdb-teachings').value = item.teachings;
-      document.getElementById('jdb-mood').value = item.mood;
-      document.getElementById('jdb-satisfaction').value = item.satisfaction;
-      document.getElementById('sae-work').value = item.saeWork;
-      document.getElementById('sae-sport').value = item.saeSport;
-      document.getElementById('sae-social').value = item.saeSocial;
+      document.getElementById('jdb-mood').value = item.mood || 5;
+      updateMoodLabel(item.mood || 5);
+      document.getElementById('jdb-satisfaction').value = item.satisfaction || 7;
+      
+      document.getElementById('sleep-onset').value = item.sleepOnset || 7;
+      document.getElementById('val-sleep-onset').innerText = (item.sleepOnset || 7) + '/10';
+      document.getElementById('sleep-wake').value = item.sleepWake || 6;
+      document.getElementById('val-sleep-wake').innerText = (item.sleepWake || 6) + '/10';
+      document.getElementById('sleep-quality').value = item.sleepQuality || 7;
+      document.getElementById('val-sleep-quality').innerText = (item.sleepQuality || 7) + '/10';
+
+      document.getElementById('sae-work').value = item.saeWork || 7;
+      document.getElementById('sae-sport').value = item.saeSport || 5;
+      document.getElementById('sae-social').value = item.saeSocial || 7;
       
       document.getElementById('sports-container').innerHTML = '';
       (item.sports || []).forEach(s => addSportBlock(s));
 
+      switchVoyageurSubTab('quest');
       switchFormTab(1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
