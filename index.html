@@ -21,14 +21,13 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-  <!-- Header Navigation avec Choix de Logo -->
+  <!-- Header Navigation -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
       
       <!-- Logo & Navigation -->
       <div class="flex items-center space-x-6">
         <div class="cursor-pointer flex items-center space-x-2" onclick="switchTab('dashboard')">
-          <!-- Proposition A par défaut, basculable via options -->
           <div id="main-logo-container">
             <h1 class="text-xl font-black tracking-wider text-emerald-400 font-mono">🌿 ERGO<span class="text-slate-100">.HUB</span></h1>
           </div>
@@ -42,12 +41,12 @@
         </nav>
       </div>
 
-      <!-- Selecteur de Style de Logo + Profil Joueur -->
+      <!-- Options Logo & Profil -->
       <div class="flex items-center space-x-3">
         <select onchange="changeLogoStyle(this.value)" class="bg-slate-900 text-[10px] text-slate-300 border border-slate-700 rounded px-2 py-1">
-          <option value="A">Style Logo: 🌿 ERGO.HUB</option>
-          <option value="B">Style Logo: ⚔️ ERGO_HUB</option>
-          <option value="C">Style Logo: 🔬 ERGO LAB</option>
+          <option value="A">Style: 🌿 ERGO.HUB</option>
+          <option value="B">Style: ⚔️ ERGO_HUB</option>
+          <option value="C">Style: 🔬 ERGO LAB</option>
         </select>
 
         <button onclick="switchTab('voyageur'); switchVoyageurSubTab('quest');" id="header-quest-btn" class="relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition">
@@ -97,13 +96,13 @@
       </div>
     </section>
 
-    <!-- TAB 2: WORKSPACE (Kanban, Agenda iCal & Ressources) -->
+    <!-- TAB 2: WORKSPACE -->
     <section id="sec-workspace" class="hidden space-y-6">
       
-      <!-- Sous-Barre Navigation Workspace -->
+      <!-- Sous-Barre Workspace -->
       <div class="flex space-x-2 border-b border-slate-700 pb-3">
         <button onclick="switchWorkspaceSubTab('kanban')" id="wsubtab-kanban" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">
-          📋 Kanban & Quêtes
+          📋 Arbre de Quêtes & Kanban
         </button>
         <button onclick="switchWorkspaceSubTab('agenda')" id="wsubtab-agenda" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
           📅 Agenda & Emploi du Temps
@@ -113,54 +112,44 @@
         </button>
       </div>
 
-      <!-- SOUS-ONGLET 1: KANBAN RPG AVANCÉ -->
+      <!-- SOUS-ONGLET KANBAN AVANCÉ (QUÊTES & SOUS-QUÊTES) -->
       <div id="wsub-kanban" class="space-y-6">
         <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
-          <div class="flex items-center gap-4">
-            <h2 class="text-lg font-bold">Kanban des Quêtes & Tâches</h2>
-            <!-- Filtres / Tri -->
+          <div class="flex items-center gap-3">
+            <h2 class="text-lg font-bold">Kanban des Quêtes & Sous-Quêtes</h2>
             <select id="kanban-sort-by" onchange="renderKanban()" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300">
               <option value="urgency">Trier par Urgence</option>
-              <option value="dueDate">Trier par Échéance</option>
-              <option value="ue">Trier par Matière / UE</option>
+              <option value="dueDate">Trier par Échéance Ultime</option>
+              <option value="ue">Trier par UE / Matière</option>
             </select>
           </div>
           <div class="flex items-center gap-3">
             <span class="text-xs bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-amber-400 font-mono">
               🧠 Charge Mentale : <span id="kb-mental-val">3</span>/10
             </span>
-            <button onclick="toggleAddTaskModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">+ Créer une Quête</button>
+            <button onclick="toggleAddTaskModal()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">+ Créer une Quête Principale</button>
           </div>
         </div>
 
-        <!-- Formulaire de Création de Quête Enrichi -->
+        <!-- Formulaire de Création de Méta-Quête & Sous-Quêtes Balisées -->
         <div id="add-task-form-box" class="hidden bg-slate-800 p-5 rounded-xl border border-slate-700 space-y-4">
-          <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">Créer une Quête (Tâche Avancée)</h3>
+          <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">Créer une Quête Principale (Projet / Livrable Majeur)</h3>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
             <div>
-              <label class="block text-slate-400 mb-1">Titre de la tâche *</label>
-              <input type="text" id="new-task-title" placeholder="ex: Rédaction Protocole Usabilité" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+              <label class="block text-slate-400 mb-1">Titre de la Quête Principale *</label>
+              <input type="text" id="new-task-title" placeholder="ex: Livrable Synthèse d'Ouvrage (5 Chapitres)" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">Matière / UE</label>
-              <input type="text" id="new-task-ue" placeholder="ex: UE Ergonomie / Master M2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+              <label class="block text-slate-400 mb-1">UE / Matière</label>
+              <input type="text" id="new-task-ue" placeholder="ex: UE Ergonomie / Sociologie" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">Type de travail</label>
-              <select id="new-task-type" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-                <option value="lecture">📖 Lecture Article / Ouvrage</option>
-                <option value="livrable">📝 Livrable / Rapport</option>
-                <option value="rendezvous">🤝 Rendez-vous / Réunion</option>
-                <option value="preparation">🛠️ Préparation / Terrain</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-slate-400 mb-1">Date d'échéance</label>
+              <label class="block text-slate-400 mb-1">Date Butoire Ultime (Livrable Final)</label>
               <input type="date" id="new-task-due" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-amber-300 font-mono">
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">Degré d'urgence</label>
+              <label class="block text-slate-400 mb-1">Degré d'Urgence Global</label>
               <select id="new-task-urgency" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
                 <option value="1">🟢 Basse</option>
                 <option value="2" selected>🟡 Moyenne</option>
@@ -169,7 +158,7 @@
               </select>
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">Coût Charge Mentale</label>
+              <label class="block text-slate-400 mb-1">Coût Charge Mentale (Projet)</label>
               <select id="new-task-cost" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
                 <option value="1">1 Point</option>
                 <option value="2">2 Points</option>
@@ -179,22 +168,26 @@
           </div>
 
           <div>
-            <label class="block text-xs text-slate-400 mb-1">Description / Consignes</label>
-            <textarea id="new-task-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200" placeholder="Détails de la tâche..."></textarea>
+            <label class="block text-xs text-slate-400 mb-1">Description / Objectif Global</label>
+            <textarea id="new-task-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200" placeholder="Explication du rendu final..."></textarea>
           </div>
 
-          <!-- Jalons / Sous-objectifs -->
-          <div class="space-y-2 pt-2 border-t border-slate-700">
+          <!-- Section Générateur de Sous-Quêtes Balisées -->
+          <div class="space-y-3 pt-3 border-t border-slate-700">
             <div class="flex justify-between items-center">
-              <label class="block text-xs font-bold text-amber-400">Jalons / Sous-objectifs (+5 XP par jalon complété)</label>
-              <button type="button" onclick="addSubGoalInput()" class="text-[10px] bg-slate-700 px-2 py-0.5 rounded text-emerald-400">+ Ajouter un jalon</button>
+              <div>
+                <h4 class="text-xs font-bold text-amber-400">Balisage des Sous-Quêtes & Jalons Autonomes</h4>
+                <p class="text-[10px] text-slate-400">Chaque sous-quête complétée offre +10 XP et fait progresser la Méta-Quête.</p>
+              </div>
+              <button type="button" onclick="addSubQuestInput()" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-emerald-400 font-bold border border-slate-600">+ Ajouter une Sous-Quête</button>
             </div>
-            <div id="subgoals-input-container" class="space-y-2"></div>
+
+            <div id="subquests-input-container" class="space-y-3"></div>
           </div>
 
           <div class="flex justify-end gap-2 pt-2">
             <button onclick="toggleAddTaskModal()" class="px-3 py-1.5 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
-            <button onclick="addNewTask()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs rounded font-bold text-white">Créer la Quête</button>
+            <button onclick="addNewTask()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs rounded font-bold text-white">Créer l'Arbre de Quêtes</button>
           </div>
         </div>
 
@@ -218,7 +211,7 @@
 
           <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
             <h3 class="font-bold text-emerald-400 mb-3 flex justify-between items-center">
-              <span>✅ Terminé (+25 XP)</span>
+              <span>✅ Terminé (+50 XP)</span>
               <span id="count-done" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-emerald-400">0</span>
             </h3>
             <div id="col-done" class="space-y-3 flex-grow" ondrop="drop(event, 'done')" ondragover="allowDrop(event)"></div>
@@ -226,7 +219,7 @@
         </div>
       </div>
 
-      <!-- SOUS-ONGLET 2: AGENDA / GOOGLE CALENDAR -->
+      <!-- SOUS-ONGLET AGENDA -->
       <div id="wsub-agenda" class="hidden space-y-4">
         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center flex-wrap gap-2">
           <div>
@@ -241,7 +234,7 @@
         </div>
       </div>
 
-      <!-- SOUS-ONGLET 3: ESPACE RESSOURCES -->
+      <!-- SOUS-ONGLET RESSOURCES -->
       <div id="wsub-resources" class="hidden space-y-4">
         <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-2">
           <div>
@@ -251,7 +244,6 @@
           <button onclick="toggleAddResourceModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white">+ Nouvelle Ressource</button>
         </div>
 
-        <!-- Formulaire Ajout Ressource -->
         <div id="add-resource-form-box" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
           <h4 class="text-xs font-bold text-emerald-400 uppercase">Ajouter un document / lien</h4>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -277,7 +269,7 @@
 
     </section>
 
-    <!-- TAB 3: CRM (RÉSEAU PRO) -->
+    <!-- TAB 3: CRM -->
     <section id="sec-crm" class="hidden space-y-6">
       <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
         <div>
@@ -306,10 +298,9 @@
       </div>
     </section>
 
-    <!-- TAB 4: VOYAGEUR & JOURNAL DE BORD (3 Sous-Onglets) -->
+    <!-- TAB 4: VOYAGEUR & JOURNAL DE BORD -->
     <section id="sec-voyageur" class="hidden space-y-6">
       
-      <!-- Sous-Barre Navigation Voyageur -->
       <div class="flex space-x-2 border-b border-slate-700 pb-3">
         <button onclick="switchVoyageurSubTab('gamification')" id="vsubtab-gamification" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">
           🛡️ Fiche Personnage
@@ -363,7 +354,7 @@
         </div>
       </div>
 
-      <!-- SOUS-ONGLET 2: QUÊTE JOURNALIÈRE & ARCHIVES -->
+      <!-- SOUS-ONGLET 2: QUÊTE JOURNALIÈRE -->
       <div id="vsub-quest" class="hidden space-y-6">
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2">
@@ -380,7 +371,6 @@
 
           <form id="form-jdb" onsubmit="saveJdbEntry(event)" class="space-y-4">
             
-            <!-- Section 1 : Réflexivité, Mood & Satisfaction (Toutes deux en Échelle 1-10) -->
             <div id="fsec-1" class="space-y-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-300 mb-1">Date du bilan (Antidatage possible)</label>
@@ -404,7 +394,6 @@
               </div>
             </div>
 
-            <!-- Section 2 : Sommeil -->
             <div id="fsec-2" class="hidden space-y-4">
               <p class="text-xs text-slate-400 font-semibold uppercase">Évaluation du sommeil & récupération (1 à 10) :</p>
               <div class="space-y-3 bg-slate-900 p-4 rounded-lg border border-slate-700">
@@ -432,7 +421,6 @@
               </div>
             </div>
 
-            <!-- Section 3 : SAE -->
             <div id="fsec-3" class="hidden space-y-3">
               <p class="text-xs text-slate-400 font-semibold uppercase">Sentiment d'auto-efficacité (SAE) (1 à 10) :</p>
               <div>
@@ -449,7 +437,6 @@
               </div>
             </div>
 
-            <!-- Section 4 : Multi-Séances Sport -->
             <div id="fsec-4" class="hidden space-y-4">
               <div class="flex justify-between items-center">
                 <span class="text-xs font-bold text-slate-300">Séances effectuées</span>
@@ -617,7 +604,7 @@
       chercheur: { name: "Chercheur en Ergonomie", stats: { methodologie: 13, analyse: 12, stress: 10, creativite: 10, empathie: 9 } }
     };
 
-    // Global States
+    // States
     let hero = JSON.parse(localStorage.getItem('ergo_hero')) || {
       classKey: 'psychologue_travail',
       isClassLocked: false,
@@ -633,17 +620,17 @@
     let kanbanTasks = JSON.parse(localStorage.getItem('ergo_kanban_tasks')) || [
       {
         id: 'task-1',
-        title: "Analyse de l'activité - Chapitre 1",
+        title: "Synthèse d'Ouvrage (5 Chapitres)",
         ue: "UE Ergonomie",
-        type: "livrable",
-        desc: "Synthétiser l'analyse de l'activité.",
-        dueDate: "2026-10-15",
+        dueDate: "2026-12-18",
         urgency: 3,
-        cost: 1,
+        cost: 2,
+        desc: "Projet majeur de lecture et de rédaction réflexive.",
         status: 'todo',
-        subGoals: [
-          { id: 'sub-1', title: "Lecture de l'ouvrage", done: false },
-          { id: 'sub-2', title: "Rédaction des synthèses", done: false }
+        expanded: true,
+        subQuests: [
+          { id: 'sq-1', title: "Lecture Chapitre 1", type: "lecture", duration: "2h00", dueDate: "2026-10-05", cost: 1, done: false },
+          { id: 'sq-2', title: "Rédaction Synthèse Chapitre 1", type: "livrable", duration: "1h30", dueDate: "2026-10-10", cost: 1, done: false }
         ]
       }
     ];
@@ -657,9 +644,8 @@
     let currentEditingId = null;
     let saeChart = null;
     let sportBlockCounter = 0;
-    let tempSubGoals = [];
 
-    // Logo Style Switcher
+    // Logo Switcher
     function changeLogoStyle(styleKey) {
       const box = document.getElementById('main-logo-container');
       if (styleKey === 'A') {
@@ -671,7 +657,7 @@
       }
     }
 
-    // Navigation
+    // Navigation Tabs
     function switchTab(tabId) {
       ['dashboard', 'workspace', 'crm', 'voyageur'].forEach(t => {
         const sec = document.getElementById(`sec-${t}`);
@@ -730,21 +716,49 @@
       if (targetTab) targetTab.className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
     }
 
-    // KANBAN RPG LOGIC
+    // KANBAN & ARBRE DE QUÊTES LOGIC
     function toggleAddTaskModal() {
       document.getElementById('add-task-form-box').classList.toggle('hidden');
-      tempSubGoals = [];
-      document.getElementById('subgoals-input-container').innerHTML = '';
+      document.getElementById('subquests-input-container').innerHTML = '';
+      addSubQuestInput(); // un premier bloc par défaut
     }
 
-    function addSubGoalInput() {
-      const container = document.getElementById('subgoals-input-container');
-      const idx = container.children.length;
+    function addSubQuestInput() {
+      const container = document.getElementById('subquests-input-container');
+      const id = Date.now() + Math.random();
       const div = document.createElement('div');
-      div.className = "flex gap-2 items-center";
+      div.className = "p-3 bg-slate-900 rounded-lg border border-slate-700 space-y-2 relative text-xs";
       div.innerHTML = `
-        <input type="text" placeholder="Jalon ${idx + 1} (ex: Recherche bibliographique)" class="subgoal-item-input w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-slate-200">
-        <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 text-xs">✕</button>
+        <div class="flex justify-between items-center">
+          <input type="text" class="sq-title w-3/4 bg-slate-800 border border-slate-700 rounded px-2 py-1 font-bold text-slate-200" placeholder="Titre de la sous-quête (ex: Lecture Chapitre 1)">
+          <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400 text-xs hover:underline">Supprimer</button>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div>
+            <label class="block text-[10px] text-slate-400">Type</label>
+            <select class="sq-type w-full bg-slate-800 border border-slate-700 rounded p-1 text-[11px]">
+              <option value="lecture">📖 Lecture</option>
+              <option value="livrable">📝 Rédaction / Livrable</option>
+              <option value="rendezvous">🤝 Réunion / RDV</option>
+              <option value="preparation">🛠️ Préparation</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400">Durée Est.</label>
+            <input type="text" class="sq-dur w-full bg-slate-800 border border-slate-700 rounded p-1 text-[11px]" placeholder="ex: 1h30">
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400">Échéance Jalon</label>
+            <input type="date" class="sq-due w-full bg-slate-800 border border-slate-700 rounded p-1 text-[11px] text-amber-300 font-mono">
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400">Coût Charge</label>
+            <select class="sq-cost w-full bg-slate-800 border border-slate-700 rounded p-1 text-[11px]">
+              <option value="1">1 PT</option>
+              <option value="2">2 PTS</option>
+            </select>
+          </div>
+        </div>
       `;
       container.appendChild(div);
     }
@@ -752,25 +766,34 @@
     function addNewTask() {
       const title = document.getElementById('new-task-title').value.trim();
       const ue = document.getElementById('new-task-ue').value.trim();
-      const type = document.getElementById('new-task-type').value;
       const dueDate = document.getElementById('new-task-due').value;
       const urgency = parseInt(document.getElementById('new-task-urgency').value);
       const cost = parseInt(document.getElementById('new-task-cost').value);
       const desc = document.getElementById('new-task-desc').value.trim();
 
-      if (!title) return alert("Le titre de la quête est obligatoire.");
+      if (!title) return alert("Le titre de la Quête Principale est obligatoire.");
 
-      const subInputs = document.querySelectorAll('.subgoal-item-input');
-      const subGoals = [];
-      subInputs.forEach((inp, idx) => {
-        if (inp.value.trim()) {
-          subGoals.push({ id: `sub-${Date.now()}-${idx}`, title: inp.value.trim(), done: false });
+      const subBlocks = document.querySelectorAll('#subquests-input-container > div');
+      const subQuests = [];
+      subBlocks.forEach((b, idx) => {
+        const sqTitle = b.querySelector('.sq-title')?.value.trim();
+        if (sqTitle) {
+          subQuests.push({
+            id: `sq-${Date.now()}-${idx}`,
+            title: sqTitle,
+            type: b.querySelector('.sq-type')?.value || 'livrable',
+            duration: b.querySelector('.sq-dur')?.value.trim() || '1h',
+            dueDate: b.querySelector('.sq-due')?.value || '',
+            cost: parseInt(b.querySelector('.sq-cost')?.value || 1),
+            done: false
+          });
         }
       });
 
       const newTask = {
         id: `task-${Date.now()}`,
-        title, ue: ue || 'Projet Ergo', type, dueDate, urgency, cost, desc, status: 'todo', subGoals
+        title, ue: ue || 'Projet Ergo', dueDate, urgency, cost, desc,
+        status: 'todo', expanded: true, subQuests
       };
 
       kanbanTasks.push(newTask);
@@ -780,27 +803,46 @@
       document.getElementById('new-task-title').value = '';
     }
 
-    function toggleSubGoal(taskId, subId) {
+    function toggleSubQuest(taskId, sqId) {
       kanbanTasks = kanbanTasks.map(t => {
-        if (t.id === taskId && t.subGoals) {
-          t.subGoals = t.subGoals.map(sg => {
-            if (sg.id === subId) {
-              const newDone = !sg.done;
-              if (newDone) { gainXp(5); playRetroSound('subGoal'); }
-              return { ...sg, done: newDone };
+        if (t.id === taskId && t.subQuests) {
+          t.subQuests = t.subQuests.map(sq => {
+            if (sq.id === sqId) {
+              const newDone = !sq.done;
+              if (newDone) {
+                gainXp(10);
+                playRetroSound('subGoal');
+              }
+              return { ...sq, done: newDone };
             }
-            return sg;
+            return sq;
           });
+
+          // Vérifier si toutes les sous-quêtes sont achevées
+          const allDone = t.subQuests.every(sq => sq.done);
+          if (allDone && t.status !== 'done') {
+            t.status = 'done';
+            gainXp(50);
+            playRetroSound('levelUp');
+            alert(`🎉 Toutes les sous-quêtes de "${t.title}" sont achevées ! Quête Principale terminée (+50 XP) !`);
+          }
         }
         return t;
       });
+
+      saveKanban();
+      renderKanban();
+    }
+
+    function toggleExpandTask(id) {
+      kanbanTasks = kanbanTasks.map(t => t.id === id ? { ...t, expanded: !t.expanded } : t);
       saveKanban();
       renderKanban();
     }
 
     function moveTask(id, targetStatus) {
       kanbanTasks = kanbanTasks.map(t => t.id === id ? { ...t, status: targetStatus } : t);
-      if (targetStatus === 'done') gainXp(25);
+      if (targetStatus === 'done') gainXp(50);
       hero.mentalLoad = Math.min(10, hero.mentalLoad + 1);
       saveHero();
       saveKanban();
@@ -827,73 +869,107 @@
       const sortBy = document.getElementById('kanban-sort-by')?.value || 'urgency';
 
       const urgencyLabels = { 1: "🟢 Basse", 2: "🟡 Moyenne", 3: "🟠 Haute", 4: "🔴 URGENT" };
-      const typeBadges = {
-        lecture: "📖 Lecture", livrable: "📝 Livrable", rendezvous: "🤝 Réunion", preparation: "🛠️ Préparation"
-      };
+      const typeIcons = { lecture: "📖", livrable: "📝", rendezvous: "🤝", preparation: "🛠️" };
 
       ['todo', 'doing', 'done'].forEach(status => {
         const col = document.getElementById(`col-${status}`);
         let tasks = kanbanTasks.filter(t => t.status === status);
 
-        // Tri
         if (sortBy === 'urgency') tasks.sort((a,b) => b.urgency - a.urgency);
         else if (sortBy === 'dueDate') tasks.sort((a,b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999'));
         else if (sortBy === 'ue') tasks.sort((a,b) => a.ue.localeCompare(b.ue));
 
         document.getElementById(`count-${status}`).innerText = tasks.length;
 
-        col.innerHTML = tasks.map(t => `
-          <div id="${t.id}" draggable="true" ondragstart="drag(event)" class="p-3 bg-slate-800 rounded-lg border border-slate-700 cursor-move space-y-2">
-            <div class="flex justify-between items-start">
-              <div>
-                <span class="text-[9px] bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-amber-300 font-mono">${typeBadges[t.type] || '📌 Quête'}</span>
-                <p class="text-sm font-bold text-slate-100 mt-1">${t.title}</p>
-                <p class="text-[11px] text-slate-400">${t.ue} • Coût: ${t.cost} PT</p>
+        col.innerHTML = tasks.map(t => {
+          const totalSq = t.subQuests ? t.subQuests.length : 0;
+          const doneSq = t.subQuests ? t.subQuests.filter(sq => sq.done).length : 0;
+          const pct = totalSq > 0 ? Math.round((doneSq / totalSq) * 100) : (t.status === 'done' ? 100 : 0);
+
+          return `
+            <div id="${t.id}" draggable="true" ondragstart="drag(event)" class="p-3 bg-slate-800 rounded-lg border border-slate-700 cursor-move space-y-2">
+              
+              <!-- Header Méta-Quête -->
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="text-[9px] bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-amber-300 font-mono">👑 Quête Principale</span>
+                  <h4 class="text-sm font-bold text-slate-100 mt-1">${t.title}</h4>
+                  <p class="text-[11px] text-slate-400">${t.ue} • Livrable Final : <b class="text-amber-300 font-mono">${t.dueDate || 'N/C'}</b></p>
+                </div>
+                <div class="flex flex-col items-end gap-1">
+                  <span class="text-[10px] font-bold ${t.urgency >= 3 ? 'text-rose-400' : 'text-slate-400'}">${urgencyLabels[t.urgency]}</span>
+                  <button onclick="deleteTask('${t.id}')" class="text-[10px] text-rose-400 hover:underline">✕</button>
+                </div>
               </div>
-              <div class="flex flex-col gap-1 items-end">
-                <span class="text-[10px] font-bold ${t.urgency >= 3 ? 'text-rose-400' : 'text-slate-400'}">${urgencyLabels[t.urgency]}</span>
-                <button onclick="deleteTask('${t.id}')" class="text-[10px] text-rose-400 hover:underline">✕</button>
+
+              ${t.desc ? `<p class="text-xs text-slate-300 bg-slate-900/50 p-2 rounded border border-slate-800 italic">${t.desc}</p>` : ''}
+
+              <!-- Progress Bar -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-[10px] text-slate-400">
+                  <span>Progression : <b>${doneSq}/${totalSq} Jalons</b></span>
+                  <span class="text-emerald-400 font-bold">${pct}%</span>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-2 border border-slate-700">
+                  <div class="bg-emerald-500 h-1.5 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                </div>
               </div>
+
+              <!-- Accordéon / Sous-Quêtes Balisées -->
+              ${totalSq > 0 ? `
+                <div class="pt-2 border-t border-slate-700/50">
+                  <button onclick="toggleExpandTask('${t.id}')" class="w-full flex justify-between items-center text-[11px] font-bold text-slate-300 hover:text-emerald-400">
+                    <span>📜 Sous-Quêtes autonomes (${doneSq}/${totalSq})</span>
+                    <span>${t.expanded ? '▲ Masquer' : '▼ Déplier'}</span>
+                  </button>
+
+                  ${t.expanded ? `
+                    <div class="mt-2 space-y-2 pl-1">
+                      ${t.subQuests.map(sq => `
+                        <div class="p-2 bg-slate-900/80 rounded border border-slate-700/80 flex items-start gap-2">
+                          <input type="checkbox" ${sq.done ? 'checked' : ''} onchange="toggleSubQuest('${t.id}', '${sq.id}')" class="mt-0.5 rounded accent-emerald-500 cursor-pointer">
+                          <div class="flex-grow text-xs">
+                            <p class="font-bold ${sq.done ? 'line-through text-slate-500' : 'text-slate-200'}">
+                              ${typeIcons[sq.type] \vert{}\vert{} '📌'} ${sq.title}
+                            </p>
+                            <div class="flex justify-between text-[10px] text-slate-400 mt-0.5 font-mono">
+                              <span>⏱️ ${sq.duration}</span>
+                              <span>📅 ${sq.dueDate || 'Aujourd\'hui'}</span>
+                              <span class="text-amber-400">+10 XP</span>
+                            </div>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                </div>
+              ` : ''}
+
+              <div class="flex justify-between items-center pt-2 text-[10px] text-slate-400 border-t border-slate-700/50">
+                <span>Coût Mentale: ${t.cost} PT</span>
+                ${status !== 'done' ? `
+                  <button onclick="moveTask('${t.id}', '${status === 'todo' ? 'doing' : 'done'}')" class="bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-emerald-400 font-bold">Avancer ➡️</button>
+                ` : '<span class="text-emerald-400 font-bold">Livrable Validé ✅</span>'}
+              </div>
+
             </div>
-
-            ${t.desc ? `<p class="text-xs text-slate-300 bg-slate-900/50 p-2 rounded border border-slate-800 italic">${t.desc}</p>` : ''}
-
-            <!-- Jalons -->
-            ${t.subGoals && t.subGoals.length > 0 ? `
-              <div class="space-y-1 pt-1 border-t border-slate-700/50">
-                <p class="text-[10px] text-slate-400 font-semibold uppercase">Jalons & Sous-objectifs (+5 XP) :</p>
-                ${t.subGoals.map(sg => `
-                  <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
-                    <input type="checkbox" ${sg.done ? 'checked' : ''} onchange="toggleSubGoal('${t.id}', '${sg.id}')" class="rounded accent-emerald-500">
-                    <span class="${sg.done ? 'line-through text-slate-500' : ''}">${sg.title}</span>
-                  </label>
-                `).join('')}
-              </div>
-            ` : ''}
-
-            <div class="flex justify-between items-center pt-2 text-[10px] text-slate-400 border-t border-slate-700/50">
-              <span>📅 ${t.dueDate ? t.dueDate : 'Sans date'}</span>
-              ${status !== 'done' ? `
-                <button onclick="moveTask('${t.id}', '${status === 'todo' ? 'doing' : 'done'}')" class="bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-emerald-400 font-bold">Avancer ➡️</button>
-              ` : '<span class="text-emerald-400 font-bold">Complété ✅</span>'}
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       });
 
       const nextTaskEl = document.getElementById('dash-next-task');
       const urgentTodo = kanbanTasks.filter(t => t.status === 'todo').sort((a,b) => b.urgency - a.urgency)[0];
-      if (nextTaskEl) nextTaskEl.innerText = urgentTodo ? urgentTodo.title : 'Aucune tâche urgente';
+      if (nextTaskEl) nextTaskEl.innerText = urgentTodo ? urgentTodo.title : 'Aucune quête urgente';
       updateMentalLoadUI();
     }
 
     // AGENDA / ICAL
     function promptCalendarUrl() {
-      const url = prompt("Entre l'URL d'intégration de ton Google Calendar (Lien iCal / Iframe) :", document.getElementById('calendar-iframe').src);
+      const url = prompt("Entre l'URL d'intégration Google Calendar :", document.getElementById('calendar-iframe').src);
       if (url) document.getElementById('calendar-iframe').src = url;
     }
 
-    // ESPACE RESSOURCES LOGIC
+    // ESPACE RESSOURCES
     function toggleAddResourceModal() {
       document.getElementById('add-resource-form-box').classList.toggle('hidden');
     }
@@ -983,7 +1059,7 @@
       `).join('');
     }
 
-    // JDB LOGIC (Humeur & Satisfaction identiques 1-10)
+    // JDB LOGIC
     function updateMoodLabel(val) {
       const el = document.getElementById('val-jdb-mood');
       const desc = document.getElementById('lbl-mood-desc');
