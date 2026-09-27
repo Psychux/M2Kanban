@@ -21,7 +21,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-  <!-- Header Navigation (Design Historique Restauré) -->
+  <!-- Header Navigation -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
       
@@ -127,16 +127,14 @@
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Fiche Personnage Voyageur (Spécialité Verrouillée) -->
+        <!-- Fiche Personnage Voyageur -->
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🛡️ Le Voyageur</h2>
             <span id="hero-level-badge" class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-xs font-bold">Niveau 1</span>
           </div>
 
-          <div id="archetype-selection-box">
-            <!-- Choix initial ou affichage verrouillé -->
-          </div>
+          <div id="archetype-selection-box"></div>
 
           <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
             <div class="flex justify-between items-center text-xs">
@@ -306,7 +304,7 @@
   </main>
 
   <script>
-    // Sound Engine
+    // Retro Sound Engine
     const playRetroSound = (type) => {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -372,6 +370,7 @@
     let saeChart = null;
     let sportBlockCounter = 0;
 
+    // Set Default Custom Date to Yesterday
     const yest = new Date();
     yest.setDate(yest.getDate() - 1);
     document.getElementById('jdb-custom-date').value = yest.toISOString().split('T')[0];
@@ -625,8 +624,8 @@
       document.getElementById('dash-hero-level').innerText = `Niveau ${hero.level} (${hero.xp} / 100 XP)`;
 
       // Quest Availability Badge in Header
-      const today = new Date().toLocaleDateString('fr-FR');
-      const isDone = hero.completedDates && hero.completedDates.includes(document.getElementById('jdb-custom-date').value);
+      const selectedDate = document.getElementById('jdb-custom-date').value;
+      const isDone = hero.completedDates && hero.completedDates.includes(selectedDate);
       const questHeaderBtn = document.getElementById('header-quest-btn');
       
       if (isDone) {
@@ -657,7 +656,7 @@
         archBox.innerHTML = `
           <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 flex justify-between items-center">
             <div>
-              <span class="text-[10px] text-slate-500 uppercase font-bold">Spécialité Incarne</span>
+              <span class="text-[10px] text-slate-500 uppercase font-bold">Spécialité Incarnée</span>
               <p class="text-sm font-bold text-emerald-400">${cfg.name}</p>
             </div>
             <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">⚔️ Incarné</span>
