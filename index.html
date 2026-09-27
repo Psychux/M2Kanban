@@ -21,13 +21,14 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-  <!-- Header Navigation -->
+  <!-- Header Navigation V1 -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
       
-      <!-- Logo & Navigation -->
+      <!-- Logo V1 & Navigation -->
       <div class="flex items-center space-x-6">
-        <div class="cursor-pointer" onclick="switchTab('dashboard')">
+        <div class="cursor-pointer flex items-center space-x-2" onclick="switchTab('dashboard')">
+          <span class="text-2xl">🧠</span>
           <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">Ergo Hub</h1>
         </div>
         <nav class="flex space-x-1 bg-slate-900 p-1 rounded-lg border border-slate-700">
@@ -38,9 +39,9 @@
         </nav>
       </div>
 
-      <!-- Profil Joueur (Haut Droite) & Quête Dispo -->
+      <!-- Profil Joueur & Badge Quête -->
       <div class="flex items-center space-x-3">
-        <button onclick="switchTab('voyageur')" id="header-quest-btn" class="relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition">
+        <button onclick="switchTab('voyageur'); switchVoyageurSubTab('quest');" id="header-quest-btn" class="relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition">
           <span class="animate-pulse">📜</span>
           <span id="header-quest-text">Quête Dispo !</span>
         </button>
@@ -78,7 +79,7 @@
         </div>
         <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
           <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Prochaine Échéance</h3>
-          <p class="text-base font-medium text-slate-200">Aucune tâche urgente</p>
+          <p id="dash-next-task" class="text-base font-medium text-slate-200">Aucune tâche urgente</p>
         </div>
         <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
           <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Dernier Bilan JdB</h3>
@@ -87,45 +88,102 @@
       </div>
     </section>
 
-    <!-- TAB 2: WORKSPACE -->
+    <!-- TAB 2: WORKSPACE (KANBAN RESTAURÉ) -->
     <section id="sec-workspace" class="hidden space-y-6">
-      <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700">
-        <h2 class="text-xl font-bold">Workspace (Kanban & Agenda)</h2>
-        <span class="text-xs bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-amber-400 font-mono">
-          🧠 Charge Mentale : <span id="kb-mental-val">3</span>/10
-        </span>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[300px]">
-          <h3 class="font-bold text-slate-300 mb-3">📌 À Faire</h3>
-          <div id="col-todo" class="space-y-3 flex-grow" ondrop="drop(event, 'todo')" ondragover="allowDrop(event)">
-            <div id="task-1" draggable="true" ondragstart="drag(event)" class="p-3 bg-slate-800 rounded-lg border border-slate-700 cursor-move">
-              <p class="text-sm font-bold">Analyse de l'activité - Chapitre 1</p>
-              <p class="text-xs text-slate-400 mt-1">UE Ergonomie - Coût : 1 PT Charge</p>
-            </div>
-          </div>
+      <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
+        <div>
+          <h2 class="text-xl font-bold">Workspace (Kanban)</h2>
+          <p class="text-xs text-slate-400">Gère tes tâches de cours et tes projets ergo.</p>
         </div>
-        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[300px]">
-          <h3 class="font-bold text-amber-400 mb-3">⚡ En Cours</h3>
+        <div class="flex items-center gap-3">
+          <span class="text-xs bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-amber-400 font-mono">
+            🧠 Charge Mentale : <span id="kb-mental-val">3</span>/10
+          </span>
+          <button onclick="toggleAddTaskModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">+ Nouvelle Tâche</button>
+        </div>
+      </div>
+
+      <!-- Formulaire Ajout Tâche -->
+      <div id="add-task-form-box" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+        <h3 class="text-sm font-bold text-emerald-400">Ajouter une tâche au Kanban</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <input type="text" id="new-task-title" placeholder="Titre de la tâche" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <input type="text" id="new-task-ue" placeholder="UE / Matière (ex: UE Ergonomie)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <select id="new-task-cost" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+            <option value="1">Coût : 1 PT Charge</option>
+            <option value="2">Coût : 2 PTS Charge</option>
+            <option value="3">Coût : 3 PTS Charge</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button onclick="toggleAddTaskModal()" class="px-3 py-1 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
+          <button onclick="addNewTask()" class="px-3 py-1 bg-emerald-600 text-xs rounded font-bold text-white">Ajouter</button>
+        </div>
+      </div>
+
+      <!-- Colonnes Kanban -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
+          <h3 class="font-bold text-slate-300 mb-3 flex justify-between items-center">
+            <span>📌 À Faire</span>
+            <span id="count-todo" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400">0</span>
+          </h3>
+          <div id="col-todo" class="space-y-3 flex-grow" ondrop="drop(event, 'todo')" ondragover="allowDrop(event)"></div>
+        </div>
+
+        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
+          <h3 class="font-bold text-amber-400 mb-3 flex justify-between items-center">
+            <span>⚡ En Cours</span>
+            <span id="count-doing" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-400">0</span>
+          </h3>
           <div id="col-doing" class="space-y-3 flex-grow" ondrop="drop(event, 'doing')" ondragover="allowDrop(event)"></div>
         </div>
-        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[300px]">
-          <h3 class="font-bold text-emerald-400 mb-3">✅ Terminé (+XP & Butin)</h3>
+
+        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
+          <h3 class="font-bold text-emerald-400 mb-3 flex justify-between items-center">
+            <span>✅ Terminé (+XP)</span>
+            <span id="count-done" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-emerald-400">0</span>
+          </h3>
           <div id="col-done" class="space-y-3 flex-grow" ondrop="drop(event, 'done')" ondragover="allowDrop(event)"></div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 3: CRM -->
+    <!-- TAB 3: CRM (RÉSEAU PRO RESTAURÉ) -->
     <section id="sec-crm" class="hidden space-y-6">
-      <h2 class="text-xl font-bold">Réseau Pro Ergonomie</h2>
-      <p class="text-slate-400 text-sm">Annuaire CRM disponible.</p>
+      <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
+        <div>
+          <h2 class="text-xl font-bold">Réseau Pro Ergonomie (CRM)</h2>
+          <p class="text-xs text-slate-400">Gère tes contacts professionnels, tuteurs, enseignants et paires.</p>
+        </div>
+        <button onclick="toggleAddCrmModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">+ Nouveau Contact</button>
+      </div>
+
+      <!-- Formulaire Ajout CRM -->
+      <div id="add-crm-form-box" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+        <h3 class="text-sm font-bold text-emerald-400">Ajouter un contact pro</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <input type="text" id="crm-name" placeholder="Nom complet" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <input type="text" id="crm-role" placeholder="Rôle (ex: Ergonome, Enseignant)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <input type="text" id="crm-org" placeholder="Structure / Université" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <input type="text" id="crm-contact" placeholder="Email / LinkedIn / Tel" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+        </div>
+        <div class="flex justify-end gap-2">
+          <button onclick="toggleAddCrmModal()" class="px-3 py-1 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
+          <button onclick="addNewCrmContact()" class="px-3 py-1 bg-emerald-600 text-xs rounded font-bold text-white">Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- Liste des contacts CRM -->
+      <div id="crm-contacts-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <p class="text-xs text-slate-500 italic col-span-full">Aucun contact enregistré pour le moment.</p>
+      </div>
     </section>
 
-    <!-- TAB 4: VOYAGEUR & JOURNAL DE BORD (Restructuré en 3 Sous-Onglets) -->
+    <!-- TAB 4: VOYAGEUR & JOURNAL DE BORD (3 Sous-Onglets) -->
     <section id="sec-voyageur" class="hidden space-y-6">
       
-      <!-- Sous-Barre de Navigation interne Voyageur -->
+      <!-- Sous-Barre Navigation -->
       <div class="flex space-x-2 border-b border-slate-700 pb-3">
         <button onclick="switchVoyageurSubTab('gamification')" id="vsubtab-gamification" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">
           🛡️ Fiche Personnage
@@ -138,7 +196,7 @@
         </button>
       </div>
 
-      <!-- SOUS-ONGLET 1: GAMIFICATION (FICHE DE PERSONNAGE) -->
+      <!-- SOUS-ONGLET 1: GAMIFICATION -->
       <div id="vsub-gamification" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
@@ -179,7 +237,7 @@
         </div>
       </div>
 
-      <!-- SOUS-ONGLET 2: QUÊTE JOURNALIÈRE ET ARCHIVES -->
+      <!-- SOUS-ONGLET 2: QUÊTE JOURNALIÈRE & ARCHIVES -->
       <div id="vsub-quest" class="hidden space-y-6">
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2">
@@ -196,7 +254,7 @@
 
           <form id="form-jdb" onsubmit="saveJdbEntry(event)" class="space-y-4">
             
-            <!-- Section 1 : Réflexivité & Humeur -->
+            <!-- Section 1 : Réflexivité & Mood -->
             <div id="fsec-1" class="space-y-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-300 mb-1">Date du bilan (Antidatage possible)</label>
@@ -232,7 +290,7 @@
 
             <!-- Section 2 : Sommeil -->
             <div id="fsec-2" class="hidden space-y-4">
-              <p class="text-xs text-slate-400 font-semibold uppercase">Évaluation de la nuit & récupération (1 à 10) :</p>
+              <p class="text-xs text-slate-400 font-semibold uppercase">Évaluation du sommeil & récupération (1 à 10) :</p>
               <div class="space-y-3 bg-slate-900 p-4 rounded-lg border border-slate-700">
                 <div>
                   <div class="flex justify-between text-xs mb-1">
@@ -289,7 +347,7 @@
           </form>
         </div>
 
-        <!-- Archives des bilans -->
+        <!-- Archives -->
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2">
             <h2 class="text-xl font-bold text-slate-200">🗂️ Archives des Bilans</h2>
@@ -305,7 +363,7 @@
         </div>
       </div>
 
-      <!-- SOUS-ONGLET 3: DASHBOARD ANALYTIQUE & FILTRAGE SPORT -->
+      <!-- SOUS-ONGLET 3: DASHBOARD ANALYTIQUE -->
       <div id="vsub-analytics" class="hidden space-y-6">
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -339,14 +397,13 @@
           </div>
         </div>
 
-        <!-- Centre d'Analyse Sportive avec Filtres Dynamiques -->
+        <!-- Centre d'Analyse Sportive -->
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2">
             <h3 class="text-base font-bold text-amber-400 flex items-center gap-2">🔍 Centre d'Analyse des Séances Sportives</h3>
             <span class="text-xs text-slate-400">Filtrage dynamique de la pratique</span>
           </div>
 
-          <!-- Barre de filtres -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-slate-900 rounded-lg border border-slate-700 text-xs">
             <div>
               <label class="block text-slate-400 mb-1 font-semibold">Discipline</label>
@@ -368,7 +425,6 @@
             </div>
           </div>
 
-          <!-- Table filtrée -->
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs text-slate-300 border-collapse">
               <thead>
@@ -446,34 +502,31 @@
       chercheur: { name: "Chercheur en Ergonomie", stats: { methodologie: 13, analyse: 12, stress: 10, creativite: 10, empathie: 9 } }
     };
 
-    let hero;
-    try {
-      hero = JSON.parse(localStorage.getItem('ergo_hero')) || null;
-    } catch(e) { hero = null; }
+    // Global States
+    let hero = JSON.parse(localStorage.getItem('ergo_hero')) || {
+      classKey: 'psychologue_travail',
+      isClassLocked: false,
+      level: 1,
+      xp: 0,
+      statPoints: 0,
+      mentalLoad: 3,
+      statsBonus: { empathie: 0, stress: 0, analyse: 0, creativite: 0, methodologie: 0 },
+      inventory: [itemPool[0], itemPool[4]],
+      completedDates: []
+    };
 
-    if (!hero || !hero.classKey) {
-      hero = {
-        classKey: 'psychologue_travail',
-        isClassLocked: false,
-        level: 1,
-        xp: 0,
-        statPoints: 0,
-        mentalLoad: 3,
-        statsBonus: { empathie: 0, stress: 0, analyse: 0, creativite: 0, methodologie: 0 },
-        inventory: [itemPool[0], itemPool[4]],
-        completedDates: []
-      };
-    }
+    let kanbanTasks = JSON.parse(localStorage.getItem('ergo_kanban_tasks')) || [
+      { id: 'task-1', title: "Analyse de l'activité - Chapitre 1", ue: "UE Ergonomie", cost: 1, status: 'todo' }
+    ];
 
-    let jdbEntries = [];
-    try {
-      jdbEntries = JSON.parse(localStorage.getItem('ergo_jdb_entries')) || [];
-    } catch(e) { jdbEntries = []; }
+    let crmContacts = JSON.parse(localStorage.getItem('ergo_crm_contacts')) || [];
+    let jdbEntries = JSON.parse(localStorage.getItem('ergo_jdb_entries')) || [];
 
     let currentEditingId = null;
     let saeChart = null;
     let sportBlockCounter = 0;
 
+    // Navigation
     function switchTab(tabId) {
       ['dashboard', 'workspace', 'crm', 'voyageur'].forEach(t => {
         const sec = document.getElementById(`sec-${t}`);
@@ -485,6 +538,9 @@
       const activeTab = document.getElementById(`tab-${tabId}`);
       if (activeSec) activeSec.classList.remove('hidden');
       if (activeTab) activeTab.className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white";
+      
+      if (tabId === 'workspace') renderKanban();
+      if (tabId === 'crm') renderCrm();
       if (tabId === 'voyageur') renderVoyageur();
     }
 
@@ -515,6 +571,125 @@
       if (targetTab) targetTab.className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
     }
 
+    // KANBAN LOGIC
+    function toggleAddTaskModal() {
+      const box = document.getElementById('add-task-form-box');
+      box.classList.toggle('hidden');
+    }
+
+    function addNewTask() {
+      const title = document.getElementById('new-task-title').value.trim();
+      const ue = document.getElementById('new-task-ue').value.trim();
+      const cost = parseInt(document.getElementById('new-task-cost').value);
+
+      if (!title) return alert("Le titre de la tâche est requis.");
+
+      const newTask = { id: `task-${Date.now()}`, title, ue: ue || 'Projet Ergo', cost, status: 'todo' };
+      kanbanTasks.push(newTask);
+      saveKanban();
+      renderKanban();
+      toggleAddTaskModal();
+      document.getElementById('new-task-title').value = '';
+    }
+
+    function moveTask(id, targetStatus) {
+      kanbanTasks = kanbanTasks.map(t => t.id === id ? { ...t, status: targetStatus } : t);
+      if (targetStatus === 'done') gainXp(25);
+      hero.mentalLoad = Math.min(10, hero.mentalLoad + 1);
+      playRetroSound('kanban');
+      saveHero();
+      saveKanban();
+      renderKanban();
+    }
+
+    function deleteTask(id) {
+      kanbanTasks = kanbanTasks.filter(t => t.id !== id);
+      saveKanban();
+      renderKanban();
+    }
+
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    function drop(ev, targetCol) {
+      ev.preventDefault();
+      const id = ev.dataTransfer.getData("text");
+      moveTask(id, targetCol);
+    }
+
+    function saveKanban() { localStorage.setItem('ergo_kanban_tasks', JSON.stringify(kanbanTasks)); }
+
+    function renderKanban() {
+      ['todo', 'doing', 'done'].forEach(status => {
+        const col = document.getElementById(`col-${status}`);
+        const tasks = kanbanTasks.filter(t => t.status === status);
+        document.getElementById(`count-${status}`).innerText = tasks.length;
+
+        col.innerHTML = tasks.map(t => `
+          <div id="${t.id}" draggable="true" ondragstart="drag(event)" class="p-3 bg-slate-800 rounded-lg border border-slate-700 cursor-move flex justify-between items-start space-x-2">
+            <div>
+              <p class="text-sm font-bold text-slate-200">${t.title}</p>
+              <p class="text-xs text-slate-400 mt-1">${t.ue} - Coût : ${t.cost} PT Charge</p>
+            </div>
+            <div class="flex flex-col gap-1">
+              ${status !== 'done' ? `<button onclick="moveTask('${t.id}', '${status === 'todo' ? 'doing' : 'done'}')" class="text-[10px] bg-slate-700 hover:bg-slate-600 px-1.5 py-0.5 rounded text-emerald-400">➡️</button>` : ''}
+              <button onclick="deleteTask('${t.id}')" class="text-[10px] text-rose-400 hover:underline">✕</button>
+            </div>
+          </div>
+        `).join('');
+      });
+
+      const nextTaskEl = document.getElementById('dash-next-task');
+      const firstTodo = kanbanTasks.find(t => t.status === 'todo');
+      if (nextTaskEl) nextTaskEl.innerText = firstTodo ? firstTodo.title : 'Aucune tâche urgente';
+      updateMentalLoadUI();
+    }
+
+    // CRM LOGIC
+    function toggleAddCrmModal() {
+      document.getElementById('add-crm-form-box').classList.toggle('hidden');
+    }
+
+    function addNewCrmContact() {
+      const name = document.getElementById('crm-name').value.trim();
+      const role = document.getElementById('crm-role').value.trim();
+      const org = document.getElementById('crm-org').value.trim();
+      const contact = document.getElementById('crm-contact').value.trim();
+
+      if (!name) return alert("Le nom est obligatoire.");
+
+      crmContacts.push({ id: Date.now(), name, role: role || 'Contact Ergonomie', org: org || 'Université', contact: contact || '-' });
+      localStorage.setItem('ergo_crm_contacts', JSON.stringify(crmContacts));
+      renderCrm();
+      toggleAddCrmModal();
+      document.getElementById('crm-name').value = '';
+    }
+
+    function deleteCrmContact(id) {
+      crmContacts = crmContacts.filter(c => c.id !== id);
+      localStorage.setItem('ergo_crm_contacts', JSON.stringify(crmContacts));
+      renderCrm();
+    }
+
+    function renderCrm() {
+      const container = document.getElementById('crm-contacts-list');
+      if (!container) return;
+      if (crmContacts.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic col-span-full">Aucun contact enregistré pour le moment.</p>`;
+        return;
+      }
+      container.innerHTML = crmContacts.map(c => `
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-start space-x-2">
+          <div>
+            <h3 class="text-sm font-bold text-emerald-400">${c.name}</h3>
+            <p class="text-xs text-slate-300">${c.role} @ ${c.org}</p>
+            <p class="text-[11px] text-slate-400 font-mono mt-2">✉️ ${c.contact}</p>
+          </div>
+          <button onclick="deleteCrmContact(${c.id})" class="text-xs text-rose-400 hover:underline">Supprimer</button>
+        </div>
+      `).join('');
+    }
+
+    // JDB & SPORT LOGIC
     function updateMoodLabel(val) {
       const el = document.getElementById('val-jdb-mood');
       const desc = document.getElementById('lbl-mood-desc');
@@ -702,17 +877,6 @@
       return sports;
     }
 
-    function allowDrop(ev) { ev.preventDefault(); }
-    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
-    function drop(ev, targetCol) {
-      ev.preventDefault();
-      hero.mentalLoad = Math.min(10, hero.mentalLoad + 1);
-      playRetroSound('kanban');
-      updateMentalLoadUI();
-      saveHero();
-      if(targetCol === 'done') gainXp(25);
-    }
-
     function updateMentalLoadUI() {
       const bar = document.getElementById('dash-mental-bar');
       const text = document.getElementById('dash-mental-text');
@@ -883,12 +1047,13 @@
       renderVoyageur();
     }
 
+    // CSV TEMPLATE COMPLET
     function downloadCSVTemplate() {
-      const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,sleepQuality,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail\",8,8,7,8,6,7";
+      const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,sleepOnset,sleepWake,sleepQuality,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail\",8,8,8,7,8,8,6,7";
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "modele_journal_de_bord.csv");
+      link.setAttribute("download", "modele_journal_de_bord_complet.csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -907,7 +1072,7 @@
         lines.forEach((line, idx) => {
           if (idx === 0 || !line.trim()) return;
           const parts = line.includes(';') ? line.split(';') : line.split(',');
-          if (parts.length >= 8) {
+          if (parts.length >= 10) {
             const rawDate = parts[0].replace(/"/g, '').trim();
             const entry = {
               id: Date.now() + idx,
@@ -917,10 +1082,12 @@
               teachings: parts[1].replace(/"/g, '').trim(),
               mood: parseInt(parts[2].trim()) || 5,
               satisfaction: parseInt(parts[3].trim()) || 7,
-              sleepQuality: parseInt(parts[4].trim()) || 7,
-              saeWork: parseInt(parts[5].trim()) || 7,
-              saeSport: parseInt(parts[6].trim()) || 5,
-              saeSocial: parseInt(parts[7].trim()) || 7,
+              sleepOnset: parseInt(parts[4].trim()) || 7,
+              sleepWake: parseInt(parts[5].trim()) || 6,
+              sleepQuality: parseInt(parts[6].trim()) || 7,
+              saeWork: parseInt(parts[7].trim()) || 7,
+              saeSport: parseInt(parts[8].trim()) || 5,
+              saeSocial: parseInt(parts[9].trim()) || 7,
               sports: []
             };
             jdbEntries.push(entry);
@@ -930,7 +1097,7 @@
 
         jdbEntries.sort((a, b) => b.timestamp - a.timestamp);
         localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
-        alert(`📥 Importation réussie : ${addedCount} bilans ajoutés !`);
+        alert(`📥 Importation réussie : ${addedCount} bilans complets ajoutés !`);
         renderVoyageur();
       };
       reader.readAsText(file);
@@ -1038,7 +1205,7 @@
             ${(e.sports && e.sports.length) ? `<div class="mt-2 flex flex-wrap gap-1">${e.sports.map(s => `<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.title || s.type} (${s.duration}m)</span>`).join('')}</div>` : ''}
           </div>
           <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-            <span class="text-slate-500">Sommeil: ${e.sleepQuality || '-'}/10</span>
+            <span class="text-slate-500">Sommeil (R/E/Q): ${e.sleepWake||'-'}/${e.sleepOnset||'-'}/${e.sleepQuality||'-'}</span>
             <div class="space-x-2">
               <button onclick="editEntry(${e.id})" class="text-emerald-400 hover:underline">Éditer</button>
               <button onclick="deleteEntry(${e.id})" class="text-rose-400 hover:underline">Supprimer</button>
@@ -1085,13 +1252,15 @@
       }
     }
 
-    // Initialisation
+    // Init
     document.addEventListener('DOMContentLoaded', () => {
       const yestDate = new Date();
       yestDate.setDate(yestDate.getDate() - 1);
       const customDateEl = document.getElementById('jdb-custom-date');
       if (customDateEl) customDateEl.value = yestDate.toISOString().split('T')[0];
 
+      renderKanban();
+      renderCrm();
       renderVoyageur();
     });
   </script>
