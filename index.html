@@ -21,11 +21,11 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-  <!-- Header Navigation -->
+  <!-- Header Navigation restauré -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
       
-      <!-- Logo & Navigation Principale -->
+      <!-- Logo & Navigation -->
       <div class="flex items-center space-x-6">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
           <span class="text-2xl">🧠</span>
@@ -38,20 +38,20 @@
         </nav>
       </div>
 
-      <!-- Badge Profil Joueur (Haut Droite) & Raccourci Quête -->
+      <!-- Profil Joueur (Haut Droite) & Quête Dispo -->
       <div class="flex items-center space-x-3">
         <button onclick="switchTab('voyageur')" id="header-quest-btn" class="relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition">
           <span class="animate-pulse">📜</span>
-          <span>Quête Dispo !</span>
+          <span id="header-quest-text">Quête Dispo !</span>
         </button>
 
         <div onclick="switchTab('voyageur')" class="flex items-center space-x-3 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 cursor-pointer hover:border-emerald-500/50 transition">
-          <div class="w-8 h-8 rounded-full bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-between p-1.5">
+          <div class="w-8 h-8 rounded-full bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-center">
             <span class="text-sm">🛡️</span>
           </div>
           <div class="text-left">
             <p id="header-hero-name" class="text-xs font-bold text-slate-200 leading-tight">Voyageur</p>
-            <p id="header-hero-level" class="text-[10px] text-amber-400 font-mono">Niv. 1 | Psychologue</p>
+            <p id="header-hero-level" class="text-[10px] text-amber-400 font-mono">Niv. 1</p>
           </div>
         </div>
       </div>
@@ -127,7 +127,7 @@
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Fiche Personnage Voyageur -->
+        <!-- Fiche Personnage Voyageur (Spécialité Verrouillable RP) -->
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🛡️ Le Voyageur</h2>
@@ -172,7 +172,7 @@
           </div>
           
           <div class="flex space-x-2 border-b border-slate-700 pb-2">
-            <button onclick="switchFormTab(1)" id="ftab-1" class="px-3 py-1 bg-emerald-600 rounded text-xs font-bold">1. Réflexivité & Date</button>
+            <button onclick="switchFormTab(1)" id="ftab-1" class="px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white">1. Réflexivité & Date</button>
             <button onclick="switchFormTab(2)" id="ftab-2" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">2. SAE (Efficacité)</button>
             <button onclick="switchFormTab(3)" id="ftab-3" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">3. Sport (Optionnel)</button>
           </div>
@@ -280,7 +280,7 @@
         </div>
       </div>
 
-      <!-- ARCHIVES, IMPORT & TEMPLATE EXCEL -->
+      <!-- ARCHIVES & IMPORT/EXPORT CSV -->
       <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
         <div class="flex justify-between items-center flex-wrap gap-2">
           <h2 class="text-xl font-bold text-slate-200">🗂️ Archives des Bilans</h2>
@@ -304,7 +304,7 @@
   </main>
 
   <script>
-    // Retro Sound Engine
+    // Audio Synth Engine
     const playRetroSound = (type) => {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -353,45 +353,59 @@
       chercheur: { name: "Chercheur en Ergonomie", stats: { methodologie: 13, analyse: 12, stress: 10, creativite: 10, empathie: 9 } }
     };
 
-    let hero = JSON.parse(localStorage.getItem('ergo_hero') || JSON.stringify({
-      classKey: 'psychologue_travail',
-      isClassLocked: false,
-      level: 1,
-      xp: 0,
-      statPoints: 0,
-      mentalLoad: 3,
-      statsBonus: { empathie: 0, stress: 0, analyse: 0, creativite: 0, methodologie: 0 },
-      inventory: [itemPool[0], itemPool[4]],
-      completedDates: []
-    }));
+    let hero;
+    try {
+      hero = JSON.parse(localStorage.getItem('ergo_hero')) || null;
+    } catch(e) { hero = null; }
 
-    let jdbEntries = JSON.parse(localStorage.getItem('ergo_jdb_entries') || '[]');
+    if (!hero || !hero.classKey) {
+      hero = {
+        classKey: 'psychologue_travail',
+        isClassLocked: false,
+        level: 1,
+        xp: 0,
+        statPoints: 0,
+        mentalLoad: 3,
+        statsBonus: { empathie: 0, stress: 0, analyse: 0, creativite: 0, methodologie: 0 },
+        inventory: [itemPool[0], itemPool[4]],
+        completedDates: []
+      };
+    }
+
+    let jdbEntries = [];
+    try {
+      jdbEntries = JSON.parse(localStorage.getItem('ergo_jdb_entries')) || [];
+    } catch(e) { jdbEntries = []; }
+
     let currentEditingId = null;
     let saeChart = null;
     let sportBlockCounter = 0;
 
-    // Set Default Custom Date to Yesterday
-    const yest = new Date();
-    yest.setDate(yest.getDate() - 1);
-    document.getElementById('jdb-custom-date').value = yest.toISOString().split('T')[0];
-
     function switchTab(tabId) {
       ['dashboard', 'workspace', 'crm', 'voyageur'].forEach(t => {
-        document.getElementById(`sec-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white";
+        const sec = document.getElementById(`sec-${t}`);
+        const tab = document.getElementById(`tab-${t}`);
+        if (sec) sec.classList.add('hidden');
+        if (tab) tab.className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white";
       });
-      document.getElementById(`sec-${tabId}`).classList.remove('hidden');
-      document.getElementById(`tab-${tabId}`).className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white";
-      if(tabId === 'voyageur') renderVoyageur();
+      const activeSec = document.getElementById(`sec-${tabId}`);
+      const activeTab = document.getElementById(`tab-${tabId}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeTab) activeTab.className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white";
+      if (tabId === 'voyageur') renderVoyageur();
     }
 
     function switchFormTab(idx) {
       [1, 2, 3].forEach(i => {
-        document.getElementById(`fsec-${i}`).classList.add('hidden');
-        document.getElementById(`ftab-${i}`).className = "px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300";
+        const fsec = document.getElementById(`fsec-${i}`);
+        const ftab = document.getElementById(`ftab-${i}`);
+        if (fsec) fsec.classList.add('hidden');
+        if (ftab) ftab.className = "px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300";
       });
-      document.getElementById(`fsec-${idx}`).classList.remove('hidden');
-      document.getElementById(`ftab-${idx}`).className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
+      const targetSec = document.getElementById(`fsec-${idx}`);
+      const targetTab = document.getElementById(`ftab-${idx}`);
+      if (targetSec) targetSec.classList.remove('hidden');
+      if (targetTab) targetTab.className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
     }
 
     function addSportBlock(data = {}) {
@@ -431,7 +445,9 @@
     }
 
     function updateSportFields(id, data = {}) {
-      const type = document.getElementById(`sp-type-${id}`).value;
+      const typeEl = document.getElementById(`sp-type-${id}`);
+      if (!typeEl) return;
+      const type = typeEl.value;
       const target = document.getElementById(`sp-fields-${id}`);
 
       if (type === 'course') {
@@ -547,7 +563,7 @@
       blocks.forEach(b => {
         const id = b.id.replace('sport-block-', '');
         const title = document.getElementById(`sp-title-${id}`)?.value || 'Séance de Sport';
-        const type = document.getElementById(`sp-type-${id}`).value;
+        const type = document.getElementById(`sp-type-${id}`)?.value || 'autre';
         const duration = parseInt(document.getElementById(`sp-dur-${id}`)?.value || 0);
 
         if (type === 'course') {
@@ -568,7 +584,6 @@
       return sports;
     }
 
-    // Kanban & Mental Load
     function allowDrop(ev) { ev.preventDefault(); }
     function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
     function drop(ev, targetCol) {
@@ -581,12 +596,14 @@
     }
 
     function updateMentalLoadUI() {
-      document.getElementById('dash-mental-bar').style.width = `${hero.mentalLoad * 10}%`;
-      document.getElementById('dash-mental-text').innerText = `${hero.mentalLoad} / 10 pts`;
-      document.getElementById('kb-mental-val').innerText = hero.mentalLoad;
+      const bar = document.getElementById('dash-mental-bar');
+      const text = document.getElementById('dash-mental-text');
+      const kbVal = document.getElementById('kb-mental-val');
+      if (bar) bar.style.width = `${hero.mentalLoad * 10}%`;
+      if (text) text.innerText = `${hero.mentalLoad} / 10 pts`;
+      if (kbVal) kbVal.innerText = hero.mentalLoad;
     }
 
-    // Hero Systems & Locked Archetypes
     function lockClassChoice(key) {
       hero.classKey = key;
       hero.isClassLocked = true;
@@ -615,79 +632,89 @@
     }
 
     function renderVoyageur() {
-      const cfg = classConfigs[hero.classKey];
+      const cfg = classConfigs[hero.classKey] || classConfigs['psychologue_travail'];
       
-      // Header Updates
-      document.getElementById('header-hero-name').innerText = cfg.name;
-      document.getElementById('header-hero-level').innerText = `Niv. ${hero.level} | ${cfg.name.substring(0, 12)}...`;
-      document.getElementById('dash-hero-name').innerText = cfg.name;
-      document.getElementById('dash-hero-level').innerText = `Niveau ${hero.level} (${hero.xp} / 100 XP)`;
+      const hName = document.getElementById('header-hero-name');
+      const hLvl = document.getElementById('header-hero-level');
+      const dName = document.getElementById('dash-hero-name');
+      const dLvl = document.getElementById('dash-hero-level');
 
-      // Quest Availability Badge in Header
-      const selectedDate = document.getElementById('jdb-custom-date').value;
+      if (hName) hName.innerText = cfg.name;
+      if (hLvl) hLvl.innerText = `Niv. ${hero.level}`;
+      if (dName) dName.innerText = cfg.name;
+      if (dLvl) dLvl.innerText = `Niveau ${hero.level} (${hero.xp} / 100 XP)`;
+
+      const customDateEl = document.getElementById('jdb-custom-date');
+      const selectedDate = customDateEl ? customDateEl.value : '';
       const isDone = hero.completedDates && hero.completedDates.includes(selectedDate);
-      const questHeaderBtn = document.getElementById('header-quest-btn');
-      
-      if (isDone) {
-        questHeaderBtn.className = "flex items-center gap-2 px-3 py-1.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-lg text-xs font-bold";
-        questHeaderBtn.innerHTML = `<span>✅</span><span>Bilan Fait</span>`;
-      } else {
-        questHeaderBtn.className = "relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition";
-        questHeaderBtn.innerHTML = `<span class="animate-pulse">📜</span><span>Quête Dispo !</span>`;
+      const questBtn = document.getElementById('header-quest-btn');
+      const questText = document.getElementById('header-quest-text');
+
+      if (questBtn && questText) {
+        if (isDone) {
+          questBtn.className = "flex items-center gap-2 px-3 py-1.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-lg text-xs font-bold";
+          questText.innerText = "Bilan Fait ✅";
+        } else {
+          questBtn.className = "relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition";
+          questText.innerText = "Quête Dispo !";
+        }
       }
 
-      // Class Selection Box (Locked RP)
       const archBox = document.getElementById('archetype-selection-box');
-      if (!hero.isClassLocked) {
-        archBox.innerHTML = `
-          <label class="block text-xs font-semibold text-amber-400 mb-1">Choisir sa spécialité de départ (Dédefinitif)</label>
-          <div class="flex gap-2">
-            <select id="select-class-init" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
-              <option value="psychologue_travail">Psychologue du Travail & des Orgs</option>
-              <option value="facteurs_humains">Spécialiste Facteurs Humains</option>
-              <option value="ux_designer">Ergonome UX / UI Designer</option>
-              <option value="px_designer">Player Experience (PX) Designer</option>
-              <option value="chercheur">Chercheur en Ergonomie Critique</option>
-            </select>
-            <button onclick="lockClassChoice(document.getElementById('select-class-init').value)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 font-bold text-xs rounded-lg">Incarner</button>
-          </div>
-        `;
-      } else {
-        archBox.innerHTML = `
-          <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 flex justify-between items-center">
-            <div>
-              <span class="text-[10px] text-slate-500 uppercase font-bold">Spécialité Incarnée</span>
-              <p class="text-sm font-bold text-emerald-400">${cfg.name}</p>
+      if (archBox) {
+        if (!hero.isClassLocked) {
+          archBox.innerHTML = `
+            <label class="block text-xs font-semibold text-amber-400 mb-1">Choisir sa spécialité (Définitif)</label>
+            <div class="flex gap-2">
+              <select id="select-class-init" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
+                <option value="psychologue_travail">Psychologue du Travail & des Orgs</option>
+                <option value="facteurs_humains">Spécialiste Facteurs Humains</option>
+                <option value="ux_designer">Ergonome UX / UI Designer</option>
+                <option value="px_designer">Player Experience (PX) Designer</option>
+                <option value="chercheur">Chercheur en Ergonomie Critique</option>
+              </select>
+              <button onclick="lockClassChoice(document.getElementById('select-class-init').value)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 font-bold text-xs rounded-lg">Incarner</button>
             </div>
-            <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">⚔️ Incarné</span>
-          </div>
-        `;
+          `;
+        } else {
+          archBox.innerHTML = `
+            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 flex justify-between items-center">
+              <div>
+                <span class="text-[10px] text-slate-500 uppercase font-bold">Spécialité Incarnée</span>
+                <p class="text-sm font-bold text-emerald-400">${cfg.name}</p>
+              </div>
+              <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">⚔️ Incarné</span>
+            </div>
+          `;
+        }
       }
 
-      // Stats
       const container = document.getElementById('stats-container');
-      const labels = { empathie: "Empathie", stress: "Régulation Stress", analyse: "Analyse Critique", creativite: "Créativité", methodologie: "Méthodologie" };
-      container.innerHTML = Object.keys(labels).map(k => {
-        const total = cfg.stats[k] + (hero.statsBonus[k] || 0);
-        return `
-          <div class="flex justify-between items-center">
-            <span class="text-slate-400">${labels[k]} : <b class="text-slate-200">${total}</b></span>
-            ${hero.statPoints > 0 ? `<button onclick="addStatPoint('${k}')" class="px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 rounded text-[10px] font-bold">+1</button>` : ''}
-          </div>
-        `;
-      }).join('');
+      if (container) {
+        const labels = { empathie: "Empathie", stress: "Régulation Stress", analyse: "Analyse Critique", creativite: "Créativité", methodologie: "Méthodologie" };
+        container.innerHTML = Object.keys(labels).map(k => {
+          const total = cfg.stats[k] + (hero.statsBonus[k] || 0);
+          return `
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">${labels[k]} : <b class="text-slate-200">${total}</b></span>
+              ${hero.statPoints > 0 ? `<button onclick="addStatPoint('${k}')" class="px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 rounded text-[10px] font-bold">+1</button>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
 
-      // Inventory
       const invContainer = document.getElementById('inventory-list');
-      invContainer.innerHTML = hero.inventory.map(item => `
-        <div class="relative group cursor-pointer px-2.5 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
-          <span>📦 ${item.name}</span>
-          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-slate-950 border border-slate-600 rounded shadow-xl text-[11px] z-50">
-            <p class="font-bold text-amber-400">${item.name} <span class="text-[9px] text-slate-500">(${item.rarity})</span></p>
-            <p class="text-slate-300 mt-0.5">${item.desc}</p>
+      if (invContainer) {
+        invContainer.innerHTML = hero.inventory.map(item => `
+          <div class="relative group cursor-pointer px-2.5 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
+            <span>📦 ${item.name}</span>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-slate-950 border border-slate-600 rounded shadow-xl text-[11px] z-50">
+              <p class="font-bold text-amber-400">${item.name} <span class="text-[9px] text-slate-500">(${item.rarity})</span></p>
+              <p class="text-slate-300 mt-0.5">${item.desc}</p>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
 
       renderJdbDashboard();
       updateMentalLoadUI();
@@ -695,7 +722,6 @@
 
     function saveHero() { localStorage.setItem('ergo_hero', JSON.stringify(hero)); }
 
-    // JdB Logic
     function saveJdbEntry(e) {
       e.preventDefault();
       const rawDate = document.getElementById('jdb-custom-date').value;
@@ -737,7 +763,7 @@
     }
 
     function downloadCSVTemplate() {
-      const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail et analyse de l'activité\",4,8,8,6,7\n2026-09-25,\"Révision des critères d'utilisabilité de Bastien & Scapin\",3,7,7,5,6";
+      const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail\",4,8,8,6,7";
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
@@ -789,22 +815,23 @@
     }
 
     function renderJdbDashboard() {
-      if (jdbEntries.length === 0) return;
+      if (!jdbEntries || jdbEntries.length === 0) return;
 
-      const avgMood = (jdbEntries.reduce((acc, e) => acc + e.mood, 0) / jdbEntries.length).toFixed(1);
-      document.getElementById('kpi-mood').innerText = `${avgMood} / 5`;
+      const avgMood = (jdbEntries.reduce((acc, e) => acc + (e.mood || 0), 0) / jdbEntries.length).toFixed(1);
+      const moodEl = document.getElementById('kpi-mood');
+      if (moodEl) moodEl.innerText = `${avgMood} / 5`;
 
       const now = Date.now();
       const j7 = jdbEntries.filter(e => now - e.timestamp <= 7 * 86400000);
       const j30 = jdbEntries.filter(e => now - e.timestamp <= 30 * 86400000);
-      const calcAvg = (arr, key) => arr.length ? (arr.reduce((a, b) => a + b[key], 0) / arr.length).toFixed(1) : '-';
+      const calcAvg = (arr, key) => arr.length ? (arr.reduce((a, b) => a + (b[key] || 0), 0) / arr.length).toFixed(1) : '-';
 
-      document.getElementById('sae-w-7').innerText = calcAvg(j7, 'saeWork');
-      document.getElementById('sae-w-30').innerText = calcAvg(j30, 'saeWork');
-      document.getElementById('sae-s-7').innerText = calcAvg(j7, 'saeSport');
-      document.getElementById('sae-s-30').innerText = calcAvg(j30, 'saeSport');
-      document.getElementById('sae-p-7').innerText = calcAvg(j7, 'saeSocial');
-      document.getElementById('sae-p-30').innerText = calcAvg(j30, 'saeSocial');
+      const sw7 = document.getElementById('sae-w-7'); if (sw7) sw7.innerText = calcAvg(j7, 'saeWork');
+      const sw30 = document.getElementById('sae-w-30'); if (sw30) sw30.innerText = calcAvg(j30, 'saeWork');
+      const ss7 = document.getElementById('sae-s-7'); if (ss7) ss7.innerText = calcAvg(j7, 'saeSport');
+      const ss30 = document.getElementById('sae-s-30'); if (ss30) ss30.innerText = calcAvg(j30, 'saeSport');
+      const sp7 = document.getElementById('sae-p-7'); if (sp7) sp7.innerText = calcAvg(j7, 'saeSocial');
+      const sp30 = document.getElementById('sae-p-30'); if (sp30) sp30.innerText = calcAvg(j30, 'saeSocial');
 
       let totalMin = 0, totalKm = 0, amMin = 0, renfMin = 0, mobMin = 0;
       jdbEntries.forEach(e => {
@@ -817,18 +844,20 @@
         });
       });
 
-      document.getElementById('kpi-sport-hours').innerText = `${Math.floor(totalMin/60)}h${totalMin%60 < 10 ? '0' : ''}${totalMin%60}`;
-      document.getElementById('kpi-course-km').innerText = `Course : ${totalKm.toFixed(1)} km`;
-      document.getElementById('kpi-am-h').innerText = `${(amMin/60).toFixed(1)}h`;
-      document.getElementById('kpi-renf-h').innerText = `${(renfMin/60).toFixed(1)}h`;
-      document.getElementById('kpi-mob-h').innerText = `${(mobMin/60).toFixed(1)}h`;
+      const spH = document.getElementById('kpi-sport-hours'); if (spH) spH.innerText = `${Math.floor(totalMin/60)}h${totalMin%60 < 10 ? '0' : ''}${totalMin%60}`;
+      const cKm = document.getElementById('kpi-course-km'); if (cKm) cKm.innerText = `Course : ${totalKm.toFixed(1)} km`;
+      const amH = document.getElementById('kpi-am-h'); if (amH) amH.innerText = `${(amMin/60).toFixed(1)}h`;
+      const rH = document.getElementById('kpi-renf-h'); if (rH) rH.innerText = `${(renfMin/60).toFixed(1)}h`;
+      const mH = document.getElementById('kpi-mob-h'); if (mH) mH.innerText = `${(mobMin/60).toFixed(1)}h`;
 
       renderChart();
       renderArchives();
     }
 
     function renderChart() {
-      const ctx = document.getElementById('chart-sae').getContext('2d');
+      const canvas = document.getElementById('chart-sae');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       const recent = [...jdbEntries].slice(0, 7).reverse();
 
       if (saeChart) saeChart.destroy();
@@ -848,6 +877,7 @@
 
     function renderArchives() {
       const container = document.getElementById('jdb-archives-list');
+      if (!container) return;
       container.innerHTML = jdbEntries.map(e => `
         <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 flex flex-col justify-between space-y-3">
           <div>
@@ -859,7 +889,7 @@
             ${(e.sports && e.sports.length) ? `<div class="mt-2 flex flex-wrap gap-1">${e.sports.map(s => `<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.title || s.type} (${s.duration}m)</span>`).join('')}</div>` : ''}
           </div>
           <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-            <span class="text-slate-500">SAE: ${((e.saeWork + e.saeSport + e.saeSocial)/3).toFixed(1)}</span>
+            <span class="text-slate-500">SAE: ${(((e.saeWork || 0) + (e.saeSport || 0) + (e.saeSocial || 0))/3).toFixed(1)}</span>
             <div class="space-x-2">
               <button onclick="editEntry(${e.id})" class="text-emerald-400 hover:underline">Éditer</button>
               <button onclick="deleteEntry(${e.id})" class="text-rose-400 hover:underline">Supprimer</button>
@@ -896,8 +926,15 @@
       }
     }
 
-    // Init
-    renderVoyageur();
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+      const yestDate = new Date();
+      yestDate.setDate(yestDate.getDate() - 1);
+      const customDateEl = document.getElementById('jdb-custom-date');
+      if (customDateEl) customDateEl.value = yestDate.toISOString().split('T')[0];
+
+      renderVoyageur();
+    });
   </script>
 </body>
 </html>
