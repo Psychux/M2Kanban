@@ -21,19 +21,41 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-  <!-- Header Navigation -->
+  <!-- Header Navigation (Design Historique Restauré) -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-      <div class="flex items-center space-x-3">
-        <span class="text-2xl">🧠</span>
-        <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">Ergo Hub</h1>
+      
+      <!-- Logo & Navigation Principale -->
+      <div class="flex items-center space-x-6">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+          <span class="text-2xl">🧠</span>
+          <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">Ergo Hub</h1>
+        </div>
+        <nav class="flex space-x-1 bg-slate-900 p-1 rounded-lg border border-slate-700">
+          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white">Dashboard</button>
+          <button onclick="switchTab('workspace')" id="tab-workspace" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white">Workspace</button>
+          <button onclick="switchTab('crm')" id="tab-crm" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white">Réseau Pro</button>
+        </nav>
       </div>
-      <nav class="flex space-x-2 bg-slate-900 p-1 rounded-lg border border-slate-700">
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 rounded-md font-medium text-sm transition bg-emerald-600 text-white">Dashboard</button>
-        <button onclick="switchTab('workspace')" id="tab-workspace" class="px-4 py-2 rounded-md font-medium text-sm transition text-slate-400 hover:text-white">Workspace</button>
-        <button onclick="switchTab('crm')" id="tab-crm" class="px-4 py-2 rounded-md font-medium text-sm transition text-slate-400 hover:text-white">Réseau Pro</button>
-        <button onclick="switchTab('voyageur')" id="tab-voyageur" class="px-4 py-2 rounded-md font-medium text-sm transition text-slate-400 hover:text-white">Voyageur & JdB</button>
-      </nav>
+
+      <!-- Badge Profil Joueur (Haut Droite) & Raccourci Quête -->
+      <div class="flex items-center space-x-3">
+        <button onclick="switchTab('voyageur')" id="header-quest-btn" class="relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition">
+          <span class="animate-pulse">📜</span>
+          <span>Quête Dispo !</span>
+        </button>
+
+        <div onclick="switchTab('voyageur')" class="flex items-center space-x-3 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 cursor-pointer hover:border-emerald-500/50 transition">
+          <div class="w-8 h-8 rounded-full bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-between p-1.5">
+            <span class="text-sm">🛡️</span>
+          </div>
+          <div class="text-left">
+            <p id="header-hero-name" class="text-xs font-bold text-slate-200 leading-tight">Voyageur</p>
+            <p id="header-hero-level" class="text-[10px] text-amber-400 font-mono">Niv. 1 | Psychologue</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </header>
 
@@ -42,10 +64,10 @@
     <!-- TAB 1: DASHBOARD -->
     <section id="sec-dashboard" class="space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
+        <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 cursor-pointer hover:border-slate-600 transition" onclick="switchTab('voyageur')">
           <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Profil Voyageur</h3>
-          <p id="dash-hero-name" class="text-lg font-bold text-emerald-400">Ergonome Voyageur</p>
-          <p id="dash-hero-way" class="text-xs text-slate-400">Psychologue du Travail</p>
+          <p id="dash-hero-name" class="text-lg font-bold text-emerald-400">Psychologue du Travail</p>
+          <p id="dash-hero-level" class="text-xs text-amber-400 font-mono mt-0.5">Niveau 1 (0 / 100 XP)</p>
           <div class="mt-3">
             <span class="text-xs text-slate-400">Charge Mentale:</span>
             <div class="w-full bg-slate-900 rounded-full h-2.5 mt-1 border border-slate-700">
@@ -105,22 +127,15 @@
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Fiche Personnage Voyageur -->
+        <!-- Fiche Personnage Voyageur (Spécialité Verrouillée) -->
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🛡️ Le Voyageur</h2>
             <span id="hero-level-badge" class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-xs font-bold">Niveau 1</span>
           </div>
 
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Classe de Spécialité</label>
-            <select id="select-class" onchange="changeClass(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
-              <option value="psychologue_travail">Psychologue du Travail & des Orgs</option>
-              <option value="facteurs_humains">Spécialiste Facteurs Humains</option>
-              <option value="ux_designer">Ergonome UX / UI Designer</option>
-              <option value="px_designer">Player Experience (PX) Designer</option>
-              <option value="chercheur">Chercheur en Ergonomie Critique</option>
-            </select>
+          <div id="archetype-selection-box">
+            <!-- Choix initial ou affichage verrouillé -->
           </div>
 
           <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
@@ -342,6 +357,7 @@
 
     let hero = JSON.parse(localStorage.getItem('ergo_hero') || JSON.stringify({
       classKey: 'psychologue_travail',
+      isClassLocked: false,
       level: 1,
       xp: 0,
       statPoints: 0,
@@ -356,7 +372,6 @@
     let saeChart = null;
     let sportBlockCounter = 0;
 
-    // Set Default Custom Date to Yesterday
     const yest = new Date();
     yest.setDate(yest.getDate() - 1);
     document.getElementById('jdb-custom-date').value = yest.toISOString().split('T')[0];
@@ -364,10 +379,10 @@
     function switchTab(tabId) {
       ['dashboard', 'workspace', 'crm', 'voyageur'].forEach(t => {
         document.getElementById(`sec-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).className = "px-4 py-2 rounded-md font-medium text-sm transition text-slate-400 hover:text-white";
+        document.getElementById(`tab-${t}`).className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white";
       });
       document.getElementById(`sec-${tabId}`).classList.remove('hidden');
-      document.getElementById(`tab-${tabId}`).className = "px-4 py-2 rounded-md font-medium text-sm transition bg-emerald-600 text-white";
+      document.getElementById(`tab-${tabId}`).className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white";
       if(tabId === 'voyageur') renderVoyageur();
     }
 
@@ -390,7 +405,7 @@
       block.className = "p-3 bg-slate-900 rounded-lg border border-slate-700 space-y-3 relative";
       block.innerHTML = `
         <div class="flex justify-between items-center">
-          <span class="text-xs font-bold text-emerald-400">Séance #${id}</span>
+          <input type="text" id="sp-title-${id}" value="${data.title || ''}" placeholder="Titre de la séance (ex: Footing Seuil)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-amber-300 font-bold w-3/4">
           <button type="button" onclick="removeSportBlock(${id})" class="text-[11px] text-rose-400 hover:underline">Supprimer</button>
         </div>
         <div>
@@ -434,18 +449,18 @@
               </select>
             </div>
             <div>
-              <label class="block text-[10px] text-slate-400">Durée (min)</label>
-              <input type="number" id="sp-dur-${id}" value="${data.duration || 45}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+              <label class="block text-[10px] text-slate-400">Distance (km)</label>
+              <input type="number" step="0.1" id="sp-km-${id}" value="${data.km || 5.0}" oninput="calcRunningPaceOrDuration(${id}, 'km')" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-[10px] text-slate-400">Distance (km)</label>
-              <input type="number" step="0.1" id="sp-km-${id}" value="${data.km || 5.0}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+              <label class="block text-[10px] text-slate-400">Durée (min)</label>
+              <input type="number" id="sp-dur-${id}" value="${data.duration || 30}" oninput="calcRunningPaceOrDuration(${id}, 'dur')" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
             </div>
             <div>
-              <label class="block text-[10px] text-slate-400">Allure (ex: 6:30)</label>
-              <input type="text" id="sp-pace-${id}" value="${data.pace || ''}" placeholder="6:30" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+              <label class="block text-[10px] text-slate-400">Allure (ex: 6:00)</label>
+              <input type="text" id="sp-pace-${id}" value="${data.pace || ''}" oninput="calcRunningPaceOrDuration(${id}, 'pace')" placeholder="6:00" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs font-mono">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
@@ -454,12 +469,25 @@
               <input type="number" id="sp-hr-${id}" value="${data.hr || 145}" placeholder="145" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
             </div>
             <div>
-              <label class="block text-[10px] text-slate-400">Intensité (1-10)</label>
-              <input type="number" id="sp-rpe-${id}" min="1" max="10" value="${data.rpe || 6}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+              <label class="block text-[10px] text-slate-400">Intensité ressentie (RPE)</label>
+              <select id="sp-rpe-${id}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+                <option value="1">1 - Très facile</option>
+                <option value="2">2 - Facile</option>
+                <option value="3">3 - Modéré</option>
+                <option value="4">4 - Un peu difficile</option>
+                <option value="5">5 - Difficile</option>
+                <option value="6" selected>6 - Soutenu</option>
+                <option value="7">7 - Très soutenu</option>
+                <option value="8">8 - Éprouvant</option>
+                <option value="9">9 - Très éprouvant</option>
+                <option value="10">10 - Effort Maximal</option>
+              </select>
             </div>
           </div>
         `;
         if (data.workType) document.getElementById(`sp-run-work-${id}`).value = data.workType;
+        if (data.rpe) document.getElementById(`sp-rpe-${id}`).value = data.rpe;
+        calcRunningPaceOrDuration(id, 'init');
       } else if (type === 'arts_martiaux') {
         target.innerHTML = `
           <div class="grid grid-cols-2 gap-2">
@@ -487,27 +515,55 @@
       }
     }
 
+    function calcRunningPaceOrDuration(id, changedField) {
+      const km = parseFloat(document.getElementById(`sp-km-${id}`)?.value || 0);
+      const durInput = document.getElementById(`sp-dur-${id}`);
+      const paceInput = document.getElementById(`sp-pace-${id}`);
+
+      if (!durInput || !paceInput || km <= 0) return;
+
+      if (changedField === 'km' || changedField === 'dur' || changedField === 'init') {
+        const dur = parseFloat(durInput.value || 0);
+        if (dur > 0) {
+          const paceDec = dur / km;
+          const pMin = Math.floor(paceDec);
+          const pSec = Math.round((paceDec - pMin) * 60);
+          paceInput.value = `${pMin}:${pSec < 10 ? '0' : ''}${pSec}`;
+        }
+      } else if (changedField === 'pace') {
+        const paceStr = paceInput.value.trim();
+        if (paceStr.includes(':')) {
+          const [pMin, pSec] = paceStr.split(':').map(Number);
+          if (!isNaN(pMin) && !isNaN(pSec)) {
+            const paceInMin = pMin + (pSec / 60);
+            durInput.value = Math.round(paceInMin * km);
+          }
+        }
+      }
+    }
+
     function collectSportsData() {
       const blocks = document.querySelectorAll('#sports-container > div');
       const sports = [];
       blocks.forEach(b => {
         const id = b.id.replace('sport-block-', '');
+        const title = document.getElementById(`sp-title-${id}`)?.value || 'Séance de Sport';
         const type = document.getElementById(`sp-type-${id}`).value;
         const duration = parseInt(document.getElementById(`sp-dur-${id}`)?.value || 0);
 
         if (type === 'course') {
           sports.push({
-            type, duration,
+            title, type, duration,
             workType: document.getElementById(`sp-run-work-${id}`)?.value,
             km: parseFloat(document.getElementById(`sp-km-${id}`)?.value || 0),
             pace: document.getElementById(`sp-pace-${id}`)?.value,
             hr: parseInt(document.getElementById(`sp-hr-${id}`)?.value || 0),
-            rpe: parseInt(document.getElementById(`sp-rpe-${id}`)?.value || 5)
+            rpe: parseInt(document.getElementById(`sp-rpe-${id}`)?.value || 6)
           });
         } else if (type === 'arts_martiaux') {
-          sports.push({ type, duration, amStyle: document.getElementById(`sp-am-style-${id}`)?.value });
+          sports.push({ title, type, duration, amStyle: document.getElementById(`sp-am-style-${id}`)?.value });
         } else {
-          sports.push({ type, duration });
+          sports.push({ title, type, duration });
         }
       });
       return sports;
@@ -531,8 +587,14 @@
       document.getElementById('kb-mental-val').innerText = hero.mentalLoad;
     }
 
-    // Hero Systems
-    function changeClass(key) { hero.classKey = key; saveHero(); renderVoyageur(); }
+    // Hero Systems & Locked Archetypes
+    function lockClassChoice(key) {
+      hero.classKey = key;
+      hero.isClassLocked = true;
+      saveHero();
+      renderVoyageur();
+    }
+
     function addStatPoint(stat) {
       if(hero.statPoints > 0) {
         hero.statPoints--;
@@ -555,11 +617,55 @@
 
     function renderVoyageur() {
       const cfg = classConfigs[hero.classKey];
-      document.getElementById('select-class').value = hero.classKey;
-      document.getElementById('dash-hero-way').innerText = cfg.name;
-      document.getElementById('hero-level-badge').innerText = `Niveau ${hero.level} (${hero.xp}/100 XP)`;
-      document.getElementById('stat-points-pool').innerText = hero.statPoints;
+      
+      // Header Updates
+      document.getElementById('header-hero-name').innerText = cfg.name;
+      document.getElementById('header-hero-level').innerText = `Niv. ${hero.level} | ${cfg.name.substring(0, 12)}...`;
+      document.getElementById('dash-hero-name').innerText = cfg.name;
+      document.getElementById('dash-hero-level').innerText = `Niveau ${hero.level} (${hero.xp} / 100 XP)`;
 
+      // Quest Availability Badge in Header
+      const today = new Date().toLocaleDateString('fr-FR');
+      const isDone = hero.completedDates && hero.completedDates.includes(document.getElementById('jdb-custom-date').value);
+      const questHeaderBtn = document.getElementById('header-quest-btn');
+      
+      if (isDone) {
+        questHeaderBtn.className = "flex items-center gap-2 px-3 py-1.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-lg text-xs font-bold";
+        questHeaderBtn.innerHTML = `<span>✅</span><span>Bilan Fait</span>`;
+      } else {
+        questHeaderBtn.className = "relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition";
+        questHeaderBtn.innerHTML = `<span class="animate-pulse">📜</span><span>Quête Dispo !</span>`;
+      }
+
+      // Class Selection Box (Locked RP)
+      const archBox = document.getElementById('archetype-selection-box');
+      if (!hero.isClassLocked) {
+        archBox.innerHTML = `
+          <label class="block text-xs font-semibold text-amber-400 mb-1">Choisir sa spécialité de départ (Dédefinitif)</label>
+          <div class="flex gap-2">
+            <select id="select-class-init" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
+              <option value="psychologue_travail">Psychologue du Travail & des Orgs</option>
+              <option value="facteurs_humains">Spécialiste Facteurs Humains</option>
+              <option value="ux_designer">Ergonome UX / UI Designer</option>
+              <option value="px_designer">Player Experience (PX) Designer</option>
+              <option value="chercheur">Chercheur en Ergonomie Critique</option>
+            </select>
+            <button onclick="lockClassChoice(document.getElementById('select-class-init').value)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 font-bold text-xs rounded-lg">Incarner</button>
+          </div>
+        `;
+      } else {
+        archBox.innerHTML = `
+          <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 flex justify-between items-center">
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase font-bold">Spécialité Incarne</span>
+              <p class="text-sm font-bold text-emerald-400">${cfg.name}</p>
+            </div>
+            <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">⚔️ Incarné</span>
+          </div>
+        `;
+      }
+
+      // Stats
       const container = document.getElementById('stats-container');
       const labels = { empathie: "Empathie", stress: "Régulation Stress", analyse: "Analyse Critique", creativite: "Créativité", methodologie: "Méthodologie" };
       container.innerHTML = Object.keys(labels).map(k => {
@@ -572,6 +678,7 @@
         `;
       }).join('');
 
+      // Inventory
       const invContainer = document.getElementById('inventory-list');
       invContainer.innerHTML = hero.inventory.map(item => `
         <div class="relative group cursor-pointer px-2.5 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
@@ -630,7 +737,6 @@
       renderVoyageur();
     }
 
-    // Download CSV Template
     function downloadCSVTemplate() {
       const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail et analyse de l'activité\",4,8,8,6,7\n2026-09-25,\"Révision des critères d'utilisabilité de Bastien & Scapin\",3,7,7,5,6";
       const encodedUri = encodeURI(csvContent);
@@ -642,7 +748,6 @@
       document.body.removeChild(link);
     }
 
-    // CSV Import Logic
     function importCSV(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -655,7 +760,6 @@
 
         lines.forEach((line, idx) => {
           if (idx === 0 || !line.trim()) return;
-          // Gestion des virgules et point-virgules
           const parts = line.includes(';') ? line.split(';') : line.split(',');
           if (parts.length >= 7) {
             const rawDate = parts[0].replace(/"/g, '').trim();
@@ -753,7 +857,7 @@
               <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-300">Humeur: ${e.mood}/5</span>
             </div>
             <p class="text-xs text-slate-300 line-clamp-2 italic">"${e.teachings}"</p>
-            ${(e.sports && e.sports.length) ? `<div class="mt-2 flex flex-wrap gap-1">${e.sports.map(s => `<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.type} (${s.duration}m)</span>`).join('')}</div>` : ''}
+            ${(e.sports && e.sports.length) ? `<div class="mt-2 flex flex-wrap gap-1">${e.sports.map(s => `<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.title || s.type} (${s.duration}m)</span>`).join('')}</div>` : ''}
           </div>
           <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
             <span class="text-slate-500">SAE: ${((e.saeWork + e.saeSport + e.saeSocial)/3).toFixed(1)}</span>
