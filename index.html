@@ -65,7 +65,7 @@
       </div>
     </section>
 
-    <!-- TAB 2: WORKSPACE (KANBAN) -->
+    <!-- TAB 2: WORKSPACE -->
     <section id="sec-workspace" class="hidden space-y-6">
       <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700">
         <h2 class="text-xl font-bold">Workspace (Kanban & Agenda)</h2>
@@ -123,26 +123,19 @@
             </select>
           </div>
 
-          <!-- Caractéristiques & Attribution Points -->
           <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
             <div class="flex justify-between items-center text-xs">
               <span class="font-bold text-slate-300">Points à attribuer :</span>
               <span id="stat-points-pool" class="text-emerald-400 font-bold">0</span>
             </div>
-            <div id="stats-container" class="space-y-1 text-xs">
-              <!-- Dynamique JS -->
-            </div>
+            <div id="stats-container" class="space-y-1 text-xs"></div>
           </div>
 
-          <!-- Inventaire avec Infobulles -->
           <div>
             <h3 class="text-sm font-bold text-slate-300 mb-2">Sac d'Inventaire</h3>
-            <div id="inventory-list" class="flex flex-wrap gap-2 p-3 bg-slate-900 rounded-lg border border-slate-700 min-h-[60px]">
-              <!-- Dynamique JS -->
-            </div>
+            <div id="inventory-list" class="flex flex-wrap gap-2 p-3 bg-slate-900 rounded-lg border border-slate-700 min-h-[60px]"></div>
           </div>
 
-          <!-- Arbre de Compétences Passives -->
           <div class="pt-2 border-t border-slate-700">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Arbre de Compétences (Passif)</h3>
             <div class="space-y-1.5 text-xs">
@@ -156,32 +149,36 @@
               </div>
             </div>
           </div>
-
         </div>
 
-        <!-- Quête Journalière (Bilan de la Veille) -->
+        <!-- Quête Journalière (Bilan) -->
         <div class="lg:col-span-2 bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-center flex-wrap gap-2">
             <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">📜 Quête Journalière (Bilan)</h2>
-            <span id="quest-status-badge" class="text-xs px-2.5 py-1 rounded bg-slate-700 text-slate-300">Disponible aujourd'hui</span>
+            <span id="quest-status-badge" class="text-xs px-2.5 py-1 rounded bg-slate-700 text-slate-300">Saisie active</span>
           </div>
           
           <div class="flex space-x-2 border-b border-slate-700 pb-2">
-            <button onclick="switchFormTab(1)" id="ftab-1" class="px-3 py-1 bg-emerald-600 rounded text-xs font-bold">1. Réflexivité & Humeur</button>
+            <button onclick="switchFormTab(1)" id="ftab-1" class="px-3 py-1 bg-emerald-600 rounded text-xs font-bold">1. Réflexivité & Date</button>
             <button onclick="switchFormTab(2)" id="ftab-2" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">2. SAE (Efficacité)</button>
             <button onclick="switchFormTab(3)" id="ftab-3" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">3. Sport (Optionnel)</button>
           </div>
 
           <form id="form-jdb" onsubmit="saveJdbEntry(event)" class="space-y-4">
             
+            <!-- Section 1 -->
             <div id="fsec-1" class="space-y-3">
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Enseignements & Observations de la veille</label>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Date du bilan (Antidatage possible)</label>
+                <input type="date" id="jdb-custom-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-amber-300 font-mono">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Enseignements & Observations</label>
                 <textarea id="jdb-teachings" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Qu'as-tu appris ou observé..."></textarea>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1">Humeur globale de la veille</label>
+                  <label class="block text-xs font-semibold text-slate-300 mb-1">Humeur globale</label>
                   <select id="jdb-mood" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
                     <option value="5">⚡ Excellente (5/5)</option>
                     <option value="4">😊 Bonne (4/5)</option>
@@ -197,8 +194,9 @@
               </div>
             </div>
 
+            <!-- Section 2 -->
             <div id="fsec-2" class="hidden space-y-3">
-              <p class="text-xs text-slate-400">Sentiment d'auto-efficacité (SAE) d'hier (1 à 10) :</p>
+              <p class="text-xs text-slate-400">Sentiment d'auto-efficacité (SAE) (1 à 10) :</p>
               <div>
                 <label class="block text-xs font-semibold text-slate-300 mb-1">Travail exécuté : <span id="val-sae-work">7</span>/10</label>
                 <input type="range" id="sae-work" min="1" max="10" value="7" oninput="document.getElementById('val-sae-work').innerText=this.value" class="w-full accent-emerald-500">
@@ -213,42 +211,14 @@
               </div>
             </div>
 
-            <div id="fsec-3" class="hidden space-y-3">
-              <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Discipline effectuée</label>
-                <select id="sport-type" onchange="toggleSportFields(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
-                  <option value="none">Aucune activité</option>
-                  <option value="course">Course à pied</option>
-                  <option value="renforcement">Renforcement musculaire</option>
-                  <option value="mobilite">Mobilité / Souplesse</option>
-                  <option value="arts_martiaux">Arts Martiaux (Tai Ji / Wing Chun)</option>
-                  <option value="autre">Autre sport</option>
-                </select>
+            <!-- Section 3 : Multi-Séances Sport -->
+            <div id="fsec-3" class="hidden space-y-4">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-slate-300">Séances effectuées</span>
+                <button type="button" onclick="addSportBlock()" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-emerald-400 font-bold border border-slate-600">+ Ajouter une séance</button>
               </div>
 
-              <div id="sport-fields-details" class="hidden space-y-3 bg-slate-900 p-3 rounded-lg border border-slate-700">
-                <div id="field-am-style" class="hidden">
-                  <label class="block text-xs font-semibold text-slate-300 mb-1">Style d'art martial</label>
-                  <select id="am-style" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
-                    <option value="Tai Ji">Tai Ji</option>
-                    <option value="Wing Chun">Wing Chun</option>
-                  </select>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Durée (minutes)</label>
-                    <input type="number" id="sport-duration" min="0" value="45" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
-                  </div>
-                  <div id="field-course-km" class="hidden">
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Distance (km)</label>
-                    <input type="number" step="0.1" id="sport-km" value="5.0" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
-                  </div>
-                </div>
-                <div id="field-course-pace" class="hidden">
-                  <label class="block text-xs font-semibold text-slate-300 mb-1">Allure (ex: 6:30/km)</label>
-                  <input type="text" id="sport-pace" placeholder="6:30" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
-                </div>
-              </div>
+              <div id="sports-container" class="space-y-3"></div>
             </div>
 
             <button type="submit" id="btn-submit-jdb" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-bold text-sm transition">Consigner le Bilan</button>
@@ -297,9 +267,20 @@
         </div>
       </div>
 
-      <!-- ARCHIVES (VIGNETTES) -->
+      <!-- ARCHIVES, IMPORT & TEMPLATE EXCEL -->
       <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-        <h2 class="text-xl font-bold text-slate-200">🗂️ Archives des Bilans</h2>
+        <div class="flex justify-between items-center flex-wrap gap-2">
+          <h2 class="text-xl font-bold text-slate-200">🗂️ Archives des Bilans</h2>
+          <div class="flex gap-2">
+            <button onclick="downloadCSVTemplate()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-amber-400 border border-slate-600">
+              📄 Modèle CSV
+            </button>
+            <label for="csv-file-input" class="cursor-pointer px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-emerald-400 border border-slate-600 inline-block">
+              📥 Importer CSV
+            </label>
+            <input type="file" id="csv-file-input" accept=".csv" onchange="importCSV(event)" class="hidden">
+          </div>
+        </div>
         <div id="jdb-archives-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <p class="text-xs text-slate-500 italic col-span-full">Aucun bilan archivé pour le moment.</p>
         </div>
@@ -310,7 +291,7 @@
   </main>
 
   <script>
-    // Audio Synth Engine (Retro 8-bit)
+    // Sound Engine
     const playRetroSound = (type) => {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -343,16 +324,14 @@
       } catch(e){}
     };
 
-    // Item Pool
     const itemPool = [
-      { name: "Gourdin du Plan Méthodologique", type: "Arme", rarity: "Épique", desc: "+3 Méthodologie. Assène des arguments irréfutables.", bonus: "methodologie:3" },
-      { name: "Robe de la Statistique Inférentielle", type: "Équipement", rarity: "Épique", desc: "+3 Analyse. Invoque des tests de Student éclair.", bonus: "analyse:3" },
-      { name: "Bâton de Bastien & Scapin", type: "Outil", rarity: "Rare", desc: "+2 Analyse Critique. Évalue 8 critères en un coup.", bonus: "analyse:2" },
-      { name: "Pinceau Figma Magique", type: "Outil", rarity: "Rare", desc: "+2 Créativité. Prototype plus vite que son ombre.", bonus: "creativite:2" },
+      { name: "Gourdin du Plan Méthodologique", type: "Arme", rarity: "Épique", desc: "+3 Méthodologie.", bonus: "methodologie:3" },
+      { name: "Robe de la Statistique Inférentielle", type: "Équipement", rarity: "Épique", desc: "+3 Analyse.", bonus: "analyse:3" },
+      { name: "Bâton de Bastien & Scapin", type: "Outil", rarity: "Rare", desc: "+2 Analyse Critique.", bonus: "analyse:2" },
+      { name: "Pinceau Figma Magique", type: "Outil", rarity: "Rare", desc: "+2 Créativité.", bonus: "creativite:2" },
       { name: "Trousse de Soin Ergonomique", type: "Soin", rarity: "Consommable", desc: "Restaure 5 points de Charge Mentale.", bonus: "heal:5" }
     ];
 
-    // Classes & Initial Stats
     const classConfigs = {
       psychologue_travail: { name: "Psychologue du Travail", stats: { empathie: 13, stress: 12, analyse: 10, creativite: 10, methodologie: 10 } },
       facteurs_humains: { name: "Spécialiste Facteurs Humains", stats: { analyse: 13, methodologie: 12, stress: 10, empathie: 10, creativite: 9 } },
@@ -361,7 +340,6 @@
       chercheur: { name: "Chercheur en Ergonomie", stats: { methodologie: 13, analyse: 12, stress: 10, creativite: 10, empathie: 9 } }
     };
 
-    // State
     let hero = JSON.parse(localStorage.getItem('ergo_hero') || JSON.stringify({
       classKey: 'psychologue_travail',
       level: 1,
@@ -370,14 +348,19 @@
       mentalLoad: 3,
       statsBonus: { empathie: 0, stress: 0, analyse: 0, creativite: 0, methodologie: 0 },
       inventory: [itemPool[0], itemPool[4]],
-      lastQuestDate: null
+      completedDates: []
     }));
 
     let jdbEntries = JSON.parse(localStorage.getItem('ergo_jdb_entries') || '[]');
     let currentEditingId = null;
     let saeChart = null;
+    let sportBlockCounter = 0;
 
-    // Navigation
+    // Set Default Custom Date to Yesterday
+    const yest = new Date();
+    yest.setDate(yest.getDate() - 1);
+    document.getElementById('jdb-custom-date').value = yest.toISOString().split('T')[0];
+
     function switchTab(tabId) {
       ['dashboard', 'workspace', 'crm', 'voyageur'].forEach(t => {
         document.getElementById(`sec-${t}`).classList.add('hidden');
@@ -397,12 +380,137 @@
       document.getElementById(`ftab-${idx}`).className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
     }
 
-    function toggleSportFields(val) {
-      const box = document.getElementById('sport-fields-details');
-      box.classList.toggle('hidden', val === 'none');
-      document.getElementById('field-course-km').classList.toggle('hidden', val !== 'course');
-      document.getElementById('field-course-pace').classList.toggle('hidden', val !== 'course');
-      document.getElementById('field-am-style').classList.toggle('hidden', val !== 'arts_martiaux');
+    function addSportBlock(data = {}) {
+      sportBlockCounter++;
+      const id = sportBlockCounter;
+      const container = document.getElementById('sports-container');
+
+      const block = document.createElement('div');
+      block.id = `sport-block-${id}`;
+      block.className = "p-3 bg-slate-900 rounded-lg border border-slate-700 space-y-3 relative";
+      block.innerHTML = `
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold text-emerald-400">Séance #${id}</span>
+          <button type="button" onclick="removeSportBlock(${id})" class="text-[11px] text-rose-400 hover:underline">Supprimer</button>
+        </div>
+        <div>
+          <label class="block text-[10px] font-semibold text-slate-300 mb-1">Discipline</label>
+          <select id="sp-type-${id}" onchange="updateSportFields(${id})" class="sp-type-select w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            <option value="course">Course à pied</option>
+            <option value="renforcement">Renforcement musculaire</option>
+            <option value="mobilite">Mobilité / Souplesse</option>
+            <option value="arts_martiaux">Arts Martiaux</option>
+            <option value="autre">Autre sport</option>
+          </select>
+        </div>
+        <div id="sp-fields-${id}" class="space-y-2"></div>
+      `;
+
+      container.appendChild(block);
+      if (data.type) document.getElementById(`sp-type-${id}`).value = data.type;
+      updateSportFields(id, data);
+    }
+
+    function removeSportBlock(id) {
+      const el = document.getElementById(`sport-block-${id}`);
+      if (el) el.remove();
+    }
+
+    function updateSportFields(id, data = {}) {
+      const type = document.getElementById(`sp-type-${id}`).value;
+      const target = document.getElementById(`sp-fields-${id}`);
+
+      if (type === 'course') {
+        target.innerHTML = `
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-400">Type de travail</label>
+              <select id="sp-run-work-${id}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+                <option value="EF">Endurance Fondamentale (EF)</option>
+                <option value="Seuil">Seuil</option>
+                <option value="Fractionné">Fractionné</option>
+                <option value="Libre">Sortie Libre</option>
+                <option value="Côtes">Côtes / Dénivelé</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400">Durée (min)</label>
+              <input type="number" id="sp-dur-${id}" value="${data.duration || 45}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-400">Distance (km)</label>
+              <input type="number" step="0.1" id="sp-km-${id}" value="${data.km || 5.0}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400">Allure (ex: 6:30)</label>
+              <input type="text" id="sp-pace-${id}" value="${data.pace || ''}" placeholder="6:30" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-400">FC Moyenne (BPM)</label>
+              <input type="number" id="sp-hr-${id}" value="${data.hr || 145}" placeholder="145" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400">Intensité (1-10)</label>
+              <input type="number" id="sp-rpe-${id}" min="1" max="10" value="${data.rpe || 6}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
+          </div>
+        `;
+        if (data.workType) document.getElementById(`sp-run-work-${id}`).value = data.workType;
+      } else if (type === 'arts_martiaux') {
+        target.innerHTML = `
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-400">Style</label>
+              <select id="sp-am-style-${id}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+                <option value="Tai Ji">Tai Ji</option>
+                <option value="Wing Chun">Wing Chun</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400">Durée (min)</label>
+              <input type="number" id="sp-dur-${id}" value="${data.duration || 60}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+            </div>
+          </div>
+        `;
+        if (data.amStyle) document.getElementById(`sp-am-style-${id}`).value = data.amStyle;
+      } else {
+        target.innerHTML = `
+          <div>
+            <label class="block text-[10px] text-slate-400">Durée (min)</label>
+            <input type="number" id="sp-dur-${id}" value="${data.duration || 45}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
+          </div>
+        `;
+      }
+    }
+
+    function collectSportsData() {
+      const blocks = document.querySelectorAll('#sports-container > div');
+      const sports = [];
+      blocks.forEach(b => {
+        const id = b.id.replace('sport-block-', '');
+        const type = document.getElementById(`sp-type-${id}`).value;
+        const duration = parseInt(document.getElementById(`sp-dur-${id}`)?.value || 0);
+
+        if (type === 'course') {
+          sports.push({
+            type, duration,
+            workType: document.getElementById(`sp-run-work-${id}`)?.value,
+            km: parseFloat(document.getElementById(`sp-km-${id}`)?.value || 0),
+            pace: document.getElementById(`sp-pace-${id}`)?.value,
+            hr: parseInt(document.getElementById(`sp-hr-${id}`)?.value || 0),
+            rpe: parseInt(document.getElementById(`sp-rpe-${id}`)?.value || 5)
+          });
+        } else if (type === 'arts_martiaux') {
+          sports.push({ type, duration, amStyle: document.getElementById(`sp-am-style-${id}`)?.value });
+        } else {
+          sports.push({ type, duration });
+        }
+      });
+      return sports;
     }
 
     // Kanban & Mental Load
@@ -414,9 +522,7 @@
       playRetroSound('kanban');
       updateMentalLoadUI();
       saveHero();
-      if(targetCol === 'done') {
-        gainXp(25);
-      }
+      if(targetCol === 'done') gainXp(25);
     }
 
     function updateMentalLoadUI() {
@@ -425,19 +531,13 @@
       document.getElementById('kb-mental-val').innerText = hero.mentalLoad;
     }
 
-    // Hero & Stats System
-    function changeClass(key) {
-      hero.classKey = key;
-      saveHero();
-      renderVoyageur();
-    }
-
+    // Hero Systems
+    function changeClass(key) { hero.classKey = key; saveHero(); renderVoyageur(); }
     function addStatPoint(stat) {
       if(hero.statPoints > 0) {
         hero.statPoints--;
         hero.statsBonus[stat] = (hero.statsBonus[stat] || 0) + 1;
-        saveHero();
-        renderVoyageur();
+        saveHero(); renderVoyageur();
       }
     }
 
@@ -448,10 +548,9 @@
         hero.level++;
         hero.statPoints += 2;
         playRetroSound('levelUp');
-        alert(`🎉 Niveau supérieur ! Vous êtes maintenant niveau ${hero.level}. +2 Points de caractéristiques !`);
+        alert(`🎉 Niveau supérieur ! Niveau ${hero.level}. +2 Points de caractéristiques !`);
       }
-      saveHero();
-      renderVoyageur();
+      saveHero(); renderVoyageur();
     }
 
     function renderVoyageur() {
@@ -461,7 +560,6 @@
       document.getElementById('hero-level-badge').innerText = `Niveau ${hero.level} (${hero.xp}/100 XP)`;
       document.getElementById('stat-points-pool').innerText = hero.statPoints;
 
-      // Stats
       const container = document.getElementById('stats-container');
       const labels = { empathie: "Empathie", stress: "Régulation Stress", analyse: "Analyse Critique", creativite: "Créativité", methodologie: "Méthodologie" };
       container.innerHTML = Object.keys(labels).map(k => {
@@ -474,9 +572,8 @@
         `;
       }).join('');
 
-      // Inventory
       const invContainer = document.getElementById('inventory-list');
-      invContainer.innerHTML = hero.inventory.map((item, idx) => `
+      invContainer.innerHTML = hero.inventory.map(item => `
         <div class="relative group cursor-pointer px-2.5 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
           <span>📦 ${item.name}</span>
           <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-slate-950 border border-slate-600 rounded shadow-xl text-[11px] z-50">
@@ -486,45 +583,31 @@
         </div>
       `).join('');
 
-      // Quest Badge
-      const today = new Date().toLocaleDateString('fr-FR');
-      const questBadge = document.getElementById('quest-status-badge');
-      if (hero.lastQuestDate === today) {
-        questBadge.className = "text-xs px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
-        questBadge.innerText = "Quête du jour déjà validée (Mode Édition)";
-      } else {
-        questBadge.className = "text-xs px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-        questBadge.innerText = "Quête journalière disponible (+50 XP)";
-      }
-
       renderJdbDashboard();
       updateMentalLoadUI();
     }
 
-    function saveHero() {
-      localStorage.setItem('ergo_hero', JSON.stringify(hero));
-    }
+    function saveHero() { localStorage.setItem('ergo_hero', JSON.stringify(hero)); }
 
     // JdB Logic
     function saveJdbEntry(e) {
       e.preventDefault();
-      const today = new Date().toLocaleDateString('fr-FR');
+      const rawDate = document.getElementById('jdb-custom-date').value;
+      const formattedDate = new Date(rawDate).toLocaleDateString('fr-FR');
+      const timestamp = new Date(rawDate).getTime();
       
       const entry = {
         id: currentEditingId || Date.now(),
-        date: today,
-        timestamp: Date.now(),
+        date: formattedDate,
+        rawDate: rawDate,
+        timestamp: timestamp,
         teachings: document.getElementById('jdb-teachings').value,
         mood: parseInt(document.getElementById('jdb-mood').value),
         satisfaction: parseInt(document.getElementById('jdb-satisfaction').value),
         saeWork: parseInt(document.getElementById('sae-work').value),
         saeSport: parseInt(document.getElementById('sae-sport').value),
         saeSocial: parseInt(document.getElementById('sae-social').value),
-        sportType: document.getElementById('sport-type').value,
-        amStyle: document.getElementById('am-style').value,
-        sportDuration: parseInt(document.getElementById('sport-duration').value || 0),
-        sportKm: parseFloat(document.getElementById('sport-km').value || 0),
-        sportPace: document.getElementById('sport-pace').value
+        sports: collectSportsData()
       };
 
       if (currentEditingId) {
@@ -532,8 +615,9 @@
         currentEditingId = null;
       } else {
         jdbEntries.unshift(entry);
-        if (hero.lastQuestDate !== today) {
-          hero.lastQuestDate = today;
+        if (!hero.completedDates) hero.completedDates = [];
+        if (!hero.completedDates.includes(rawDate)) {
+          hero.completedDates.push(rawDate);
           gainXp(50);
           playRetroSound('questDone');
         }
@@ -541,9 +625,64 @@
 
       localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
       document.getElementById('form-jdb').reset();
+      document.getElementById('sports-container').innerHTML = '';
       switchFormTab(1);
-      toggleSportFields('none');
       renderVoyageur();
+    }
+
+    // Download CSV Template
+    function downloadCSVTemplate() {
+      const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail et analyse de l'activité\",4,8,8,6,7\n2026-09-25,\"Révision des critères d'utilisabilité de Bastien & Scapin\",3,7,7,5,6";
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "modele_journal_de_bord.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // CSV Import Logic
+    function importCSV(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const text = evt.target.result;
+        const lines = text.split(/\r\n|\n/);
+        let addedCount = 0;
+
+        lines.forEach((line, idx) => {
+          if (idx === 0 || !line.trim()) return;
+          // Gestion des virgules et point-virgules
+          const parts = line.includes(';') ? line.split(';') : line.split(',');
+          if (parts.length >= 7) {
+            const rawDate = parts[0].replace(/"/g, '').trim();
+            const entry = {
+              id: Date.now() + idx,
+              date: new Date(rawDate).toLocaleDateString('fr-FR'),
+              rawDate: rawDate,
+              timestamp: new Date(rawDate).getTime(),
+              teachings: parts[1].replace(/"/g, '').trim(),
+              mood: parseInt(parts[2].trim()) || 3,
+              satisfaction: parseInt(parts[3].trim()) || 7,
+              saeWork: parseInt(parts[4].trim()) || 7,
+              saeSport: parseInt(parts[5].trim()) || 5,
+              saeSocial: parseInt(parts[6].trim()) || 7,
+              sports: []
+            };
+            jdbEntries.push(entry);
+            addedCount++;
+          }
+        });
+
+        jdbEntries.sort((a, b) => b.timestamp - a.timestamp);
+        localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
+        alert(`📥 Importation réussie : ${addedCount} bilans ajoutés !`);
+        renderVoyageur();
+      };
+      reader.readAsText(file);
     }
 
     function renderJdbDashboard() {
@@ -566,13 +705,13 @@
 
       let totalMin = 0, totalKm = 0, amMin = 0, renfMin = 0, mobMin = 0;
       jdbEntries.forEach(e => {
-        if (e.sportType !== 'none') {
-          totalMin += e.sportDuration || 0;
-          if (e.sportType === 'course') totalKm += e.sportKm || 0;
-          if (e.sportType === 'arts_martiaux') amMin += e.sportDuration || 0;
-          if (e.sportType === 'renforcement') renfMin += e.sportDuration || 0;
-          if (e.sportType === 'mobilite') mobMin += e.sportDuration || 0;
-        }
+        (e.sports || []).forEach(s => {
+          totalMin += s.duration || 0;
+          if (s.type === 'course') totalKm += s.km || 0;
+          if (s.type === 'arts_martiaux') amMin += s.duration || 0;
+          if (s.type === 'renforcement') renfMin += s.duration || 0;
+          if (s.type === 'mobilite') mobMin += s.duration || 0;
+        });
       });
 
       document.getElementById('kpi-sport-hours').innerText = `${Math.floor(totalMin/60)}h${totalMin%60 < 10 ? '0' : ''}${totalMin%60}`;
@@ -614,6 +753,7 @@
               <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-300">Humeur: ${e.mood}/5</span>
             </div>
             <p class="text-xs text-slate-300 line-clamp-2 italic">"${e.teachings}"</p>
+            ${(e.sports && e.sports.length) ? `<div class="mt-2 flex flex-wrap gap-1">${e.sports.map(s => `<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.type} (${s.duration}m)</span>`).join('')}</div>` : ''}
           </div>
           <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
             <span class="text-slate-500">SAE: ${((e.saeWork + e.saeSport + e.saeSocial)/3).toFixed(1)}</span>
@@ -630,14 +770,17 @@
       const item = jdbEntries.find(e => e.id === id);
       if (!item) return;
       currentEditingId = id;
+      if (item.rawDate) document.getElementById('jdb-custom-date').value = item.rawDate;
       document.getElementById('jdb-teachings').value = item.teachings;
       document.getElementById('jdb-mood').value = item.mood;
       document.getElementById('jdb-satisfaction').value = item.satisfaction;
       document.getElementById('sae-work').value = item.saeWork;
       document.getElementById('sae-sport').value = item.saeSport;
       document.getElementById('sae-social').value = item.saeSocial;
-      document.getElementById('sport-type').value = item.sportType;
-      toggleSportFields(item.sportType);
+      
+      document.getElementById('sports-container').innerHTML = '';
+      (item.sports || []).forEach(s => addSportBlock(s));
+
       switchFormTab(1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
