@@ -112,7 +112,7 @@
         </button>
       </div>
 
-      <!-- SOUS-ONGLET KANBAN AVANCÉ (QUÊTES & SOUS-QUÊTES) -->
+      <!-- SOUS-ONGLET KANBAN -->
       <div id="wsub-kanban" class="space-y-6">
         <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
           <div class="flex items-center gap-3">
@@ -131,21 +131,21 @@
           </div>
         </div>
 
-        <!-- Formulaire de Création de Méta-Quête & Sous-Quêtes Balisées -->
+        <!-- Formulaire de Création de Quête -->
         <div id="add-task-form-box" class="hidden bg-slate-800 p-5 rounded-xl border border-slate-700 space-y-4">
           <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">Créer une Quête Principale (Projet / Livrable Majeur)</h3>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
             <div>
               <label class="block text-slate-400 mb-1">Titre de la Quête Principale *</label>
-              <input type="text" id="new-task-title" placeholder="ex: Livrable Synthèse d'Ouvrage (5 Chapitres)" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+              <input type="text" id="new-task-title" placeholder="ex: Livrable Synthèse d'Ouvrage" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
             </div>
             <div>
               <label class="block text-slate-400 mb-1">UE / Matière</label>
-              <input type="text" id="new-task-ue" placeholder="ex: UE Ergonomie / Sociologie" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+              <input type="text" id="new-task-ue" placeholder="ex: UE Ergonomie" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">Date Butoire Ultime (Livrable Final)</label>
+              <label class="block text-slate-400 mb-1">Date Butoire Ultime</label>
               <input type="date" id="new-task-due" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-amber-300 font-mono">
             </div>
             <div>
@@ -158,7 +158,7 @@
               </select>
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">Coût Charge Mentale (Projet)</label>
+              <label class="block text-slate-400 mb-1">Coût Charge Mentale</label>
               <select id="new-task-cost" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
                 <option value="1">1 Point</option>
                 <option value="2">2 Points</option>
@@ -172,16 +172,14 @@
             <textarea id="new-task-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200" placeholder="Explication du rendu final..."></textarea>
           </div>
 
-          <!-- Section Générateur de Sous-Quêtes Balisées -->
           <div class="space-y-3 pt-3 border-t border-slate-700">
             <div class="flex justify-between items-center">
               <div>
                 <h4 class="text-xs font-bold text-amber-400">Balisage des Sous-Quêtes & Jalons Autonomes</h4>
-                <p class="text-[10px] text-slate-400">Chaque sous-quête complétée offre +10 XP et fait progresser la Méta-Quête.</p>
+                <p class="text-[10px] text-slate-400">Chaque sous-quête complétée offre +10 XP.</p>
               </div>
               <button type="button" onclick="addSubQuestInput()" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-emerald-400 font-bold border border-slate-600">+ Ajouter une Sous-Quête</button>
             </div>
-
             <div id="subquests-input-container" class="space-y-3"></div>
           </div>
 
@@ -223,12 +221,11 @@
       <div id="wsub-agenda" class="hidden space-y-4">
         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center flex-wrap gap-2">
           <div>
-            <h3 class="text-base font-bold text-amber-400">📅 Agenda du M2 & Emploi du Temps</h3>
-            <p class="text-xs text-slate-400">Visualise tes prochains cours et échéances synchronisées.</p>
+            <h3 class="text-base font-bold text-amber-400">📅 Agenda & Emploi du Temps</h3>
+            <p class="text-xs text-slate-400">Visualise tes prochains cours et échéances.</p>
           </div>
-          <button onclick="promptCalendarUrl()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-emerald-400 border border-slate-600">⚙️ Configurer Iframe Google Calendar</button>
+          <button onclick="promptCalendarUrl()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-emerald-400 border border-slate-600">⚙️ Configurer Google Calendar</button>
         </div>
-
         <div class="bg-slate-900 rounded-xl border border-slate-700 p-2 h-[500px] overflow-hidden">
           <iframe id="calendar-iframe" src="https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com&ctz=Europe%2FParis" style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
         </div>
@@ -239,7 +236,7 @@
         <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-2">
           <div>
             <h3 class="text-base font-bold text-emerald-400">📚 Espace Ressources Ergonomie</h3>
-            <p class="text-xs text-slate-400">Banque de liens, articles, dossiers Drive et grilles de lecture.</p>
+            <p class="text-xs text-slate-400">Banque de liens, articles et dossiers Drive.</p>
           </div>
           <button onclick="toggleAddResourceModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white">+ Nouvelle Ressource</button>
         </div>
@@ -262,9 +259,7 @@
           </div>
         </div>
 
-        <div id="resources-list-box" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <p class="text-xs text-slate-500 italic col-span-full">Aucune ressource enregistrée pour le moment.</p>
-        </div>
+        <div id="resources-list-box" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
       </div>
 
     </section>
@@ -283,7 +278,7 @@
         <h3 class="text-sm font-bold text-emerald-400">Ajouter un contact pro</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
           <input type="text" id="crm-name" placeholder="Nom complet" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-          <input type="text" id="crm-role" placeholder="Rôle (ex: Ergonome, Enseignant)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <input type="text" id="crm-role" placeholder="Rôle (ex: Ergonome)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
           <input type="text" id="crm-org" placeholder="Structure / Université" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
           <input type="text" id="crm-contact" placeholder="Email / LinkedIn / Tel" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
         </div>
@@ -293,9 +288,7 @@
         </div>
       </div>
 
-      <div id="crm-contacts-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <p class="text-xs text-slate-500 italic col-span-full">Aucun contact enregistré pour le moment.</p>
-      </div>
+      <div id="crm-contacts-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
     </section>
 
     <!-- TAB 4: VOYAGEUR & JOURNAL DE BORD -->
@@ -306,10 +299,10 @@
           🛡️ Fiche Personnage
         </button>
         <button onclick="switchVoyageurSubTab('quest')" id="vsubtab-quest" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
-          📜 Quête Journalière & Archives
+          📜 Quête Journalière & Archives Accordéon
         </button>
         <button onclick="switchVoyageurSubTab('analytics')" id="vsubtab-analytics" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
-          📊 Dashboard JdB & Filtrage Sport
+          📊 Exportation & Synthèse à la Carte
         </button>
       </div>
 
@@ -354,8 +347,10 @@
         </div>
       </div>
 
-      <!-- SOUS-ONGLET 2: QUÊTE JOURNALIÈRE -->
+      <!-- SOUS-ONGLET 2: SAISIE & ARCHIVES ACCORDÉON -->
       <div id="vsub-quest" class="hidden space-y-6">
+        
+        <!-- Formulaire de saisie JdB -->
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2">
             <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">📜 Saisie de la Quête Journalière</h2>
@@ -373,12 +368,12 @@
             
             <div id="fsec-1" class="space-y-3">
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Date du bilan (Antidatage possible)</label>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Date du bilan</label>
                 <input type="date" id="jdb-custom-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-amber-300 font-mono">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Enseignements & Observations</label>
-                <textarea id="jdb-teachings" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Qu'as-tu appris ou observé..."></textarea>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Enseignements & Observations Réflexives</label>
+                <textarea id="jdb-teachings" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Qu'as-tu appris ou observé aujourd'hui..."></textarea>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-1">
@@ -450,102 +445,157 @@
           </form>
         </div>
 
-        <!-- Archives -->
+        <!-- Archives sous forme d'Accordéon Temporel -->
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
           <div class="flex justify-between items-center flex-wrap gap-2">
-            <h2 class="text-xl font-bold text-slate-200">🗂️ Archives des Bilans</h2>
-            <div class="flex gap-2">
-              <button onclick="downloadCSVTemplate()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-amber-400 border border-slate-600">📄 Modèle CSV</button>
-              <label for="csv-file-input" class="cursor-pointer px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-emerald-400 border border-slate-600 inline-block">📥 Importer CSV</label>
-              <input type="file" id="csv-file-input" accept=".csv" onchange="importCSV(event)" class="hidden">
+            <div>
+              <h2 class="text-xl font-bold text-slate-200">🗂️ Archives Hiérarchisées (Année > Mois > Semaine)</h2>
+              <p class="text-xs text-slate-400">Navigue dans l'historique sans surcharger ton affichage.</p>
             </div>
           </div>
-          <div id="jdb-archives-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <p class="text-xs text-slate-500 italic col-span-full">Aucun bilan archivé pour le moment.</p>
+
+          <!-- Arborescence Générée -->
+          <div id="jdb-accordion-tree" class="space-y-3">
+            <p class="text-xs text-slate-500 italic">Aucun bilan archivé pour le moment.</p>
           </div>
         </div>
+
       </div>
 
-      <!-- SOUS-ONGLET 3: DASHBOARD ANALYTIQUE -->
+      <!-- SOUS-ONGLET 3: EXPORTATION & SYNTHÈSE À LA CARTE -->
       <div id="vsub-analytics" class="hidden space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-            <span class="text-xs text-slate-400 font-semibold uppercase">Humeur Moyenne</span>
-            <p id="kpi-mood" class="text-2xl font-black text-emerald-400 mt-1">- / 10</p>
-          </div>
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-            <span class="text-xs text-slate-400 font-semibold uppercase">Sommeil Perçu (Moy)</span>
-            <p id="kpi-sleep" class="text-2xl font-black text-teal-400 mt-1">- / 10</p>
-          </div>
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-            <span class="text-xs text-slate-400 font-semibold uppercase">Volume Sport Global</span>
-            <p id="kpi-sport-hours" class="text-2xl font-black text-amber-400 mt-1">0h00</p>
-            <p id="kpi-course-km" class="text-xs text-slate-400 mt-1">Course : 0 km</p>
-          </div>
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-            <span class="text-xs text-slate-400 font-semibold uppercase">Disciplines (Cumul)</span>
-            <div class="text-xs mt-2 space-y-1 text-slate-300">
-              <p>🥋 Arts Martiaux : <b id="kpi-am-h">0h</b></p>
-              <p>💪 Renforcement : <b id="kpi-renf-h">0h</b></p>
-              <p>🧘 Mobilité : <b id="kpi-mob-h">0h</b></p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <h3 class="text-sm font-bold text-slate-300">Évolution Hebdomadaire du SAE</h3>
-          <div class="h-64 relative">
-            <canvas id="chart-sae"></canvas>
-          </div>
-        </div>
-
-        <!-- Centre d'Analyse Sportive -->
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <div class="flex justify-between items-center flex-wrap gap-2">
-            <h3 class="text-base font-bold text-amber-400 flex items-center gap-2">🔍 Centre d'Analyse des Séances Sportives</h3>
-            <span class="text-xs text-slate-400">Filtrage dynamique de la pratique</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-slate-900 rounded-lg border border-slate-700 text-xs">
+        
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-6">
+          <div class="flex justify-between items-center flex-wrap gap-2 border-b border-slate-700 pb-4">
             <div>
-              <label class="block text-slate-400 mb-1 font-semibold">Discipline</label>
-              <select id="filter-sport-type" onchange="applySportFilters()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
-                <option value="all">Toutes les disciplines</option>
-                <option value="course">Course à pied</option>
-                <option value="renforcement">Renforcement</option>
-                <option value="arts_martiaux">Arts Martiaux</option>
-                <option value="mobilite">Mobilité</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-slate-400 mb-1 font-semibold">Volume session min (min)</label>
-              <input type="number" id="filter-sport-dur" placeholder="ex: 30" oninput="applySportFilters()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
-            </div>
-            <div>
-              <label class="block text-slate-400 mb-1 font-semibold">Seuil FC Min (BPM)</label>
-              <input type="number" id="filter-sport-hr" placeholder="ex: 130" oninput="applySportFilters()" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
+              <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🛠️ Centre d'Exportation & Synthèse à la Carte</h2>
+              <p class="text-xs text-slate-400">Génère un document sur-mesure (CSV ou Synthèse Textuelle) selon tes critères exacts.</p>
             </div>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-300 border-collapse">
-              <thead>
-                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 uppercase text-[10px]">
-                  <th class="p-2">Date</th>
-                  <th class="p-2">Séance</th>
-                  <th class="p-2">Discipline</th>
-                  <th class="p-2">Durée</th>
-                  <th class="p-2">Volume / Pace</th>
-                  <th class="p-2">FC Moyenne</th>
-                  <th class="p-2">Cadence / RPM</th>
-                  <th class="p-2">Intensité (RPE)</th>
-                </tr>
-              </thead>
-              <tbody id="sport-filtered-tbody" class="divide-y divide-slate-800">
-                <tr><td colspan="8" class="p-3 text-center text-slate-500 italic">Aucune séance enregistrée.</td></tr>
-              </tbody>
-            </table>
+          <!-- ÉTAPE 1: Choix de la Période -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">1. Choix de la Période Temporelle</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs">
+              <div class="col-span-1 sm:col-span-2">
+                <label class="block text-slate-400 mb-1">Prédéfinis Rapides</label>
+                <select id="export-period-preset" onchange="handleExportPeriodPreset(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+                  <option value="custom">Plage Personnalisée (Saisie ci-contre)</option>
+                  <option value="curr_week">Semaine en Cours</option>
+                  <option value="prev_week">Semaine Précédente</option>
+                  <option value="curr_month" selected>Mois en Cours</option>
+                  <option value="prev_month">Mois Précédent</option>
+                  <option value="t1">Trimestre T1 (Jan - Mar)</option>
+                  <option value="t2">Trimestre T2 (Avr - Jun)</option>
+                  <option value="t3">Trimestre T3 (Jul - Sep)</option>
+                  <option value="t4">Trimestre T4 (Oct - Dec)</option>
+                  <option value="sem1">Semestre S1 (Sep - Jan)</option>
+                  <option value="sem2">Semestre S2 (Feb - Jun)</option>
+                  <option value="year">Année Universitaire Complexe</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Du</label>
+                <input type="date" id="export-date-from" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-amber-300 font-mono">
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Au</label>
+                <input type="date" id="export-date-to" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-amber-300 font-mono">
+              </div>
+            </div>
           </div>
+
+          <!-- ÉTAPE 2: Sélection des Variables -->
+          <div class="space-y-3 pt-4 border-t border-slate-700">
+            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">2. Variables & Dimensions à inclure dans le document</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              
+              <!-- Groupe Sommeil -->
+              <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
+                <p class="font-bold text-teal-400">😴 Sommeil & Récupération</p>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sleep-quality" checked class="accent-emerald-500 rounded">
+                  <span>Qualité Globale Perçue</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sleep-onset" checked class="accent-emerald-500 rounded">
+                  <span>Qualité d'Endormissement</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sleep-wake" checked class="accent-emerald-500 rounded">
+                  <span>Qualité du Réveil</span>
+                </label>
+              </div>
+
+              <!-- Groupe Sports -->
+              <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
+                <p class="font-bold text-amber-400">🏃 Disciplines & Allures Sport</p>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sport-run" checked class="accent-emerald-500 rounded">
+                  <span>Course à pied (Distance, Allure, Allure/Type)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sport-wingchun" checked class="accent-emerald-500 rounded">
+                  <span>Wing Chun</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sport-taiji" checked class="accent-emerald-500 rounded">
+                  <span>TaiJi</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sport-renf" checked class="accent-emerald-500 rounded">
+                  <span>Renforcement Musculaire</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sport-mob" checked class="accent-emerald-500 rounded">
+                  <span>Mobilité & Souplesse</span>
+                </label>
+              </div>
+
+              <!-- Groupe SAE & Réflexivité -->
+              <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
+                <p class="font-bold text-emerald-400">🧠 SAE & Réflexivité M2</p>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sae-work" checked class="accent-emerald-500 rounded">
+                  <span>SAE Travail / Master</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sae-sport" checked class="accent-emerald-500 rounded">
+                  <span>SAE Sport</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-sae-social" checked class="accent-emerald-500 rounded">
+                  <span>SAE Vie Personnelle & Sociale</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="chk-text-teachings" checked class="accent-emerald-500 rounded">
+                  <span>Verbatims Enseignements / Observations</span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ÉTAPE 3: Actions d'Exportation -->
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-700">
+            <button onclick="generateCustomExportCSV()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-emerald-400 border border-slate-600 transition">
+              📥 Télécharger le CSV Ciffré
+            </button>
+            <button onclick="generateCustomSynthesisText()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">
+              📊 Générer le Rapport Réflexif
+            </button>
+          </div>
+
+          <!-- Zone d'affichage du Rapport Généré -->
+          <div id="export-report-output" class="hidden space-y-3 bg-slate-900 p-4 rounded-xl border border-slate-700">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+              <h4 class="text-sm font-bold text-amber-300">📄 Rapport de Bilan Généré</h4>
+              <button onclick="navigator.clipboard.writeText(document.getElementById('report-text-content').innerText); alert('Copié dans le presse-papier !');" class="px-2.5 py-1 bg-slate-800 text-[11px] rounded text-emerald-400 border border-slate-700 hover:underline">📋 Copier le texte</button>
+            </div>
+            <pre id="report-text-content" class="text-xs text-slate-300 whitespace-pre-wrap font-sans leading-relaxed"></pre>
+          </div>
+
         </div>
 
       </div>
@@ -617,32 +667,12 @@
       completedDates: []
     };
 
-    let kanbanTasks = JSON.parse(localStorage.getItem('ergo_kanban_tasks')) || [
-      {
-        id: 'task-1',
-        title: "Synthèse d'Ouvrage (5 Chapitres)",
-        ue: "UE Ergonomie",
-        dueDate: "2026-12-18",
-        urgency: 3,
-        cost: 2,
-        desc: "Projet majeur de lecture et de rédaction réflexive.",
-        status: 'todo',
-        expanded: true,
-        subQuests: [
-          { id: 'sq-1', title: "Lecture Chapitre 1", type: "lecture", duration: "2h00", dueDate: "2026-10-05", cost: 1, done: false },
-          { id: 'sq-2', title: "Rédaction Synthèse Chapitre 1", type: "livrable", duration: "1h30", dueDate: "2026-10-10", cost: 1, done: false }
-        ]
-      }
-    ];
-
+    let kanbanTasks = JSON.parse(localStorage.getItem('ergo_kanban_tasks')) || [];
     let crmContacts = JSON.parse(localStorage.getItem('ergo_crm_contacts')) || [];
     let jdbEntries = JSON.parse(localStorage.getItem('ergo_jdb_entries')) || [];
-    let resourcesList = JSON.parse(localStorage.getItem('ergo_resources_list')) || [
-      { id: 1, title: "Grille Critères Bastien & Scapin", type: "Article / Doc", url: "https://drive.google.com" }
-    ];
+    let resourcesList = JSON.parse(localStorage.getItem('ergo_resources_list')) || [];
 
     let currentEditingId = null;
-    let saeChart = null;
     let sportBlockCounter = 0;
 
     // Logo Switcher
@@ -657,7 +687,7 @@
       }
     }
 
-    // Navigation Tabs
+    // Tabs Navigation
     function switchTab(tabId) {
       ['dashboard', 'workspace', 'crm', 'voyageur'].forEach(t => {
         const sec = document.getElementById(`sec-${t}`);
@@ -700,7 +730,7 @@
       const activeBtn = document.getElementById(`vsubtab-${subId}`);
       if (activeDiv) activeDiv.classList.remove('hidden');
       if (activeBtn) activeBtn.className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white";
-      if (subId === 'analytics') renderJdbDashboard();
+      if (subId === 'quest') renderAccordionArchives();
     }
 
     function switchFormTab(idx) {
@@ -716,7 +746,7 @@
       if (targetTab) targetTab.className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
     }
 
-    // KANBAN & ARBRE DE QUÊTES LOGIC
+    // KANBAN LOGIC
     function toggleAddTaskModal() {
       document.getElementById('add-task-form-box').classList.toggle('hidden');
       document.getElementById('subquests-input-container').innerHTML = '';
@@ -729,7 +759,7 @@
       div.className = "p-3 bg-slate-900 rounded-lg border border-slate-700 space-y-2 relative text-xs";
       div.innerHTML = `
         <div class="flex justify-between items-center">
-          <input type="text" class="sq-title w-3/4 bg-slate-800 border border-slate-700 rounded px-2 py-1 font-bold text-slate-200" placeholder="Titre de la sous-quête (ex: Lecture Chapitre 1)">
+          <input type="text" class="sq-title w-3/4 bg-slate-800 border border-slate-700 rounded px-2 py-1 font-bold text-slate-200" placeholder="Titre de la sous-quête">
           <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400 text-xs hover:underline">Supprimer</button>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -865,7 +895,6 @@
 
     function renderKanban() {
       const sortBy = document.getElementById('kanban-sort-by')?.value || 'urgency';
-
       const urgencyLabels = { 1: "🟢 Basse", 2: "🟡 Moyenne", 3: "🟠 Haute", 4: "🔴 URGENT" };
       const typeIcons = { lecture: "📖", livrable: "📝", rendezvous: "🤝", preparation: "🛠️" };
 
@@ -886,7 +915,6 @@
 
           return `
             <div id="${t.id}" draggable="true" ondragstart="drag(event)" class="p-3 bg-slate-800 rounded-lg border border-slate-700 cursor-move space-y-2">
-              
               <div class="flex justify-between items-start">
                 <div>
                   <span class="text-[9px] bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-amber-300 font-mono">👑 Quête Principale</span>
@@ -946,7 +974,6 @@
                   <button onclick="moveTask('${t.id}', '${status === 'todo' ? 'doing' : 'done'}')" class="bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-emerald-400 font-bold">Avancer ➡️</button>
                 ` : '<span class="text-emerald-400 font-bold">Livrable Validé ✅</span>'}
               </div>
-
             </div>
           `;
         }).join('');
@@ -964,7 +991,7 @@
       if (url) document.getElementById('calendar-iframe').src = url;
     }
 
-    // ESPACE RESSOURCES
+    // RESSOURCES LOGIC
     function toggleAddResourceModal() {
       document.getElementById('add-resource-form-box').classList.toggle('hidden');
     }
@@ -1054,7 +1081,7 @@
       `).join('');
     }
 
-    // JDB LOGIC
+    // JOURNAL DE BORD LOGIC & BLOCS SPORTIFS (SANS CADENCE)
     function updateMoodLabel(val) {
       const el = document.getElementById('val-jdb-mood');
       const desc = document.getElementById('lbl-mood-desc');
@@ -1095,16 +1122,17 @@
       block.className = "p-3 bg-slate-900 rounded-lg border border-slate-700 space-y-3 relative";
       block.innerHTML = `
         <div class="flex justify-between items-center">
-          <input type="text" id="sp-title-${id}" value="${data.title || ''}" placeholder="Titre de la séance (ex: Footing Seuil)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-amber-300 font-bold w-3/4">
+          <input type="text" id="sp-title-${id}" value="${data.title || ''}" placeholder="Titre de la séance (ex: Footing Seuil / Entraînement Wing Chun)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-amber-300 font-bold w-3/4">
           <button type="button" onclick="removeSportBlock(${id})" class="text-[11px] text-rose-400 hover:underline">Supprimer</button>
         </div>
         <div>
           <label class="block text-[10px] font-semibold text-slate-300 mb-1">Discipline</label>
           <select id="sp-type-${id}" onchange="updateSportFields(${id})" class="sp-type-select w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
             <option value="course">Course à pied</option>
+            <option value="wing_chun">Wing Chun</option>
+            <option value="taiji">TaiJi</option>
             <option value="renforcement">Renforcement musculaire</option>
             <option value="mobilite">Mobilité / Souplesse</option>
-            <option value="arts_martiaux">Arts Martiaux</option>
             <option value="autre">Autre sport</option>
           </select>
         </div>
@@ -1135,9 +1163,9 @@
               <select id="sp-run-work-${id}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
                 <option value="EF">Endurance Fondamentale (EF)</option>
                 <option value="Seuil">Seuil</option>
-                <option value="Fractionné">Fractionné</option>
+                <option value="Fractionne">Fractionné</option>
                 <option value="Libre">Sortie Libre</option>
-                <option value="Côtes">Côtes / Dénivelé</option>
+                <option value="Denivele">Côtes / Dénivelé</option>
               </select>
             </div>
             <div>
@@ -1155,14 +1183,10 @@
               <input type="text" id="sp-pace-${id}" value="${data.pace || ''}" oninput="calcRunningPaceOrDuration(${id}, 'pace')" placeholder="6:00" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs font-mono">
             </div>
           </div>
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] text-slate-400">FC Moyenne (BPM)</label>
               <input type="number" id="sp-hr-${id}" value="${data.hr || 145}" placeholder="145" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400">Cadence (RPM)</label>
-              <input type="number" id="sp-rpm-${id}" value="${data.rpm || ''}" placeholder="165" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
             </div>
             <div>
               <label class="block text-[10px] text-slate-400">Intensité (RPE)</label>
@@ -1186,7 +1210,7 @@
         calcRunningPaceOrDuration(id, 'init');
       } else {
         target.innerHTML = `
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[10px] text-slate-400">Durée (min)</label>
               <input type="number" id="sp-dur-${id}" value="${data.duration || 45}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
@@ -1194,10 +1218,6 @@
             <div>
               <label class="block text-[10px] text-slate-400">FC Moyenne (BPM)</label>
               <input type="number" id="sp-hr-${id}" value="${data.hr || 120}" placeholder="120" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400">Cadence / RPM (Opt)</label>
-              <input type="number" id="sp-rpm-${id}" value="${data.rpm || ''}" placeholder="-" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
             </div>
           </div>
         `;
@@ -1238,23 +1258,395 @@
         const id = b.id.replace('sport-block-', '');
         const title = document.getElementById(`sp-title-${id}`)?.value || 'Séance de Sport';
         const type = document.getElementById(`sp-type-${id}`)?.value || 'autre';
-        const duration = parseInt(document.getElementById(`sp-dur-${id}`)?.value || 0);
-        const hr = parseInt(document.getElementById(`sp-hr-${id}`)?.value || 0);
-        const rpm = parseInt(document.getElementById(`sp-rpm-${id}`)?.value || 0);
+        const duration = parseInt(document.getElementById(`sp-dur-${id}`)?.value || 0) || 0;
+        const hr = parseInt(document.getElementById(`sp-hr-${id}`)?.value || 0) || 0;
 
         if (type === 'course') {
           sports.push({
-            title, type, duration, hr, rpm,
-            workType: document.getElementById(`sp-run-work-${id}`)?.value,
-            km: parseFloat(document.getElementById(`sp-km-${id}`)?.value || 0),
-            pace: document.getElementById(`sp-pace-${id}`)?.value,
-            rpe: parseInt(document.getElementById(`sp-rpe-${id}`)?.value || 6)
+            title, type, duration, hr,
+            workType: document.getElementById(`sp-run-work-${id}`)?.value || 'EF',
+            km: parseFloat(document.getElementById(`sp-km-${id}`)?.value || 0) || 0,
+            pace: document.getElementById(`sp-pace-${id}`)?.value || '',
+            rpe: parseInt(document.getElementById(`sp-rpe-${id}`)?.value || 6) || 6
           });
         } else {
-          sports.push({ title, type, duration, hr, rpm });
+          sports.push({ title, type, duration, hr });
         }
       });
       return sports;
+    }
+
+    function saveJdbEntry(e) {
+      e.preventDefault();
+      const rawDate = document.getElementById('jdb-custom-date').value;
+      if (!rawDate) return alert("Veuillez sélectionner une date.");
+
+      const dateObj = new Date(rawDate);
+      const formattedDate = dateObj.toLocaleDateString('fr-FR');
+      const timestamp = dateObj.getTime();
+      
+      const entry = {
+        id: currentEditingId || Date.now(),
+        date: formattedDate,
+        rawDate: rawDate,
+        timestamp: timestamp,
+        teachings: document.getElementById('jdb-teachings').value.trim(),
+        mood: parseInt(document.getElementById('jdb-mood').value) || 5,
+        satisfaction: parseInt(document.getElementById('jdb-satisfaction').value) || 7,
+        sleepOnset: parseInt(document.getElementById('sleep-onset').value) || 7,
+        sleepWake: parseInt(document.getElementById('sleep-wake').value) || 6,
+        sleepQuality: parseInt(document.getElementById('sleep-quality').value) || 7,
+        saeWork: parseInt(document.getElementById('sae-work').value) || 7,
+        saeSport: parseInt(document.getElementById('sae-sport').value) || 5,
+        saeSocial: parseInt(document.getElementById('sae-social').value) || 7,
+        sports: collectSportsData()
+      };
+
+      if (currentEditingId) {
+        jdbEntries = jdbEntries.map(item => item.id === currentEditingId ? entry : item);
+        currentEditingId = null;
+        alert("✅ Bilan mis à jour avec succès !");
+      } else {
+        jdbEntries.unshift(entry);
+        if (!hero.completedDates) hero.completedDates = [];
+        if (!hero.completedDates.includes(rawDate)) {
+          hero.completedDates.push(rawDate);
+          gainXp(50);
+          playRetroSound('questDone');
+        }
+        alert("🎉 Bilan consigné avec succès (+50 XP) !");
+      }
+
+      jdbEntries.sort((a, b) => b.timestamp - a.timestamp);
+      localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
+      
+      document.getElementById('form-jdb').reset();
+      document.getElementById('sports-container').innerHTML = '';
+      switchFormTab(1);
+      renderVoyageur();
+    }
+
+    // ARCHIVES EN ACCORDÉON HIÉRARCHISÉ
+    function getWeekNumber(d) {
+      d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+      var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      return weekNo;
+    }
+
+    function renderAccordionArchives() {
+      const container = document.getElementById('jdb-accordion-tree');
+      if (!container) return;
+
+      if (!jdbEntries || jdbEntries.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic">Aucun bilan archivé pour le moment.</p>`;
+        return;
+      }
+
+      // Groupement par Année > Mois > Semaine
+      const tree = {};
+
+      jdbEntries.forEach(entry => {
+        const d = new Date(entry.timestamp || Date.now());
+        const year = d.getFullYear();
+        const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+        const month = `${monthNames[d.getMonth()]} ${year}`;
+        const week = `Semaine ${getWeekNumber(d)}`;
+
+        if (!tree[year]) tree[year] = {};
+        if (!tree[year][month]) tree[year][month] = {};
+        if (!tree[year][month][week]) tree[year][month][week] = [];
+
+        tree[year][month][week].push(entry);
+      });
+
+      let html = '';
+
+      Object.keys(tree).sort((a,b) => b - a).forEach(year => {
+        html += `
+          <details open class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden mb-3">
+            <summary class="p-3 bg-slate-800 font-bold text-sm text-amber-400 cursor-pointer flex justify-between items-center select-none">
+              <span>📅 Année ${year}</span>
+              <span class="text-xs text-slate-400 font-mono">${Object.values(tree[year]).reduce((acc, m) => acc + Object.values(m).reduce((a, w) => a + w.length, 0), 0)} bilans</span>
+            </summary>
+            
+            <div class="p-3 space-y-2">
+              ${Object.keys(tree[year]).map(month => `
+                <details class="bg-slate-800/60 border border-slate-700/80 rounded-lg overflow-hidden">
+                  <summary class="p-2.5 font-bold text-xs text-emerald-400 cursor-pointer flex justify-between items-center select-none">
+                    <span>🗓️ ${month}</span>
+                    <span class="text-[10px] text-slate-400 font-mono">${Object.values(tree[year][month]).reduce((a, w) => a + w.length, 0)} bilans</span>
+                  </summary>
+
+                  <div class="p-2 space-y-2">
+                    ${Object.keys(tree[year][month]).map(week => `
+                      <details class="bg-slate-900/90 border border-slate-700/50 rounded p-2">
+                        <summary class="font-bold text-xs text-slate-200 cursor-pointer flex justify-between items-center select-none">
+                          <span>📌 ${week}</span>
+                          <span class="text-[10px] text-amber-300 font-mono">${tree[year][month][week].length} entrée(s)</span>
+                        </summary>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 pt-2 border-t border-slate-800">
+                          ${tree[year][month][week].map(e => `
+                            <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs space-y-2">
+                              <div class="flex justify-between items-center">
+                                <span class="font-bold text-emerald-400">${e.date}</span>
+                                <span class="bg-slate-900 px-1.5 py-0.5 rounded text-[10px] text-amber-300">Mood: ${e.mood}/10</span>
+                              </div>
+                              <p class="text-slate-300 italic line-clamp-2">"${e.teachings}"</p>
+                              ${(e.sports && e.sports.length) ? `
+                                <div class="flex flex-wrap gap-1">
+                                  ${e.sports.map(s => `<span class="text-[9px] bg-slate-900 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.title || s.type} (${s.duration}m)</span>`).join('')}
+                                </div>
+                              ` : ''}
+                              <div class="flex justify-between items-center pt-2 border-t border-slate-700/50 text-[10px]">
+                                <span class="text-slate-500">Satisf: ${e.satisfaction}/10</span>
+                                <div class="space-x-2">
+                                  <button onclick="editEntry(${e.id})" class="text-emerald-400 hover:underline">Éditer</button>
+                                  <button onclick="deleteEntry(${e.id})" class="text-rose-400 hover:underline">Supprimer</button>
+                                </div>
+                              </div>
+                            </div>
+                          `).join('')}
+                        </div>
+                      </details>
+                    `).join('')}
+                  </div>
+                </details>
+              `).join('')}
+            </div>
+          </details>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function editEntry(id) {
+      const item = jdbEntries.find(e => e.id === id);
+      if (!item) return;
+      currentEditingId = id;
+
+      if (item.rawDate) document.getElementById('jdb-custom-date').value = item.rawDate;
+      document.getElementById('jdb-teachings').value = item.teachings || '';
+      document.getElementById('jdb-mood').value = item.mood || 5;
+      updateMoodLabel(item.mood || 5);
+      
+      document.getElementById('jdb-satisfaction').value = item.satisfaction || 7;
+      updateSatisfactionLabel(item.satisfaction || 7);
+      
+      document.getElementById('sleep-onset').value = item.sleepOnset || 7;
+      document.getElementById('val-sleep-onset').innerText = (item.sleepOnset || 7) + '/10';
+      document.getElementById('sleep-wake').value = item.sleepWake || 6;
+      document.getElementById('val-sleep-wake').innerText = (item.sleepWake || 6) + '/10';
+      document.getElementById('sleep-quality').value = item.sleepQuality || 7;
+      document.getElementById('val-sleep-quality').innerText = (item.sleepQuality || 7) + '/10';
+
+      document.getElementById('sae-work').value = item.saeWork || 7;
+      document.getElementById('sae-sport').value = item.saeSport || 5;
+      document.getElementById('sae-social').value = item.saeSocial || 7;
+      
+      document.getElementById('sports-container').innerHTML = '';
+      (item.sports || []).forEach(s => addSportBlock(s));
+
+      switchVoyageurSubTab('quest');
+      switchFormTab(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteEntry(id) {
+      if (confirm("Supprimer définitivement ce bilan du Journal de Bord ?")) {
+        jdbEntries = jdbEntries.filter(e => e.id !== id);
+        localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
+        renderVoyageur();
+      }
+    }
+
+    // EXPORTATION & SYNTHÈSE À LA CARTE
+    function handleExportPeriodPreset(val) {
+      const now = new Date();
+      let fromDate = new Date();
+      let toDate = new Date();
+
+      if (val === 'curr_week') {
+        const day = now.getDay() || 7;
+        fromDate.setDate(now.getDate() - day + 1);
+      } else if (val === 'prev_week') {
+        const day = now.getDay() || 7;
+        fromDate.setDate(now.getDate() - day - 6);
+        toDate.setDate(now.getDate() - day);
+      } else if (val === 'curr_month') {
+        fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      } else if (val === 'prev_month') {
+        fromDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        toDate = new Date(now.getFullYear(), now.getMonth(), 0);
+      } else if (val === 't1') {
+        fromDate = new Date(now.getFullYear(), 0, 1);
+        toDate = new Date(now.getFullYear(), 2, 31);
+      } else if (val === 't2') {
+        fromDate = new Date(now.getFullYear(), 3, 1);
+        toDate = new Date(now.getFullYear(), 5, 30);
+      } else if (val === 't3') {
+        fromDate = new Date(now.getFullYear(), 6, 1);
+        toDate = new Date(now.getFullYear(), 8, 30);
+      } else if (val === 't4') {
+        fromDate = new Date(now.getFullYear(), 9, 1);
+        toDate = new Date(now.getFullYear(), 11, 31);
+      } else if (val === 'sem1') {
+        fromDate = new Date(now.getFullYear() - 1, 8, 1);
+        toDate = new Date(now.getFullYear(), 0, 31);
+      } else if (val === 'sem2') {
+        fromDate = new Date(now.getFullYear(), 1, 1);
+        toDate = new Date(now.getFullYear(), 5, 30);
+      } else if (val === 'year') {
+        fromDate = new Date(now.getFullYear() - 1, 8, 1);
+      }
+
+      if (val !== 'custom') {
+        document.getElementById('export-date-from').value = fromDate.toISOString().split('T')[0];
+        document.getElementById('export-date-to').value = toDate.toISOString().split('T')[0];
+      }
+    }
+
+    function getFilteredEntriesForExport() {
+      const fromStr = document.getElementById('export-date-from').value;
+      const toStr = document.getElementById('export-date-to').value;
+
+      const fromTime = fromStr ? new Date(fromStr).getTime() : 0;
+      const toTime = toStr ? new Date(toStr).setHours(23, 59, 59, 999) : Infinity;
+
+      return jdbEntries.filter(e => {
+        const t = e.timestamp || new Date(e.rawDate).getTime();
+        return t >= fromTime && t <= toTime;
+      });
+    }
+
+    function generateCustomExportCSV() {
+      const filtered = getFilteredEntriesForExport();
+      if (filtered.length === 0) return alert("Aucune donnée disponible pour la période sélectionnée.");
+
+      const headers = ['date'];
+      if (document.getElementById('chk-sleep-quality').checked) headers.push('sommeil_qualite_globale');
+      if (document.getElementById('chk-sleep-onset').checked) headers.push('sommeil_endormissement');
+      if (document.getElementById('chk-sleep-wake').checked) headers.push('sommeil_reveil');
+      
+      if (document.getElementById('chk-sae-work').checked) headers.push('sae_travail');
+      if (document.getElementById('chk-sae-sport').checked) headers.push('sae_sport');
+      if (document.getElementById('chk-sae-social').checked) headers.push('sae_social');
+
+      if (document.getElementById('chk-sport-run').checked) headers.push('course_distance_km', 'course_duree_min', 'course_allure');
+      if (document.getElementById('chk-sport-wingchun').checked) headers.push('wingchun_duree_min');
+      if (document.getElementById('chk-sport-taiji').checked) headers.push('taiji_duree_min');
+      if (document.getElementById('chk-sport-renf').checked) headers.push('renforcement_duree_min');
+      if (document.getElementById('chk-sport-mob').checked) headers.push('mobilite_duree_min');
+
+      if (document.getElementById('chk-text-teachings').checked) headers.push('enseignements_observations');
+
+      let csv = headers.join(',') + '\n';
+
+      filtered.forEach(e => {
+        const row = [e.date];
+        
+        if (document.getElementById('chk-sleep-quality').checked) row.push(e.sleepQuality || '');
+        if (document.getElementById('chk-sleep-onset').checked) row.push(e.sleepOnset || '');
+        if (document.getElementById('chk-sleep-wake').checked) row.push(e.sleepWake || '');
+
+        if (document.getElementById('chk-sae-work').checked) row.push(e.saeWork || '');
+        if (document.getElementById('chk-sae-sport').checked) row.push(e.saeSport || '');
+        if (document.getElementById('chk-sae-social').checked) row.push(e.saeSocial || '');
+
+        // Calculations sports
+        let runKm = 0, runDur = 0, runPace = '', wcDur = 0, tjDur = 0, renfDur = 0, mobDur = 0;
+        (e.sports || []).forEach(s => {
+          if (s.type === 'course') { runKm += s.km || 0; runDur += s.duration || 0; runPace = s.pace || runPace; }
+          if (s.type === 'wing_chun') wcDur += s.duration || 0;
+          if (s.type === 'taiji') tjDur += s.duration || 0;
+          if (s.type === 'renforcement') renfDur += s.duration || 0;
+          if (s.type === 'mobilite') mobDur += s.duration || 0;
+        });
+
+        if (document.getElementById('chk-sport-run').checked) row.push(runKm, runDur, `"${runPace}"`);
+        if (document.getElementById('chk-sport-wingchun').checked) row.push(wcDur);
+        if (document.getElementById('chk-sport-taiji').checked) row.push(tjDur);
+        if (document.getElementById('chk-sport-renf').checked) row.push(renfDur);
+        if (document.getElementById('chk-sport-mob').checked) row.push(mobDur);
+
+        if (document.getElementById('chk-text-teachings').checked) row.push(`"${(e.teachings || '').replace(/"/g, '""')}"`);
+
+        csv += row.join(',') + '\n';
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `export_ergo_hub_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function generateCustomSynthesisText() {
+      const filtered = getFilteredEntriesForExport();
+      if (filtered.length === 0) return alert("Aucune donnée disponible pour la période sélectionnée.");
+
+      let txt = `📊 SYNTHÈSE RÉFLEXIVE & AUTO-QUANTIFICATION ERGO HUB\n`;
+      txt += `Période du : ${document.getElementById('export-date-from').value} au ${document.getElementById('export-date-to').value}\n`;
+      txt += `Nombre de bilans analysés : ${filtered.length}\n`;
+      txt += `=======================================================\n\n`;
+
+      // Sommeil
+      if (document.getElementById('chk-sleep-quality').checked || document.getElementById('chk-sleep-onset').checked) {
+        const avgQual = (filtered.reduce((a,e) => a + (e.sleepQuality||0),0)/filtered.length).toFixed(1);
+        const avgOns = (filtered.reduce((a,e) => a + (e.sleepOnset||0),0)/filtered.length).toFixed(1);
+        const avgWak = (filtered.reduce((a,e) => a + (e.sleepWake||0),0)/filtered.length).toFixed(1);
+        txt += `😴 RÉCUPÉRATION & SOMMEIL (Moyennes / 10) :\n`;
+        txt += `   • Qualité Globale : ${avgQual}/10\n`;
+        txt += `   • Endormissement : ${avgOns}/10 | Réveil : ${avgWak}/10\n\n`;
+      }
+
+      // SAE
+      if (document.getElementById('chk-sae-work').checked) {
+        const avgW = (filtered.reduce((a,e) => a + (e.saeWork||0),0)/filtered.length).toFixed(1);
+        const avgSp = (filtered.reduce((a,e) => a + (e.saeSport||0),0)/filtered.length).toFixed(1);
+        const avgSo = (filtered.reduce((a,e) => a + (e.saeSocial||0),0)/filtered.length).toFixed(1);
+        txt += `🎯 SENTIMENT D'AUTO-EFFICACITÉ (Moyennes / 10) :\n`;
+        txt += `   • SAE Travail / Master : ${avgW}/10\n`;
+        txt += `   • SAE Pratique Sportive : ${avgSp}/10\n`;
+        txt += `   • SAE Vie Personnelle/Sociale : ${avgSo}/10\n\n`;
+      }
+
+      // Sports Cumuls
+      let totalRunKm = 0, totalRunMin = 0, totalWc = 0, totalTj = 0, totalRenf = 0, totalMob = 0;
+      filtered.forEach(e => {
+        (e.sports||[]).forEach(s => {
+          if (s.type === 'course') { totalRunKm += s.km||0; totalRunMin += s.duration||0; }
+          if (s.type === 'wing_chun') totalWc += s.duration||0;
+          if (s.type === 'taiji') totalTj += s.duration||0;
+          if (s.type === 'renforcement') totalRenf += s.duration||0;
+          if (s.type === 'mobilite') totalMob += s.duration||0;
+        });
+      });
+
+      txt += `🏃 BILAN PRATIQUE SPORTIVE (Volume Cumulé) :\n`;
+      if (document.getElementById('chk-sport-run').checked) txt += `   • Course à pied : ${totalRunKm.toFixed(1)} km en ${Math.floor(totalRunMin/60)}h${totalRunMin%60}m\n`;
+      if (document.getElementById('chk-sport-wingchun').checked) txt += `   • Wing Chun : ${(totalWc/60).toFixed(1)}h\n`;
+      if (document.getElementById('chk-sport-taiji').checked) txt += `   • TaiJi : ${(totalTj/60).toFixed(1)}h\n`;
+      if (document.getElementById('chk-sport-renf').checked) txt += `   • Renforcement Musculaire : ${(totalRenf/60).toFixed(1)}h\n`;
+      if (document.getElementById('chk-sport-mob').checked) txt += `   • Mobilité & Souplesse : ${(totalMob/60).toFixed(1)}h\n`;
+      txt += `\n`;
+
+      // Verbatims Réflexifs
+      if (document.getElementById('chk-text-teachings').checked) {
+        txt += `🧠 EXTRAITS DES ENSEIGNEMENTS & OBSERVATIONS CONSIGNÉS :\n`;
+        filtered.forEach(e => {
+          if (e.teachings) txt += `   • [${e.date}] "${e.teachings}"\n`;
+        });
+      }
+
+      document.getElementById('report-text-content').innerText = txt;
+      document.getElementById('export-report-output').classList.remove('hidden');
     }
 
     function updateMentalLoadUI() {
@@ -1306,22 +1698,6 @@
       if (dName) dName.innerText = cfg.name;
       if (dLvl) dLvl.innerText = `Niveau ${hero.level} (${hero.xp} / 100 XP)`;
 
-      const customDateEl = document.getElementById('jdb-custom-date');
-      const selectedDate = customDateEl ? customDateEl.value : '';
-      const isDone = hero.completedDates && hero.completedDates.includes(selectedDate);
-      const questBtn = document.getElementById('header-quest-btn');
-      const questText = document.getElementById('header-quest-text');
-
-      if (questBtn && questText) {
-        if (isDone) {
-          questBtn.className = "flex items-center gap-2 px-3 py-1.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-lg text-xs font-bold";
-          questText.innerText = "Bilan Fait ✅";
-        } else {
-          questBtn.className = "relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition";
-          questText.innerText = "Quête Dispo !";
-        }
-      }
-
       const archBox = document.getElementById('archetype-selection-box');
       if (archBox) {
         if (!hero.isClassLocked) {
@@ -1365,281 +1741,19 @@
         }).join('');
       }
 
-      const invContainer = document.getElementById('inventory-list');
-      if (invContainer) {
-        invContainer.innerHTML = hero.inventory.map(item => `
-          <div class="relative group cursor-pointer px-2.5 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
-            <span>📦 ${item.name}</span>
-            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-slate-950 border border-slate-600 rounded shadow-xl text-[11px] z-50">
-              <p class="font-bold text-amber-400">${item.name} <span class="text-[9px] text-slate-500">(${item.rarity})</span></p>
-              <p class="text-slate-300 mt-0.5">${item.desc}</p>
-            </div>
-          </div>
-        `).join('');
-      }
-
-      renderJdbDashboard();
+      renderAccordionArchives();
       updateMentalLoadUI();
     }
 
     function saveHero() { localStorage.setItem('ergo_hero', JSON.stringify(hero)); }
 
-    function saveJdbEntry(e) {
-      e.preventDefault();
-      const rawDate = document.getElementById('jdb-custom-date').value;
-      const formattedDate = new Date(rawDate).toLocaleDateString('fr-FR');
-      const timestamp = new Date(rawDate).getTime();
-      
-      const entry = {
-        id: currentEditingId || Date.now(),
-        date: formattedDate,
-        rawDate: rawDate,
-        timestamp: timestamp,
-        teachings: document.getElementById('jdb-teachings').value,
-        mood: parseInt(document.getElementById('jdb-mood').value),
-        satisfaction: parseInt(document.getElementById('jdb-satisfaction').value),
-        sleepOnset: parseInt(document.getElementById('sleep-onset').value),
-        sleepWake: parseInt(document.getElementById('sleep-wake').value),
-        sleepQuality: parseInt(document.getElementById('sleep-quality').value),
-        saeWork: parseInt(document.getElementById('sae-work').value),
-        saeSport: parseInt(document.getElementById('sae-sport').value),
-        saeSocial: parseInt(document.getElementById('sae-social').value),
-        sports: collectSportsData()
-      };
-
-      if (currentEditingId) {
-        jdbEntries = jdbEntries.map(item => item.id === currentEditingId ? entry : item);
-        currentEditingId = null;
-      } else {
-        jdbEntries.unshift(entry);
-        if (!hero.completedDates) hero.completedDates = [];
-        if (!hero.completedDates.includes(rawDate)) {
-          hero.completedDates.push(rawDate);
-          gainXp(50);
-          playRetroSound('questDone');
-        }
-      }
-
-      localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
-      document.getElementById('form-jdb').reset();
-      document.getElementById('sports-container').innerHTML = '';
-      switchFormTab(1);
-      renderVoyageur();
-    }
-
-    function downloadCSVTemplate() {
-      const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,sleepOnset,sleepWake,sleepQuality,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail\",8,8,8,7,8,8,6,7";
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "modele_journal_de_bord_complet.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function importCSV(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const text = evt.target.result;
-        const lines = text.split(/\r\n|\n/);
-        let addedCount = 0;
-
-        lines.forEach((line, idx) => {
-          if (idx === 0 || !line.trim()) return;
-          const parts = line.includes(';') ? line.split(';') : line.split(',');
-          if (parts.length >= 10) {
-            const rawDate = parts[0].replace(/"/g, '').trim();
-            const entry = {
-              id: Date.now() + idx,
-              date: new Date(rawDate).toLocaleDateString('fr-FR'),
-              rawDate: rawDate,
-              timestamp: new Date(rawDate).getTime(),
-              teachings: parts[1].replace(/"/g, '').trim(),
-              mood: parseInt(parts[2].trim()) || 5,
-              satisfaction: parseInt(parts[3].trim()) || 7,
-              sleepOnset: parseInt(parts[4].trim()) || 7,
-              sleepWake: parseInt(parts[5].trim()) || 6,
-              sleepQuality: parseInt(parts[6].trim()) || 7,
-              saeWork: parseInt(parts[7].trim()) || 7,
-              saeSport: parseInt(parts[8].trim()) || 5,
-              saeSocial: parseInt(parts[9].trim()) || 7,
-              sports: []
-            };
-            jdbEntries.push(entry);
-            addedCount++;
-          }
-        });
-
-        jdbEntries.sort((a, b) => b.timestamp - a.timestamp);
-        localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
-        alert(`📥 Importation réussie : ${addedCount} bilans complets ajoutés !`);
-        renderVoyageur();
-      };
-      reader.readAsText(file);
-    }
-
-    function renderJdbDashboard() {
-      if (!jdbEntries || jdbEntries.length === 0) return;
-
-      const avgMood = (jdbEntries.reduce((acc, e) => acc + (e.mood || 0), 0) / jdbEntries.length).toFixed(1);
-      const avgSleep = (jdbEntries.reduce((acc, e) => acc + (e.sleepQuality || 0), 0) / jdbEntries.length).toFixed(1);
-
-      const moodEl = document.getElementById('kpi-mood'); if (moodEl) moodEl.innerText = `${avgMood} / 10`;
-      const sleepEl = document.getElementById('kpi-sleep'); if (sleepEl) sleepEl.innerText = `${avgSleep} / 10`;
-
-      let totalMin = 0, totalKm = 0, amMin = 0, renfMin = 0, mobMin = 0;
-      jdbEntries.forEach(e => {
-        (e.sports || []).forEach(s => {
-          totalMin += s.duration || 0;
-          if (s.type === 'course') totalKm += s.km || 0;
-          if (s.type === 'arts_martiaux') amMin += s.duration || 0;
-          if (s.type === 'renforcement') renfMin += s.duration || 0;
-          if (s.type === 'mobilite') mobMin += s.duration || 0;
-        });
-      });
-
-      const spH = document.getElementById('kpi-sport-hours'); if (spH) spH.innerText = `${Math.floor(totalMin/60)}h${totalMin%60 < 10 ? '0' : ''}${totalMin%60}`;
-      const cKm = document.getElementById('kpi-course-km'); if (cKm) cKm.innerText = `Course : ${totalKm.toFixed(1)} km`;
-      const amH = document.getElementById('kpi-am-h'); if (amH) amH.innerText = `${(amMin/60).toFixed(1)}h`;
-      const rH = document.getElementById('kpi-renf-h'); if (rH) rH.innerText = `${(renfMin/60).toFixed(1)}h`;
-      const mH = document.getElementById('kpi-mob-h'); if (mH) mH.innerText = `${(mobMin/60).toFixed(1)}h`;
-
-      renderChart();
-      renderArchives();
-      applySportFilters();
-    }
-
-    function applySportFilters() {
-      const typeFilter = document.getElementById('filter-sport-type')?.value || 'all';
-      const durFilter = parseInt(document.getElementById('filter-sport-dur')?.value || 0);
-      const hrFilter = parseInt(document.getElementById('filter-sport-hr')?.value || 0);
-
-      const tbody = document.getElementById('sport-filtered-tbody');
-      if (!tbody) return;
-
-      let rowsHtml = '';
-      let matchCount = 0;
-
-      jdbEntries.forEach(e => {
-        (e.sports || []).forEach(s => {
-          if (typeFilter !== 'all' && s.type !== typeFilter) return;
-          if (durFilter > 0 && (s.duration || 0) < durFilter) return;
-          if (hrFilter > 0 && (s.hr || 0) < hrFilter) return;
-
-          matchCount++;
-          rowsHtml += `
-            <tr class="hover:bg-slate-800/50 transition">
-              <td class="p-2 font-mono text-emerald-400">${e.date}</td>
-              <td class="p-2 font-bold">${s.title || 'Séance sans titre'}</td>
-              <td class="p-2 capitalize">${s.type}</td>
-              <td class="p-2">${s.duration || 0} min</td>
-              <td class="p-2">${s.km ? s.km + ' km (' + (s.pace || '-') + ')' : '-'}</td>
-              <td class="p-2">${s.hr ? s.hr + ' BPM' : '-'}</td>
-              <td class="p-2">${s.rpm ? s.rpm + ' RPM' : '-'}</td>
-              <td class="p-2">${s.rpe ? s.rpe + '/10' : '-'}</td>
-            </tr>
-          `;
-        });
-      });
-
-      tbody.innerHTML = matchCount > 0 ? rowsHtml : `<tr><td colspan="8" class="p-3 text-center text-slate-500 italic">Aucune séance ne correspond aux critères.</td></tr>`;
-    }
-
-    function renderChart() {
-      const canvas = document.getElementById('chart-sae');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const recent = [...jdbEntries].slice(0, 7).reverse();
-
-      if (saeChart) saeChart.destroy();
-      saeChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: recent.map(e => e.date),
-          datasets: [
-            { label: 'Travail', data: recent.map(e => e.saeWork), borderColor: '#22c55e', tension: 0.3 },
-            { label: 'Sport', data: recent.map(e => e.saeSport), borderColor: '#f59e0b', tension: 0.3 },
-            { label: 'Social', data: recent.map(e => e.saeSocial), borderColor: '#3b82f6', tension: 0.3 }
-          ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 1, max: 10 } } }
-      });
-    }
-
-    function renderArchives() {
-      const container = document.getElementById('jdb-archives-list');
-      if (!container) return;
-      container.innerHTML = jdbEntries.map(e => `
-        <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 flex flex-col justify-between space-y-3">
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <span class="text-xs font-bold text-emerald-400">📅 ${e.date}</span>
-              <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-300">Humeur: ${e.mood || '-'}/10</span>
-            </div>
-            <p class="text-xs text-slate-300 line-clamp-2 italic">"${e.teachings}"</p>
-            ${(e.sports && e.sports.length) ? `<div class="mt-2 flex flex-wrap gap-1">${e.sports.map(s => `<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.title || s.type} (${s.duration}m)</span>`).join('')}</div>` : ''}
-          </div>
-          <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-            <span class="text-slate-500">Satisf: ${e.satisfaction || '-'}/10</span>
-            <div class="space-x-2">
-              <button onclick="editEntry(${e.id})" class="text-emerald-400 hover:underline">Éditer</button>
-              <button onclick="deleteEntry(${e.id})" class="text-rose-400 hover:underline">Supprimer</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function editEntry(id) {
-      const item = jdbEntries.find(e => e.id === id);
-      if (!item) return;
-      currentEditingId = id;
-      if (item.rawDate) document.getElementById('jdb-custom-date').value = item.rawDate;
-      document.getElementById('jdb-teachings').value = item.teachings;
-      document.getElementById('jdb-mood').value = item.mood || 5;
-      updateMoodLabel(item.mood || 5);
-      
-      document.getElementById('jdb-satisfaction').value = item.satisfaction || 7;
-      updateSatisfactionLabel(item.satisfaction || 7);
-      
-      document.getElementById('sleep-onset').value = item.sleepOnset || 7;
-      document.getElementById('val-sleep-onset').innerText = (item.sleepOnset || 7) + '/10';
-      document.getElementById('sleep-wake').value = item.sleepWake || 6;
-      document.getElementById('val-sleep-wake').innerText = (item.sleepWake || 6) + '/10';
-      document.getElementById('sleep-quality').value = item.sleepQuality || 7;
-      document.getElementById('val-sleep-quality').innerText = (item.sleepQuality || 7) + '/10';
-
-      document.getElementById('sae-work').value = item.saeWork || 7;
-      document.getElementById('sae-sport').value = item.saeSport || 5;
-      document.getElementById('sae-social').value = item.saeSocial || 7;
-      
-      document.getElementById('sports-container').innerHTML = '';
-      (item.sports || []).forEach(s => addSportBlock(s));
-
-      switchVoyageurSubTab('quest');
-      switchFormTab(1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function deleteEntry(id) {
-      if (confirm("Supprimer définitivement ce bilan du Journal de Bord ?")) {
-        jdbEntries = jdbEntries.filter(e => e.id !== id);
-        localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
-        renderVoyageur();
-      }
-    }
-
     // Init
     document.addEventListener('DOMContentLoaded', () => {
-      const yestDate = new Date();
-      yestDate.setDate(yestDate.getDate() - 1);
+      const todayDate = new Date().toISOString().split('T')[0];
       const customDateEl = document.getElementById('jdb-custom-date');
-      if (customDateEl) customDateEl.value = yestDate.toISOString().split('T')[0];
+      if (customDateEl) customDateEl.value = todayDate;
 
+      handleExportPeriodPreset('curr_month');
       renderKanban();
       renderCrm();
       renderVoyageur();
