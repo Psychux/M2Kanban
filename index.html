@@ -21,16 +21,19 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
 
-  <!-- Header Navigation V1 -->
+  <!-- Header Navigation avec Choix de Logo -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
       
-      <!-- Logo V1 & Navigation -->
+      <!-- Logo & Navigation -->
       <div class="flex items-center space-x-6">
         <div class="cursor-pointer flex items-center space-x-2" onclick="switchTab('dashboard')">
-          <span class="text-2xl">🧠</span>
-          <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">Ergo Hub</h1>
+          <!-- Proposition A par défaut, basculable via options -->
+          <div id="main-logo-container">
+            <h1 class="text-xl font-black tracking-wider text-emerald-400 font-mono">🌿 ERGO<span class="text-slate-100">.HUB</span></h1>
+          </div>
         </div>
+
         <nav class="flex space-x-1 bg-slate-900 p-1 rounded-lg border border-slate-700">
           <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white">Dashboard</button>
           <button onclick="switchTab('workspace')" id="tab-workspace" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white">Workspace</button>
@@ -39,8 +42,14 @@
         </nav>
       </div>
 
-      <!-- Profil Joueur & Badge Quête -->
+      <!-- Selecteur de Style de Logo + Profil Joueur -->
       <div class="flex items-center space-x-3">
+        <select onchange="changeLogoStyle(this.value)" class="bg-slate-900 text-[10px] text-slate-300 border border-slate-700 rounded px-2 py-1">
+          <option value="A">Style Logo: 🌿 ERGO.HUB</option>
+          <option value="B">Style Logo: ⚔️ ERGO_HUB</option>
+          <option value="C">Style Logo: 🔬 ERGO LAB</option>
+        </select>
+
         <button onclick="switchTab('voyageur'); switchVoyageurSubTab('quest');" id="header-quest-btn" class="relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition">
           <span class="animate-pulse">📜</span>
           <span id="header-quest-text">Quête Dispo !</span>
@@ -88,68 +97,187 @@
       </div>
     </section>
 
-    <!-- TAB 2: WORKSPACE (KANBAN RESTAURÉ) -->
+    <!-- TAB 2: WORKSPACE (Kanban, Agenda iCal & Ressources) -->
     <section id="sec-workspace" class="hidden space-y-6">
-      <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
-        <div>
-          <h2 class="text-xl font-bold">Workspace (Kanban)</h2>
-          <p class="text-xs text-slate-400">Gère tes tâches de cours et tes projets ergo.</p>
+      
+      <!-- Sous-Barre Navigation Workspace -->
+      <div class="flex space-x-2 border-b border-slate-700 pb-3">
+        <button onclick="switchWorkspaceSubTab('kanban')" id="wsubtab-kanban" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">
+          📋 Kanban & Quêtes
+        </button>
+        <button onclick="switchWorkspaceSubTab('agenda')" id="wsubtab-agenda" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
+          📅 Agenda & Emploi du Temps
+        </button>
+        <button onclick="switchWorkspaceSubTab('resources')" id="wsubtab-resources" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
+          📚 Espace Ressources
+        </button>
+      </div>
+
+      <!-- SOUS-ONGLET 1: KANBAN RPG AVANCÉ -->
+      <div id="wsub-kanban" class="space-y-6">
+        <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
+          <div class="flex items-center gap-4">
+            <h2 class="text-lg font-bold">Kanban des Quêtes & Tâches</h2>
+            <!-- Filtres / Tri -->
+            <select id="kanban-sort-by" onchange="renderKanban()" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300">
+              <option value="urgency">Trier par Urgence</option>
+              <option value="dueDate">Trier par Échéance</option>
+              <option value="ue">Trier par Matière / UE</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-amber-400 font-mono">
+              🧠 Charge Mentale : <span id="kb-mental-val">3</span>/10
+            </span>
+            <button onclick="toggleAddTaskModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">+ Créer une Quête</button>
+          </div>
         </div>
-        <div class="flex items-center gap-3">
-          <span class="text-xs bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-amber-400 font-mono">
-            🧠 Charge Mentale : <span id="kb-mental-val">3</span>/10
-          </span>
-          <button onclick="toggleAddTaskModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">+ Nouvelle Tâche</button>
+
+        <!-- Formulaire de Création de Quête Enrichi -->
+        <div id="add-task-form-box" class="hidden bg-slate-800 p-5 rounded-xl border border-slate-700 space-y-4">
+          <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">Créer une Quête (Tâche Avancée)</h3>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">Titre de la tâche *</label>
+              <input type="text" id="new-task-title" placeholder="ex: Rédaction Protocole Usabilité" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Matière / UE</label>
+              <input type="text" id="new-task-ue" placeholder="ex: UE Ergonomie / Master M2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Type de travail</label>
+              <select id="new-task-type" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+                <option value="lecture">📖 Lecture Article / Ouvrage</option>
+                <option value="livrable">📝 Livrable / Rapport</option>
+                <option value="rendezvous">🤝 Rendez-vous / Réunion</option>
+                <option value="preparation">🛠️ Préparation / Terrain</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Date d'échéance</label>
+              <input type="date" id="new-task-due" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-amber-300 font-mono">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Degré d'urgence</label>
+              <select id="new-task-urgency" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+                <option value="1">🟢 Basse</option>
+                <option value="2" selected>🟡 Moyenne</option>
+                <option value="3">🟠 Haute</option>
+                <option value="4">🔴 Critique / URGENT</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Coût Charge Mentale</label>
+              <select id="new-task-cost" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+                <option value="1">1 Point</option>
+                <option value="2">2 Points</option>
+                <option value="3">3 Points</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Description / Consignes</label>
+            <textarea id="new-task-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200" placeholder="Détails de la tâche..."></textarea>
+          </div>
+
+          <!-- Jalons / Sous-objectifs -->
+          <div class="space-y-2 pt-2 border-t border-slate-700">
+            <div class="flex justify-between items-center">
+              <label class="block text-xs font-bold text-amber-400">Jalons / Sous-objectifs (+5 XP par jalon complété)</label>
+              <button type="button" onclick="addSubGoalInput()" class="text-[10px] bg-slate-700 px-2 py-0.5 rounded text-emerald-400">+ Ajouter un jalon</button>
+            </div>
+            <div id="subgoals-input-container" class="space-y-2"></div>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2">
+            <button onclick="toggleAddTaskModal()" class="px-3 py-1.5 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
+            <button onclick="addNewTask()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs rounded font-bold text-white">Créer la Quête</button>
+          </div>
+        </div>
+
+        <!-- Colonnes Kanban -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
+            <h3 class="font-bold text-slate-300 mb-3 flex justify-between items-center">
+              <span>📌 À Faire</span>
+              <span id="count-todo" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400">0</span>
+            </h3>
+            <div id="col-todo" class="space-y-3 flex-grow" ondrop="drop(event, 'todo')" ondragover="allowDrop(event)"></div>
+          </div>
+
+          <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
+            <h3 class="font-bold text-amber-400 mb-3 flex justify-between items-center">
+              <span>⚡ En Cours</span>
+              <span id="count-doing" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-400">0</span>
+            </h3>
+            <div id="col-doing" class="space-y-3 flex-grow" ondrop="drop(event, 'doing')" ondragover="allowDrop(event)"></div>
+          </div>
+
+          <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
+            <h3 class="font-bold text-emerald-400 mb-3 flex justify-between items-center">
+              <span>✅ Terminé (+25 XP)</span>
+              <span id="count-done" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-emerald-400">0</span>
+            </h3>
+            <div id="col-done" class="space-y-3 flex-grow" ondrop="drop(event, 'done')" ondragover="allowDrop(event)"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Formulaire Ajout Tâche -->
-      <div id="add-task-form-box" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-        <h3 class="text-sm font-bold text-emerald-400">Ajouter une tâche au Kanban</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-          <input type="text" id="new-task-title" placeholder="Titre de la tâche" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-          <input type="text" id="new-task-ue" placeholder="UE / Matière (ex: UE Ergonomie)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-          <select id="new-task-cost" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-            <option value="1">Coût : 1 PT Charge</option>
-            <option value="2">Coût : 2 PTS Charge</option>
-            <option value="3">Coût : 3 PTS Charge</option>
-          </select>
+      <!-- SOUS-ONGLET 2: AGENDA / GOOGLE CALENDAR -->
+      <div id="wsub-agenda" class="hidden space-y-4">
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center flex-wrap gap-2">
+          <div>
+            <h3 class="text-base font-bold text-amber-400">📅 Agenda du M2 & Emploi du Temps</h3>
+            <p class="text-xs text-slate-400">Visualise tes prochains cours et échéances synchronisées.</p>
+          </div>
+          <button onclick="promptCalendarUrl()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-emerald-400 border border-slate-600">⚙️ Configurer Iframe Google Calendar</button>
         </div>
-        <div class="flex justify-end gap-2">
-          <button onclick="toggleAddTaskModal()" class="px-3 py-1 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
-          <button onclick="addNewTask()" class="px-3 py-1 bg-emerald-600 text-xs rounded font-bold text-white">Ajouter</button>
+
+        <div class="bg-slate-900 rounded-xl border border-slate-700 p-2 h-[500px] overflow-hidden">
+          <iframe id="calendar-iframe" src="https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com&ctz=Europe%2FParis" style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
         </div>
       </div>
 
-      <!-- Colonnes Kanban -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
-          <h3 class="font-bold text-slate-300 mb-3 flex justify-between items-center">
-            <span>📌 À Faire</span>
-            <span id="count-todo" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400">0</span>
-          </h3>
-          <div id="col-todo" class="space-y-3 flex-grow" ondrop="drop(event, 'todo')" ondragover="allowDrop(event)"></div>
+      <!-- SOUS-ONGLET 3: ESPACE RESSOURCES -->
+      <div id="wsub-resources" class="hidden space-y-4">
+        <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-2">
+          <div>
+            <h3 class="text-base font-bold text-emerald-400">📚 Espace Ressources Ergonomie</h3>
+            <p class="text-xs text-slate-400">Banque de liens, articles, dossiers Drive et grilles de lecture.</p>
+          </div>
+          <button onclick="toggleAddResourceModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white">+ Nouvelle Ressource</button>
         </div>
 
-        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
-          <h3 class="font-bold text-amber-400 mb-3 flex justify-between items-center">
-            <span>⚡ En Cours</span>
-            <span id="count-doing" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-400">0</span>
-          </h3>
-          <div id="col-doing" class="space-y-3 flex-grow" ondrop="drop(event, 'doing')" ondragover="allowDrop(event)"></div>
+        <!-- Formulaire Ajout Ressource -->
+        <div id="add-resource-form-box" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+          <h4 class="text-xs font-bold text-emerald-400 uppercase">Ajouter un document / lien</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <input type="text" id="res-title" placeholder="Titre de la ressource" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+            <select id="res-type" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+              <option value="Article / Doc">📄 Article / Document</option>
+              <option value="Lien Web">🌐 Lien Web / Site</option>
+              <option value="Dossier Drive">📁 Dossier Drive</option>
+              <option value="Outil / Logiciel">🛠️ Outil / Logiciel</option>
+            </select>
+            <input type="url" id="res-url" placeholder="URL complète (https://...)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          </div>
+          <div class="flex justify-end gap-2">
+            <button onclick="toggleAddResourceModal()" class="px-3 py-1 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
+            <button onclick="addNewResource()" class="px-3 py-1 bg-emerald-600 text-xs rounded font-bold text-white">Enregistrer</button>
+          </div>
         </div>
 
-        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
-          <h3 class="font-bold text-emerald-400 mb-3 flex justify-between items-center">
-            <span>✅ Terminé (+XP)</span>
-            <span id="count-done" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-emerald-400">0</span>
-          </h3>
-          <div id="col-done" class="space-y-3 flex-grow" ondrop="drop(event, 'done')" ondragover="allowDrop(event)"></div>
+        <div id="resources-list-box" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <p class="text-xs text-slate-500 italic col-span-full">Aucune ressource enregistrée pour le moment.</p>
         </div>
       </div>
+
     </section>
 
-    <!-- TAB 3: CRM (RÉSEAU PRO RESTAURÉ) -->
+    <!-- TAB 3: CRM (RÉSEAU PRO) -->
     <section id="sec-crm" class="hidden space-y-6">
       <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
         <div>
@@ -159,7 +287,6 @@
         <button onclick="toggleAddCrmModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">+ Nouveau Contact</button>
       </div>
 
-      <!-- Formulaire Ajout CRM -->
       <div id="add-crm-form-box" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
         <h3 class="text-sm font-bold text-emerald-400">Ajouter un contact pro</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
@@ -174,7 +301,6 @@
         </div>
       </div>
 
-      <!-- Liste des contacts CRM -->
       <div id="crm-contacts-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <p class="text-xs text-slate-500 italic col-span-full">Aucun contact enregistré pour le moment.</p>
       </div>
@@ -183,7 +309,7 @@
     <!-- TAB 4: VOYAGEUR & JOURNAL DE BORD (3 Sous-Onglets) -->
     <section id="sec-voyageur" class="hidden space-y-6">
       
-      <!-- Sous-Barre Navigation -->
+      <!-- Sous-Barre Navigation Voyageur -->
       <div class="flex space-x-2 border-b border-slate-700 pb-3">
         <button onclick="switchVoyageurSubTab('gamification')" id="vsubtab-gamification" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">
           🛡️ Fiche Personnage
@@ -254,7 +380,7 @@
 
           <form id="form-jdb" onsubmit="saveJdbEntry(event)" class="space-y-4">
             
-            <!-- Section 1 : Réflexivité & Mood -->
+            <!-- Section 1 : Réflexivité, Mood & Satisfaction (Toutes deux en Échelle 1-10) -->
             <div id="fsec-1" class="space-y-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-300 mb-1">Date du bilan (Antidatage possible)</label>
@@ -270,20 +396,10 @@
                   <input type="range" id="jdb-mood" min="1" max="10" value="5" oninput="updateMoodLabel(this.value)" class="w-full accent-amber-500">
                   <p id="lbl-mood-desc" class="text-[10px] text-slate-400 italic">😐 Neutre</p>
                 </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1">Satisfaction générale</label>
-                  <select id="jdb-satisfaction" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200">
-                    <option value="10">10 / 10 - Parfaite</option>
-                    <option value="9">9 / 10 - Excellente</option>
-                    <option value="8">8 / 10 - Très bonne</option>
-                    <option value="7" selected>7 / 10 - Bonne</option>
-                    <option value="6">6 / 10 - Correcte</option>
-                    <option value="5">5 / 10 - Moyenne</option>
-                    <option value="4">4 / 10 - Passable</option>
-                    <option value="3">3 / 10 - Insatisfaisante</option>
-                    <option value="2">2 / 10 - Difficile</option>
-                    <option value="1">1 / 10 - Très mauvaise</option>
-                  </select>
+                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-1">
+                  <label class="block text-xs font-semibold text-slate-300">Satisfaction générale : <span id="val-jdb-satisfaction" class="text-emerald-400 font-bold">7/10</span></label>
+                  <input type="range" id="jdb-satisfaction" min="1" max="10" value="7" oninput="updateSatisfactionLabel(this.value)" class="w-full accent-emerald-500">
+                  <p id="lbl-satisfaction-desc" class="text-[10px] text-slate-400 italic">🙂 Bonne satisfaction</p>
                 </div>
               </div>
             </div>
@@ -365,7 +481,6 @@
 
       <!-- SOUS-ONGLET 3: DASHBOARD ANALYTIQUE -->
       <div id="vsub-analytics" class="hidden space-y-6">
-        
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
             <span class="text-xs text-slate-400 font-semibold uppercase">Humeur Moyenne</span>
@@ -476,12 +591,12 @@
           gain.gain.setValueAtTime(0.2, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
           osc.start(); osc.stop(ctx.currentTime + 0.25);
-        } else if (type === 'kanban') {
+        } else if (type === 'subGoal') {
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(300, ctx.currentTime);
-          gain.gain.setValueAtTime(0.15, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
-          osc.start(); osc.stop(ctx.currentTime + 0.08);
+          osc.frequency.setValueAtTime(520, ctx.currentTime);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+          osc.start(); osc.stop(ctx.currentTime + 0.1);
         }
       } catch(e){}
     };
@@ -516,15 +631,45 @@
     };
 
     let kanbanTasks = JSON.parse(localStorage.getItem('ergo_kanban_tasks')) || [
-      { id: 'task-1', title: "Analyse de l'activité - Chapitre 1", ue: "UE Ergonomie", cost: 1, status: 'todo' }
+      {
+        id: 'task-1',
+        title: "Analyse de l'activité - Chapitre 1",
+        ue: "UE Ergonomie",
+        type: "livrable",
+        desc: "Synthétiser l'analyse de l'activité.",
+        dueDate: "2026-10-15",
+        urgency: 3,
+        cost: 1,
+        status: 'todo',
+        subGoals: [
+          { id: 'sub-1', title: "Lecture de l'ouvrage", done: false },
+          { id: 'sub-2', title: "Rédaction des synthèses", done: false }
+        ]
+      }
     ];
 
     let crmContacts = JSON.parse(localStorage.getItem('ergo_crm_contacts')) || [];
     let jdbEntries = JSON.parse(localStorage.getItem('ergo_jdb_entries')) || [];
+    let resourcesList = JSON.parse(localStorage.getItem('ergo_resources_list')) || [
+      { id: 1, title: "Grille Critères Bastien & Scapin", type: "Article / Doc", url: "https://drive.google.com" }
+    ];
 
     let currentEditingId = null;
     let saeChart = null;
     let sportBlockCounter = 0;
+    let tempSubGoals = [];
+
+    // Logo Style Switcher
+    function changeLogoStyle(styleKey) {
+      const box = document.getElementById('main-logo-container');
+      if (styleKey === 'A') {
+        box.innerHTML = `<h1 class="text-xl font-black tracking-wider text-emerald-400 font-mono">🌿 ERGO<span class="text-slate-100">.HUB</span></h1>`;
+      } else if (styleKey === 'B') {
+        box.innerHTML = `<h1 class="text-xl font-bold text-amber-400 font-mono">⚔️ ERGO<span class="text-emerald-400">_HUB</span></h1>`;
+      } else if (styleKey === 'C') {
+        box.innerHTML = `<div class="flex items-center gap-1.5"><span class="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded">M2 ECIT-FH</span><h1 class="text-lg font-bold text-slate-100">Ergo Lab</h1></div>`;
+      }
+    }
 
     // Navigation
     function switchTab(tabId) {
@@ -542,6 +687,20 @@
       if (tabId === 'workspace') renderKanban();
       if (tabId === 'crm') renderCrm();
       if (tabId === 'voyageur') renderVoyageur();
+    }
+
+    function switchWorkspaceSubTab(subId) {
+      ['kanban', 'agenda', 'resources'].forEach(s => {
+        const div = document.getElementById(`wsub-${s}`);
+        const btn = document.getElementById(`wsubtab-${s}`);
+        if (div) div.classList.add('hidden');
+        if (btn) btn.className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700";
+      });
+      const activeDiv = document.getElementById(`wsub-${subId}`);
+      const activeBtn = document.getElementById(`wsubtab-${subId}`);
+      if (activeDiv) activeDiv.classList.remove('hidden');
+      if (activeBtn) activeBtn.className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white";
+      if (subId === 'resources') renderResources();
     }
 
     function switchVoyageurSubTab(subId) {
@@ -571,20 +730,49 @@
       if (targetTab) targetTab.className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
     }
 
-    // KANBAN LOGIC
+    // KANBAN RPG LOGIC
     function toggleAddTaskModal() {
-      const box = document.getElementById('add-task-form-box');
-      box.classList.toggle('hidden');
+      document.getElementById('add-task-form-box').classList.toggle('hidden');
+      tempSubGoals = [];
+      document.getElementById('subgoals-input-container').innerHTML = '';
+    }
+
+    function addSubGoalInput() {
+      const container = document.getElementById('subgoals-input-container');
+      const idx = container.children.length;
+      const div = document.createElement('div');
+      div.className = "flex gap-2 items-center";
+      div.innerHTML = `
+        <input type="text" placeholder="Jalon ${idx + 1} (ex: Recherche bibliographique)" class="subgoal-item-input w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-slate-200">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 text-xs">✕</button>
+      `;
+      container.appendChild(div);
     }
 
     function addNewTask() {
       const title = document.getElementById('new-task-title').value.trim();
       const ue = document.getElementById('new-task-ue').value.trim();
+      const type = document.getElementById('new-task-type').value;
+      const dueDate = document.getElementById('new-task-due').value;
+      const urgency = parseInt(document.getElementById('new-task-urgency').value);
       const cost = parseInt(document.getElementById('new-task-cost').value);
+      const desc = document.getElementById('new-task-desc').value.trim();
 
-      if (!title) return alert("Le titre de la tâche est requis.");
+      if (!title) return alert("Le titre de la quête est obligatoire.");
 
-      const newTask = { id: `task-${Date.now()}`, title, ue: ue || 'Projet Ergo', cost, status: 'todo' };
+      const subInputs = document.querySelectorAll('.subgoal-item-input');
+      const subGoals = [];
+      subInputs.forEach((inp, idx) => {
+        if (inp.value.trim()) {
+          subGoals.push({ id: `sub-${Date.now()}-${idx}`, title: inp.value.trim(), done: false });
+        }
+      });
+
+      const newTask = {
+        id: `task-${Date.now()}`,
+        title, ue: ue || 'Projet Ergo', type, dueDate, urgency, cost, desc, status: 'todo', subGoals
+      };
+
       kanbanTasks.push(newTask);
       saveKanban();
       renderKanban();
@@ -592,11 +780,28 @@
       document.getElementById('new-task-title').value = '';
     }
 
+    function toggleSubGoal(taskId, subId) {
+      kanbanTasks = kanbanTasks.map(t => {
+        if (t.id === taskId && t.subGoals) {
+          t.subGoals = t.subGoals.map(sg => {
+            if (sg.id === subId) {
+              const newDone = !sg.done;
+              if (newDone) { gainXp(5); playRetroSound('subGoal'); }
+              return { ...sg, done: newDone };
+            }
+            return sg;
+          });
+        }
+        return t;
+      });
+      saveKanban();
+      renderKanban();
+    }
+
     function moveTask(id, targetStatus) {
       kanbanTasks = kanbanTasks.map(t => t.id === id ? { ...t, status: targetStatus } : t);
       if (targetStatus === 'done') gainXp(25);
       hero.mentalLoad = Math.min(10, hero.mentalLoad + 1);
-      playRetroSound('kanban');
       saveHero();
       saveKanban();
       renderKanban();
@@ -619,29 +824,118 @@
     function saveKanban() { localStorage.setItem('ergo_kanban_tasks', JSON.stringify(kanbanTasks)); }
 
     function renderKanban() {
+      const sortBy = document.getElementById('kanban-sort-by')?.value || 'urgency';
+
+      const urgencyLabels = { 1: "🟢 Basse", 2: "🟡 Moyenne", 3: "🟠 Haute", 4: "🔴 URGENT" };
+      const typeBadges = {
+        lecture: "📖 Lecture", livrable: "📝 Livrable", rendezvous: "🤝 Réunion", preparation: "🛠️ Préparation"
+      };
+
       ['todo', 'doing', 'done'].forEach(status => {
         const col = document.getElementById(`col-${status}`);
-        const tasks = kanbanTasks.filter(t => t.status === status);
+        let tasks = kanbanTasks.filter(t => t.status === status);
+
+        // Tri
+        if (sortBy === 'urgency') tasks.sort((a,b) => b.urgency - a.urgency);
+        else if (sortBy === 'dueDate') tasks.sort((a,b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999'));
+        else if (sortBy === 'ue') tasks.sort((a,b) => a.ue.localeCompare(b.ue));
+
         document.getElementById(`count-${status}`).innerText = tasks.length;
 
         col.innerHTML = tasks.map(t => `
-          <div id="${t.id}" draggable="true" ondragstart="drag(event)" class="p-3 bg-slate-800 rounded-lg border border-slate-700 cursor-move flex justify-between items-start space-x-2">
-            <div>
-              <p class="text-sm font-bold text-slate-200">${t.title}</p>
-              <p class="text-xs text-slate-400 mt-1">${t.ue} - Coût : ${t.cost} PT Charge</p>
+          <div id="${t.id}" draggable="true" ondragstart="drag(event)" class="p-3 bg-slate-800 rounded-lg border border-slate-700 cursor-move space-y-2">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[9px] bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-amber-300 font-mono">${typeBadges[t.type] || '📌 Quête'}</span>
+                <p class="text-sm font-bold text-slate-100 mt-1">${t.title}</p>
+                <p class="text-[11px] text-slate-400">${t.ue} • Coût: ${t.cost} PT</p>
+              </div>
+              <div class="flex flex-col gap-1 items-end">
+                <span class="text-[10px] font-bold ${t.urgency >= 3 ? 'text-rose-400' : 'text-slate-400'}">${urgencyLabels[t.urgency]}</span>
+                <button onclick="deleteTask('${t.id}')" class="text-[10px] text-rose-400 hover:underline">✕</button>
+              </div>
             </div>
-            <div class="flex flex-col gap-1">
-              ${status !== 'done' ? `<button onclick="moveTask('${t.id}', '${status === 'todo' ? 'doing' : 'done'}')" class="text-[10px] bg-slate-700 hover:bg-slate-600 px-1.5 py-0.5 rounded text-emerald-400">➡️</button>` : ''}
-              <button onclick="deleteTask('${t.id}')" class="text-[10px] text-rose-400 hover:underline">✕</button>
+
+            ${t.desc ? `<p class="text-xs text-slate-300 bg-slate-900/50 p-2 rounded border border-slate-800 italic">${t.desc}</p>` : ''}
+
+            <!-- Jalons -->
+            ${t.subGoals && t.subGoals.length > 0 ? `
+              <div class="space-y-1 pt-1 border-t border-slate-700/50">
+                <p class="text-[10px] text-slate-400 font-semibold uppercase">Jalons & Sous-objectifs (+5 XP) :</p>
+                ${t.subGoals.map(sg => `
+                  <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                    <input type="checkbox" ${sg.done ? 'checked' : ''} onchange="toggleSubGoal('${t.id}', '${sg.id}')" class="rounded accent-emerald-500">
+                    <span class="${sg.done ? 'line-through text-slate-500' : ''}">${sg.title}</span>
+                  </label>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <div class="flex justify-between items-center pt-2 text-[10px] text-slate-400 border-t border-slate-700/50">
+              <span>📅 ${t.dueDate ? t.dueDate : 'Sans date'}</span>
+              ${status !== 'done' ? `
+                <button onclick="moveTask('${t.id}', '${status === 'todo' ? 'doing' : 'done'}')" class="bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-emerald-400 font-bold">Avancer ➡️</button>
+              ` : '<span class="text-emerald-400 font-bold">Complété ✅</span>'}
             </div>
           </div>
         `).join('');
       });
 
       const nextTaskEl = document.getElementById('dash-next-task');
-      const firstTodo = kanbanTasks.find(t => t.status === 'todo');
-      if (nextTaskEl) nextTaskEl.innerText = firstTodo ? firstTodo.title : 'Aucune tâche urgente';
+      const urgentTodo = kanbanTasks.filter(t => t.status === 'todo').sort((a,b) => b.urgency - a.urgency)[0];
+      if (nextTaskEl) nextTaskEl.innerText = urgentTodo ? urgentTodo.title : 'Aucune tâche urgente';
       updateMentalLoadUI();
+    }
+
+    // AGENDA / ICAL
+    function promptCalendarUrl() {
+      const url = prompt("Entre l'URL d'intégration de ton Google Calendar (Lien iCal / Iframe) :", document.getElementById('calendar-iframe').src);
+      if (url) document.getElementById('calendar-iframe').src = url;
+    }
+
+    // ESPACE RESSOURCES LOGIC
+    function toggleAddResourceModal() {
+      document.getElementById('add-resource-form-box').classList.toggle('hidden');
+    }
+
+    function addNewResource() {
+      const title = document.getElementById('res-title').value.trim();
+      const type = document.getElementById('res-type').value;
+      const url = document.getElementById('res-url').value.trim();
+
+      if (!title || !url) return alert("Le titre et l'URL sont obligatoires.");
+
+      resourcesList.push({ id: Date.now(), title, type, url });
+      localStorage.setItem('ergo_resources_list', JSON.stringify(resourcesList));
+      renderResources();
+      toggleAddResourceModal();
+      document.getElementById('res-title').value = '';
+      document.getElementById('res-url').value = '';
+    }
+
+    function deleteResource(id) {
+      resourcesList = resourcesList.filter(r => r.id !== id);
+      localStorage.setItem('ergo_resources_list', JSON.stringify(resourcesList));
+      renderResources();
+    }
+
+    function renderResources() {
+      const box = document.getElementById('resources-list-box');
+      if (!box) return;
+      if (resourcesList.length === 0) {
+        box.innerHTML = `<p class="text-xs text-slate-500 italic col-span-full">Aucune ressource enregistrée pour le moment.</p>`;
+        return;
+      }
+      box.innerHTML = resourcesList.map(r => `
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-start space-x-2">
+          <div>
+            <span class="text-[9px] bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-emerald-400">${r.type}</span>
+            <h4 class="text-sm font-bold text-slate-100 mt-1">${r.title}</h4>
+            <a href="${r.url}" target="_blank" class="text-xs text-amber-400 hover:underline mt-2 inline-block">🔗 Ouvrir la ressource</a>
+          </div>
+          <button onclick="deleteResource(${r.id})" class="text-xs text-rose-400 hover:underline">Supprimer</button>
+        </div>
+      `).join('');
     }
 
     // CRM LOGIC
@@ -689,7 +983,7 @@
       `).join('');
     }
 
-    // JDB & SPORT LOGIC
+    // JDB LOGIC (Humeur & Satisfaction identiques 1-10)
     function updateMoodLabel(val) {
       const el = document.getElementById('val-jdb-mood');
       const desc = document.getElementById('lbl-mood-desc');
@@ -702,6 +996,21 @@
       else if (v <= 6) t = "😐 Neutre / Correct";
       else if (v <= 8) t = "😊 Bonne forme";
       else t = "⚡ Excellente forme !";
+      if (desc) desc.innerText = t;
+    }
+
+    function updateSatisfactionLabel(val) {
+      const el = document.getElementById('val-jdb-satisfaction');
+      const desc = document.getElementById('lbl-satisfaction-desc');
+      if (el) el.innerText = `${val}/10`;
+
+      const v = parseInt(val);
+      let t = "🙂 Bonne satisfaction";
+      if (v <= 2) t = "🔴 Très insatisfaisant";
+      else if (v <= 4) t = "🟠 Passable";
+      else if (v <= 6) t = "🟡 Correct";
+      else if (v <= 8) t = "🟢 Très satisfaisant";
+      else t = "⚡ Parfait !";
       if (desc) desc.innerText = t;
     }
 
@@ -1047,7 +1356,6 @@
       renderVoyageur();
     }
 
-    // CSV TEMPLATE COMPLET
     function downloadCSVTemplate() {
       const csvContent = "data:text/csv;charset=utf-8,date,teachings,mood,satisfaction,sleepOnset,sleepWake,sleepQuality,saeWork,saeSport,saeSocial\n2026-09-26,\"Observation des postes de travail\",8,8,8,7,8,8,6,7";
       const encodedUri = encodeURI(csvContent);
@@ -1205,7 +1513,7 @@
             ${(e.sports && e.sports.length) ? `<div class="mt-2 flex flex-wrap gap-1">${e.sports.map(s => `<span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.title || s.type} (${s.duration}m)</span>`).join('')}</div>` : ''}
           </div>
           <div class="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-            <span class="text-slate-500">Sommeil (R/E/Q): ${e.sleepWake||'-'}/${e.sleepOnset||'-'}/${e.sleepQuality||'-'}</span>
+            <span class="text-slate-500">Satisf: ${e.satisfaction || '-'}/10</span>
             <div class="space-x-2">
               <button onclick="editEntry(${e.id})" class="text-emerald-400 hover:underline">Éditer</button>
               <button onclick="deleteEntry(${e.id})" class="text-rose-400 hover:underline">Supprimer</button>
@@ -1223,7 +1531,9 @@
       document.getElementById('jdb-teachings').value = item.teachings;
       document.getElementById('jdb-mood').value = item.mood || 5;
       updateMoodLabel(item.mood || 5);
+      
       document.getElementById('jdb-satisfaction').value = item.satisfaction || 7;
+      updateSatisfactionLabel(item.satisfaction || 7);
       
       document.getElementById('sleep-onset').value = item.sleepOnset || 7;
       document.getElementById('val-sleep-onset').innerText = (item.sleepOnset || 7) + '/10';
