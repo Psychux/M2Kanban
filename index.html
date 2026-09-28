@@ -24,8 +24,6 @@
   <!-- Header Navigation -->
   <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-      
-      <!-- Logo & Navigation -->
       <div class="flex items-center space-x-6">
         <div class="cursor-pointer flex items-center space-x-2" onclick="switchTab('dashboard')">
           <div id="main-logo-container">
@@ -41,7 +39,6 @@
         </nav>
       </div>
 
-      <!-- Options Logo & Profil -->
       <div class="flex items-center space-x-3">
         <select onchange="changeLogoStyle(this.value)" class="bg-slate-900 text-[10px] text-slate-300 border border-slate-700 rounded px-2 py-1">
           <option value="A">Style: 🌿 ERGO.HUB</option>
@@ -64,7 +61,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </header>
 
@@ -98,28 +94,20 @@
 
     <!-- TAB 2: WORKSPACE -->
     <section id="sec-workspace" class="hidden space-y-6">
-      
-      <!-- Sous-Barre Workspace -->
       <div class="flex space-x-2 border-b border-slate-700 pb-3">
-        <button onclick="switchWorkspaceSubTab('kanban')" id="wsubtab-kanban" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">
-          📋 Arbre de Quêtes & Kanban
-        </button>
-        <button onclick="switchWorkspaceSubTab('agenda')" id="wsubtab-agenda" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
-          📅 Agenda & Emploi du Temps
-        </button>
-        <button onclick="switchWorkspaceSubTab('resources')" id="wsubtab-resources" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
-          📚 Espace Ressources
-        </button>
+        <button onclick="switchWorkspaceSubTab('kanban')" id="wsubtab-kanban" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">📋 Arbre de Quêtes & Kanban</button>
+        <button onclick="switchWorkspaceSubTab('agenda')" id="wsubtab-agenda" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">📅 Agenda & Emploi du Temps</button>
+        <button onclick="switchWorkspaceSubTab('resources')" id="wsubtab-resources" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">📚 Espace Ressources</button>
       </div>
 
-      <!-- SOUS-ONGLET KANBAN -->
+      <!-- KANBAN -->
       <div id="wsub-kanban" class="space-y-6">
         <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
           <div class="flex items-center gap-3">
             <h2 class="text-lg font-bold">Kanban des Quêtes & Sous-Quêtes</h2>
             <select id="kanban-sort-by" onchange="renderKanban()" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300">
               <option value="urgency">Trier par Urgence</option>
-              <option value="dueDate">Trier par Échéance Ultime</option>
+              <option value="dueDate">Trier par Échéance</option>
               <option value="ue">Trier par UE / Matière</option>
             </select>
           </div>
@@ -131,14 +119,12 @@
           </div>
         </div>
 
-        <!-- Formulaire de Création de Quête -->
         <div id="add-task-form-box" class="hidden bg-slate-800 p-5 rounded-xl border border-slate-700 space-y-4">
-          <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">Créer une Quête Principale (Projet / Livrable Majeur)</h3>
-          
+          <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">Créer une Quête Principale</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
             <div>
               <label class="block text-slate-400 mb-1">Titre de la Quête Principale *</label>
-              <input type="text" id="new-task-title" placeholder="ex: Livrable Synthèse d'Ouvrage" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+              <input type="text" id="new-task-title" placeholder="ex: Livrable Synthèse" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
             </div>
             <div>
               <label class="block text-slate-400 mb-1">UE / Matière</label>
@@ -166,157 +152,113 @@
               </select>
             </div>
           </div>
-
           <div>
             <label class="block text-xs text-slate-400 mb-1">Description / Objectif Global</label>
-            <textarea id="new-task-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200" placeholder="Explication du rendu final..."></textarea>
+            <textarea id="new-task-desc" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-slate-200" placeholder="Explication..."></textarea>
           </div>
-
           <div class="space-y-3 pt-3 border-t border-slate-700">
             <div class="flex justify-between items-center">
               <div>
-                <h4 class="text-xs font-bold text-amber-400">Balisage des Sous-Quêtes & Jalons Autonomes</h4>
-                <p class="text-[10px] text-slate-400">Chaque sous-quête complétée offre +10 XP.</p>
+                <h4 class="text-xs font-bold text-amber-400">Balisage des Sous-Quêtes & Jalons</h4>
               </div>
               <button type="button" onclick="addSubQuestInput()" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-emerald-400 font-bold border border-slate-600">+ Ajouter une Sous-Quête</button>
             </div>
             <div id="subquests-input-container" class="space-y-3"></div>
           </div>
-
           <div class="flex justify-end gap-2 pt-2">
             <button onclick="toggleAddTaskModal()" class="px-3 py-1.5 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
-            <button onclick="addNewTask()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs rounded font-bold text-white">Créer l'Arbre de Quêtes</button>
+            <button onclick="addNewTask()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs rounded font-bold text-white">Créer l'Arbre</button>
           </div>
         </div>
 
-        <!-- Colonnes Kanban -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
-            <h3 class="font-bold text-slate-300 mb-3 flex justify-between items-center">
-              <span>📌 À Faire</span>
-              <span id="count-todo" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400">0</span>
-            </h3>
+            <h3 class="font-bold text-slate-300 mb-3 flex justify-between items-center"><span>📌 À Faire</span><span id="count-todo" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400">0</span></h3>
             <div id="col-todo" class="space-y-3 flex-grow" ondrop="drop(event, 'todo')" ondragover="allowDrop(event)"></div>
           </div>
-
           <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
-            <h3 class="font-bold text-amber-400 mb-3 flex justify-between items-center">
-              <span>⚡ En Cours</span>
-              <span id="count-doing" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-400">0</span>
-            </h3>
+            <h3 class="font-bold text-amber-400 mb-3 flex justify-between items-center"><span>⚡ En Cours</span><span id="count-doing" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-amber-400">0</span></h3>
             <div id="col-doing" class="space-y-3 flex-grow" ondrop="drop(event, 'doing')" ondragover="allowDrop(event)"></div>
           </div>
-
           <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 flex flex-col min-h-[350px]">
-            <h3 class="font-bold text-emerald-400 mb-3 flex justify-between items-center">
-              <span>✅ Terminé (+50 XP)</span>
-              <span id="count-done" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-emerald-400">0</span>
-            </h3>
+            <h3 class="font-bold text-emerald-400 mb-3 flex justify-between items-center"><span>✅ Terminé</span><span id="count-done" class="text-xs bg-slate-800 px-2 py-0.5 rounded text-emerald-400">0</span></h3>
             <div id="col-done" class="space-y-3 flex-grow" ondrop="drop(event, 'done')" ondragover="allowDrop(event)"></div>
           </div>
         </div>
       </div>
 
-      <!-- SOUS-ONGLET AGENDA -->
+      <!-- AGENDA -->
       <div id="wsub-agenda" class="hidden space-y-4">
         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center flex-wrap gap-2">
-          <div>
-            <h3 class="text-base font-bold text-amber-400">📅 Agenda & Emploi du Temps</h3>
-            <p class="text-xs text-slate-400">Visualise tes prochains cours et échéances.</p>
-          </div>
-          <button onclick="promptCalendarUrl()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-emerald-400 border border-slate-600">⚙️ Configurer Google Calendar</button>
+          <div><h3 class="text-base font-bold text-amber-400">📅 Agenda M2</h3></div>
+          <button onclick="promptCalendarUrl()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-emerald-400 border border-slate-600">⚙️ Configurer iFrame</button>
         </div>
         <div class="bg-slate-900 rounded-xl border border-slate-700 p-2 h-[500px] overflow-hidden">
           <iframe id="calendar-iframe" src="https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com&ctz=Europe%2FParis" style="border: 0" width="100%" height="100%" frameborder="0" scrolling="no"></iframe>
         </div>
       </div>
 
-      <!-- SOUS-ONGLET RESSOURCES -->
+      <!-- RESSOURCES -->
       <div id="wsub-resources" class="hidden space-y-4">
         <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-2">
-          <div>
-            <h3 class="text-base font-bold text-emerald-400">📚 Espace Ressources Ergonomie</h3>
-            <p class="text-xs text-slate-400">Banque de liens, articles et dossiers Drive.</p>
-          </div>
+          <div><h3 class="text-base font-bold text-emerald-400">📚 Espace Ressources Ergonomie</h3></div>
           <button onclick="toggleAddResourceModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white">+ Nouvelle Ressource</button>
         </div>
-
         <div id="add-resource-form-box" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-          <h4 class="text-xs font-bold text-emerald-400 uppercase">Ajouter un document / lien</h4>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <input type="text" id="res-title" placeholder="Titre de la ressource" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+            <input type="text" id="res-title" placeholder="Titre" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
             <select id="res-type" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-              <option value="Article / Doc">📄 Article / Document</option>
-              <option value="Lien Web">🌐 Lien Web / Site</option>
+              <option value="Article / Doc">📄 Article / Doc</option>
+              <option value="Lien Web">🌐 Lien Web</option>
               <option value="Dossier Drive">📁 Dossier Drive</option>
-              <option value="Outil / Logiciel">🛠️ Outil / Logiciel</option>
             </select>
-            <input type="url" id="res-url" placeholder="URL complète (https://...)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+            <input type="url" id="res-url" placeholder="URL (https://...)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
           </div>
           <div class="flex justify-end gap-2">
             <button onclick="toggleAddResourceModal()" class="px-3 py-1 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
             <button onclick="addNewResource()" class="px-3 py-1 bg-emerald-600 text-xs rounded font-bold text-white">Enregistrer</button>
           </div>
         </div>
-
         <div id="resources-list-box" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
       </div>
-
     </section>
 
     <!-- TAB 3: CRM -->
     <section id="sec-crm" class="hidden space-y-6">
       <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
-        <div>
-          <h2 class="text-xl font-bold">Réseau Pro Ergonomie (CRM)</h2>
-          <p class="text-xs text-slate-400">Gère tes contacts professionnels, tuteurs, enseignants et paires.</p>
-        </div>
-        <button onclick="toggleAddCrmModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">+ Nouveau Contact</button>
+        <div><h2 class="text-xl font-bold">Réseau Pro Ergonomie (CRM)</h2></div>
+        <button onclick="toggleAddCrmModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white">+ Nouveau Contact</button>
       </div>
-
       <div id="add-crm-form-box" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-        <h3 class="text-sm font-bold text-emerald-400">Ajouter un contact pro</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-          <input type="text" id="crm-name" placeholder="Nom complet" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-          <input type="text" id="crm-role" placeholder="Rôle (ex: Ergonome)" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-          <input type="text" id="crm-org" placeholder="Structure / Université" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-          <input type="text" id="crm-contact" placeholder="Email / LinkedIn / Tel" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <input type="text" id="crm-name" placeholder="Nom" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <input type="text" id="crm-role" placeholder="Rôle" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <input type="text" id="crm-org" placeholder="Structure" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+          <input type="text" id="crm-contact" placeholder="Email / Tel" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
         </div>
         <div class="flex justify-end gap-2">
           <button onclick="toggleAddCrmModal()" class="px-3 py-1 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
           <button onclick="addNewCrmContact()" class="px-3 py-1 bg-emerald-600 text-xs rounded font-bold text-white">Enregistrer</button>
         </div>
       </div>
-
       <div id="crm-contacts-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- TAB 4: VOYAGEUR & JOURNAL DE BORD -->
+    <!-- TAB 4: VOYAGEUR & JDB -->
     <section id="sec-voyageur" class="hidden space-y-6">
-      
       <div class="flex space-x-2 border-b border-slate-700 pb-3">
-        <button onclick="switchVoyageurSubTab('gamification')" id="vsubtab-gamification" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">
-          🛡️ Fiche Personnage
-        </button>
-        <button onclick="switchVoyageurSubTab('quest')" id="vsubtab-quest" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
-          📜 Quête Journalière & Archives Accordéon
-        </button>
-        <button onclick="switchVoyageurSubTab('analytics')" id="vsubtab-analytics" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">
-          📊 Exportation & Synthèse à la Carte
-        </button>
+        <button onclick="switchVoyageurSubTab('gamification')" id="vsubtab-gamification" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">🛡️ Fiche Personnage</button>
+        <button onclick="switchVoyageurSubTab('quest')" id="vsubtab-quest" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">📜 Quête Journalière</button>
+        <button onclick="switchVoyageurSubTab('analytics')" id="vsubtab-analytics" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">📊 Dashboard & Sport</button>
+        <button onclick="switchVoyageurSubTab('archives')" id="vsubtab-archives" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">🗂️ Archives & Export</button>
       </div>
 
-      <!-- SOUS-ONGLET 1: GAMIFICATION -->
+      <!-- GAMIFICATION -->
       <div id="vsub-gamification" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-            <div class="flex justify-between items-center">
-              <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🛡️ Statut du Voyageur</h2>
-              <span id="hero-level-badge" class="px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-xs font-bold">Niveau 1</span>
-            </div>
-
+            <h2 class="text-xl font-bold text-amber-400">🛡️ Statut du Voyageur</h2>
             <div id="archetype-selection-box"></div>
-
             <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 space-y-2">
               <div class="flex justify-between items-center text-xs">
                 <span class="font-bold text-slate-300">Points à attribuer :</span>
@@ -325,109 +267,76 @@
               <div id="stats-container" class="space-y-2 text-xs"></div>
             </div>
           </div>
-
           <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
             <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">📦 Sac d'Inventaire</h3>
             <div id="inventory-list" class="flex flex-wrap gap-2 p-3 bg-slate-900 rounded-lg border border-slate-700 min-h-[80px]"></div>
-
-            <div class="pt-3 border-t border-slate-700">
-              <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">🌳 Arbre de Compétences (Passif)</h3>
-              <div class="space-y-2 text-xs">
-                <div class="p-2.5 bg-slate-900/60 rounded-lg border border-slate-700 flex justify-between items-center">
-                  <span>🔍 Focus Observation</span>
-                  <span class="text-[10px] text-emerald-400 font-bold">Niv. 2</span>
-                </div>
-                <div class="p-2.5 bg-slate-900/60 rounded-lg border border-slate-700 flex justify-between items-center opacity-60">
-                  <span>🛡️ Résilience Cognitive</span>
-                  <span class="text-[10px] text-slate-500">Niv. 4</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- SOUS-ONGLET 2: SAISIE & ARCHIVES ACCORDÉON -->
+      <!-- QUÊTE JOURNALIÈRE -->
       <div id="vsub-quest" class="hidden space-y-6">
-        
-        <!-- Formulaire de saisie JdB -->
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <div class="flex justify-between items-center flex-wrap gap-2">
-            <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">📜 Saisie de la Quête Journalière</h2>
-            <span id="quest-status-badge" class="text-xs px-2.5 py-1 rounded bg-slate-700 text-slate-300">Saisie active</span>
-          </div>
-          
+          <h2 class="text-xl font-bold text-emerald-400">📜 Saisie de la Quête Journalière</h2>
           <div class="flex space-x-2 border-b border-slate-700 pb-2">
-            <button onclick="switchFormTab(1)" id="ftab-1" class="px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white">1. Réflexivité & Mood</button>
+            <button onclick="switchFormTab(1)" id="ftab-1" class="px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white">1. Réflexivité</button>
             <button onclick="switchFormTab(2)" id="ftab-2" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">2. Sommeil</button>
-            <button onclick="switchFormTab(3)" id="ftab-3" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">3. SAE (Efficacité)</button>
-            <button onclick="switchFormTab(4)" id="ftab-4" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">4. Sport (Optionnel)</button>
+            <button onclick="switchFormTab(3)" id="ftab-3" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">3. SAE</button>
+            <button onclick="switchFormTab(4)" id="ftab-4" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">4. Sport</button>
           </div>
 
           <form id="form-jdb" onsubmit="saveJdbEntry(event)" class="space-y-4">
-            
             <div id="fsec-1" class="space-y-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-300 mb-1">Date du bilan</label>
                 <input type="date" id="jdb-custom-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-amber-300 font-mono">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Enseignements & Observations Réflexives</label>
-                <textarea id="jdb-teachings" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Qu'as-tu appris ou observé aujourd'hui..."></textarea>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Enseignements & Observations</label>
+                <textarea id="jdb-teachings" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Qu'as-tu appris..."></textarea>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-1">
-                  <label class="block text-xs font-semibold text-slate-300">Humeur du jour : <span id="val-jdb-mood" class="text-amber-400 font-bold">5/10</span></label>
+                  <label class="block text-xs font-semibold text-slate-300">Humeur : <span id="val-jdb-mood" class="text-amber-400 font-bold">5/10</span></label>
                   <input type="range" id="jdb-mood" min="1" max="10" value="5" oninput="updateMoodLabel(this.value)" class="w-full accent-amber-500">
                   <p id="lbl-mood-desc" class="text-[10px] text-slate-400 italic">😐 Neutre</p>
                 </div>
                 <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-1">
-                  <label class="block text-xs font-semibold text-slate-300">Satisfaction générale : <span id="val-jdb-satisfaction" class="text-emerald-400 font-bold">7/10</span></label>
+                  <label class="block text-xs font-semibold text-slate-300">Satisfaction : <span id="val-jdb-satisfaction" class="text-emerald-400 font-bold">7/10</span></label>
                   <input type="range" id="jdb-satisfaction" min="1" max="10" value="7" oninput="updateSatisfactionLabel(this.value)" class="w-full accent-emerald-500">
-                  <p id="lbl-satisfaction-desc" class="text-[10px] text-slate-400 italic">🙂 Bonne satisfaction</p>
+                  <p id="lbl-satisfaction-desc" class="text-[10px] text-slate-400 italic">🙂 Bonne</p>
                 </div>
               </div>
             </div>
 
             <div id="fsec-2" class="hidden space-y-4">
-              <p class="text-xs text-slate-400 font-semibold uppercase">Évaluation du sommeil & récupération (1 à 10) :</p>
               <div class="space-y-3 bg-slate-900 p-4 rounded-lg border border-slate-700">
                 <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-slate-300">Qualité d'endormissement</span>
-                    <span id="val-sleep-onset" class="text-emerald-400 font-bold">7/10</span>
-                  </div>
+                  <div class="flex justify-between text-xs mb-1"><span class="text-slate-300">Endormissement</span><span id="val-sleep-onset" class="text-emerald-400 font-bold">7/10</span></div>
                   <input type="range" id="sleep-onset" min="1" max="10" value="7" oninput="document.getElementById('val-sleep-onset').innerText=this.value+'/10'" class="w-full accent-emerald-500">
                 </div>
                 <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-slate-300">Qualité du réveil</span>
-                    <span id="val-sleep-wake" class="text-emerald-400 font-bold">6/10</span>
-                  </div>
+                  <div class="flex justify-between text-xs mb-1"><span class="text-slate-300">Réveil</span><span id="val-sleep-wake" class="text-emerald-400 font-bold">6/10</span></div>
                   <input type="range" id="sleep-wake" min="1" max="10" value="6" oninput="document.getElementById('val-sleep-wake').innerText=this.value+'/10'" class="w-full accent-emerald-500">
                 </div>
                 <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="text-slate-300">Qualité de sommeil globale perçue</span>
-                    <span id="val-sleep-quality" class="text-emerald-400 font-bold">7/10</span>
-                  </div>
+                  <div class="flex justify-between text-xs mb-1"><span class="text-slate-300">Qualité Globale</span><span id="val-sleep-quality" class="text-emerald-400 font-bold">7/10</span></div>
                   <input type="range" id="sleep-quality" min="1" max="10" value="7" oninput="document.getElementById('val-sleep-quality').innerText=this.value+'/10'" class="w-full accent-emerald-500">
                 </div>
               </div>
             </div>
 
             <div id="fsec-3" class="hidden space-y-3">
-              <p class="text-xs text-slate-400 font-semibold uppercase">Sentiment d'auto-efficacité (SAE) (1 à 10) :</p>
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Travail exécuté : <span id="val-sae-work">7</span>/10</label>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Travail : <span id="val-sae-work">7</span>/10</label>
                 <input type="range" id="sae-work" min="1" max="10" value="7" oninput="document.getElementById('val-sae-work').innerText=this.value" class="w-full accent-emerald-500">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Pratique sportive : <span id="val-sae-sport">5</span>/10</label>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Sport : <span id="val-sae-sport">5</span>/10</label>
                 <input type="range" id="sae-sport" min="1" max="10" value="5" oninput="document.getElementById('val-sae-sport').innerText=this.value" class="w-full accent-emerald-500">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Vie personnelle & sociale : <span id="val-sae-social">7</span>/10</label>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Social : <span id="val-sae-social">7</span>/10</label>
                 <input type="range" id="sae-social" min="1" max="10" value="7" oninput="document.getElementById('val-sae-social').innerText=this.value" class="w-full accent-emerald-500">
               </div>
             </div>
@@ -437,1327 +346,97 @@
                 <span class="text-xs font-bold text-slate-300">Séances effectuées</span>
                 <button type="button" onclick="addSportBlock()" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-emerald-400 font-bold border border-slate-600">+ Ajouter une séance</button>
               </div>
-
               <div id="sports-container" class="space-y-3"></div>
             </div>
 
             <button type="submit" id="btn-submit-jdb" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-bold text-sm transition">Consigner le Bilan</button>
           </form>
         </div>
-
-        <!-- Archives sous forme d'Accordéon Temporel -->
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <div class="flex justify-between items-center flex-wrap gap-2">
-            <div>
-              <h2 class="text-xl font-bold text-slate-200">🗂️ Archives Hiérarchisées (Année > Mois > Semaine)</h2>
-              <p class="text-xs text-slate-400">Navigue dans l'historique sans surcharger ton affichage.</p>
-            </div>
-          </div>
-
-          <!-- Arborescence Générée -->
-          <div id="jdb-accordion-tree" class="space-y-3">
-            <p class="text-xs text-slate-500 italic">Aucun bilan archivé pour le moment.</p>
-          </div>
-        </div>
-
       </div>
 
-      <!-- SOUS-ONGLET 3: EXPORTATION & SYNTHÈSE À LA CARTE -->
+      <!-- DASHBOARD & ANALYTICS -->
       <div id="vsub-analytics" class="hidden space-y-6">
-        
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-6">
-          <div class="flex justify-between items-center flex-wrap gap-2 border-b border-slate-700 pb-4">
-            <div>
-              <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">🛠️ Centre d'Exportation & Synthèse à la Carte</h2>
-              <p class="text-xs text-slate-400">Génère un document sur-mesure (CSV ou Synthèse Textuelle) selon tes critères exacts.</p>
-            </div>
-          </div>
-
-          <!-- ÉTAPE 1: Choix de la Période -->
-          <div class="space-y-3">
-            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">1. Choix de la Période Temporelle</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs">
-              <div class="col-span-1 sm:col-span-2">
-                <label class="block text-slate-400 mb-1">Prédéfinis Rapides</label>
-                <select id="export-period-preset" onchange="handleExportPeriodPreset(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-                  <option value="custom">Plage Personnalisée (Saisie ci-contre)</option>
-                  <option value="curr_week">Semaine en Cours</option>
-                  <option value="prev_week">Semaine Précédente</option>
-                  <option value="curr_month" selected>Mois en Cours</option>
-                  <option value="prev_month">Mois Précédent</option>
-                  <option value="t1">Trimestre T1 (Jan - Mar)</option>
-                  <option value="t2">Trimestre T2 (Avr - Jun)</option>
-                  <option value="t3">Trimestre T3 (Jul - Sep)</option>
-                  <option value="t4">Trimestre T4 (Oct - Dec)</option>
-                  <option value="sem1">Semestre S1 (Sep - Jan)</option>
-                  <option value="sem2">Semestre S2 (Feb - Jun)</option>
-                  <option value="year">Année Universitaire Complexe</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-slate-400 mb-1">Du</label>
-                <input type="date" id="export-date-from" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-amber-300 font-mono">
-              </div>
-              <div>
-                <label class="block text-slate-400 mb-1">Au</label>
-                <input type="date" id="export-date-to" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-amber-300 font-mono">
-              </div>
-            </div>
-          </div>
-
-          <!-- ÉTAPE 2: Sélection des Variables -->
-          <div class="space-y-3 pt-4 border-t border-slate-700">
-            <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">2. Variables & Dimensions à inclure dans le document</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              
-              <!-- Groupe Sommeil -->
-              <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
-                <p class="font-bold text-teal-400">😴 Sommeil & Récupération</p>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sleep-quality" checked class="accent-emerald-500 rounded">
-                  <span>Qualité Globale Perçue</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sleep-onset" checked class="accent-emerald-500 rounded">
-                  <span>Qualité d'Endormissement</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sleep-wake" checked class="accent-emerald-500 rounded">
-                  <span>Qualité du Réveil</span>
-                </label>
-              </div>
-
-              <!-- Groupe Sports -->
-              <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
-                <p class="font-bold text-amber-400">🏃 Disciplines & Allures Sport</p>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sport-run" checked class="accent-emerald-500 rounded">
-                  <span>Course à pied (Distance, Allure, Allure/Type)</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sport-wingchun" checked class="accent-emerald-500 rounded">
-                  <span>Wing Chun</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sport-taiji" checked class="accent-emerald-500 rounded">
-                  <span>TaiJi</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sport-renf" checked class="accent-emerald-500 rounded">
-                  <span>Renforcement Musculaire</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sport-mob" checked class="accent-emerald-500 rounded">
-                  <span>Mobilité & Souplesse</span>
-                </label>
-              </div>
-
-              <!-- Groupe SAE & Réflexivité -->
-              <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 space-y-2">
-                <p class="font-bold text-emerald-400">🧠 SAE & Réflexivité M2</p>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sae-work" checked class="accent-emerald-500 rounded">
-                  <span>SAE Travail / Master</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sae-sport" checked class="accent-emerald-500 rounded">
-                  <span>SAE Sport</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-sae-social" checked class="accent-emerald-500 rounded">
-                  <span>SAE Vie Personnelle & Sociale</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="chk-text-teachings" checked class="accent-emerald-500 rounded">
-                  <span>Verbatims Enseignements / Observations</span>
-                </label>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- ÉTAPE 3: Actions d'Exportation -->
-          <div class="flex justify-end gap-3 pt-4 border-t border-slate-700">
-            <button onclick="generateCustomExportCSV()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-emerald-400 border border-slate-600 transition">
-              📥 Télécharger le CSV Ciffré
-            </button>
-            <button onclick="generateCustomSynthesisText()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">
-              📊 Générer le Rapport Réflexif
-            </button>
-          </div>
-
-          <!-- Zone d'affichage du Rapport Généré -->
-          <div id="export-report-output" class="hidden space-y-3 bg-slate-900 p-4 rounded-xl border border-slate-700">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-              <h4 class="text-sm font-bold text-amber-300">📄 Rapport de Bilan Généré</h4>
-              <button onclick="navigator.clipboard.writeText(document.getElementById('report-text-content').innerText); alert('Copié dans le presse-papier !');" class="px-2.5 py-1 bg-slate-800 text-[11px] rounded text-emerald-400 border border-slate-700 hover:underline">📋 Copier le texte</button>
-            </div>
-            <pre id="report-text-content" class="text-xs text-slate-300 whitespace-pre-wrap font-sans leading-relaxed"></pre>
-          </div>
-
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-xs text-slate-400 font-semibold uppercase">Humeur Moyenne</span><p id="kpi-mood" class="text-2xl font-black text-emerald-400 mt-1">- / 10</p></div>
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-xs text-slate-400 font-semibold uppercase">Sommeil (Moy)</span><p id="kpi-sleep" class="text-2xl font-black text-teal-400 mt-1">- / 10</p></div>
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-xs text-slate-400 font-semibold uppercase">Volume Sport</span><p id="kpi-sport-hours" class="text-2xl font-black text-amber-400 mt-1">0h00</p><p id="kpi-course-km" class="text-xs text-slate-400 mt-1">Course : 0 km</p></div>
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-xs text-slate-400 font-semibold uppercase">Disciplines</span><div class="text-xs mt-2 space-y-1 text-slate-300"><p>🥋 AM / Wing Chun : <b id="kpi-am-h">0h</b></p><p>💪 Renf. : <b id="kpi-renf-h">0h</b></p><p>🧘 Mob. : <b id="kpi-mob-h">0h</b></p></div></div>
         </div>
 
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+          <h3 class="text-sm font-bold text-slate-300">Évolution SAE</h3>
+          <div class="h-64 relative"><canvas id="chart-sae"></canvas></div>
+        </div>
+
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+          <h3 class="text-base font-bold text-amber-400">🔍 Centre d'Analyse Sportive</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-slate-900 rounded-lg border border-slate-700 text-xs">
+            <select id="filter-sport-type" onchange="applySportFilters()" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
+              <option value="all">Toutes disciplines</option>
+              <option value="course">Course</option>
+              <option value="wing_chun">Wing Chun</option>
+              <option value="taiji">TaiJi</option>
+              <option value="renforcement">Renforcement</option>
+              <option value="mobilite">Mobilité</option>
+            </select>
+            <input type="number" id="filter-sport-dur" placeholder="Durée min (min)" oninput="applySportFilters()" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
+            <input type="number" id="filter-sport-hr" placeholder="FC min (BPM)" oninput="applySportFilters()" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300 border-collapse">
+              <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[10px]"><th class="p-2">Date</th><th class="p-2">Séance</th><th class="p-2">Discipline</th><th class="p-2">Durée</th><th class="p-2">Volume</th><th class="p-2">FC</th><th class="p-2">RPE</th></tr></thead>
+              <tbody id="sport-filtered-tbody" class="divide-y divide-slate-800"><tr><td colspan="7" class="p-3 text-center text-slate-500 italic">Aucune séance.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARCHIVES & EXPORT -->
+      <div id="vsub-archives" class="hidden space-y-6">
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+          <h2 class="text-lg font-bold text-emerald-400">📥 Centre d'Exportation & Synthèse à la Carte</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 space-y-3">
+              <h3 class="text-xs font-bold text-amber-400 uppercase">1. Période</h3>
+              <select id="export-period-select" onchange="toggleCustomDatesExport(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-slate-200">
+                <option value="month_current">Mois en cours</option>
+                <option value="month_last">Mois précédent</option>
+                <option value="week_current">Semaine en cours</option>
+                <option value="custom">Personnalisé</option>
+              </select>
+              <div id="export-custom-dates-box" class="hidden grid grid-cols-2 gap-2">
+                <input type="date" id="export-date-from" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs text-amber-300">
+                <input type="date" id="export-date-to" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs text-amber-300">
+              </div>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 space-y-3">
+              <h3 class="text-xs font-bold text-amber-400 uppercase">2. Variables</h3>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <label class="flex items-center gap-1.5"><input type="checkbox" id="exp-var-sleep" checked class="accent-emerald-500"> Sommeil</label>
+                <label class="flex items-center gap-1.5"><input type="checkbox" id="exp-var-sae" checked class="accent-emerald-500"> SAE</label>
+                <label class="flex items-center gap-1.5"><input type="checkbox" id="exp-var-sports" checked class="accent-emerald-500"> Sports</label>
+                <label class="flex items-center gap-1.5"><input type="checkbox" id="exp-var-teachings" checked class="accent-emerald-500"> Verbatims</label>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 pt-2">
+            <button onclick="generateTextSummary()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-amber-300 rounded-lg text-xs font-bold">📊 Synthèse Textuelle</button>
+            <button onclick="exportCustomCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold">📥 Télécharger CSV</button>
+          </div>
+          <div id="summary-output-box" class="hidden p-4 bg-slate-950 border border-slate-700 rounded-lg space-y-2 text-xs font-mono text-slate-300"></div>
+        </div>
+
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+          <h2 class="text-lg font-bold text-slate-200">🗂️ Archives par Année > Mois</h2>
+          <div id="jdb-tree-container" class="space-y-3"></div>
+        </div>
       </div>
 
     </section>
 
   </main>
 
-  <script>
-    // Audio Synth Engine
-    const playRetroSound = (type) => {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        if (type === 'levelUp') {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(220, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
-          gain.gain.setValueAtTime(0.3, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-          osc.start(); osc.stop(ctx.currentTime + 0.3);
-        } else if (type === 'questDone') {
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(440, ctx.currentTime);
-          osc.frequency.setValueAtTime(660, ctx.currentTime + 0.1);
-          gain.gain.setValueAtTime(0.2, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-          osc.start(); osc.stop(ctx.currentTime + 0.25);
-        } else if (type === 'subGoal') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(520, ctx.currentTime);
-          gain.gain.setValueAtTime(0.1, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-          osc.start(); osc.stop(ctx.currentTime + 0.1);
-        }
-      } catch(e){}
-    };
-
-    const itemPool = [
-      { name: "Gourdin du Plan Méthodologique", type: "Arme", rarity: "Épique", desc: "+3 Méthodologie.", bonus: "methodologie:3" },
-      { name: "Robe de la Statistique Inférentielle", type: "Équipement", rarity: "Épique", desc: "+3 Analyse.", bonus: "analyse:3" },
-      { name: "Bâton de Bastien & Scapin", type: "Outil", rarity: "Rare", desc: "+2 Analyse Critique.", bonus: "analyse:2" },
-      { name: "Pinceau Figma Magique", type: "Outil", rarity: "Rare", desc: "+2 Créativité.", bonus: "creativite:2" },
-      { name: "Trousse de Soin Ergonomique", type: "Soin", rarity: "Consommable", desc: "Restaure 5 points de Charge Mentale.", bonus: "heal:5" }
-    ];
-
-    const classConfigs = {
-      psychologue_travail: { name: "Psychologue du Travail", stats: { empathie: 13, stress: 12, analyse: 10, creativite: 10, methodologie: 10 } },
-      facteurs_humains: { name: "Spécialiste Facteurs Humains", stats: { analyse: 13, methodologie: 12, stress: 10, empathie: 10, creativite: 9 } },
-      ux_designer: { name: "Ergonome UX / UI", stats: { creativite: 13, empathie: 12, analyse: 10, stress: 10, methodologie: 9 } },
-      px_designer: { name: "Player Experience Designer", stats: { creativite: 13, stress: 11, empathie: 11, analyse: 10, methodologie: 9 } },
-      chercheur: { name: "Chercheur en Ergonomie", stats: { methodologie: 13, analyse: 12, stress: 10, creativite: 10, empathie: 9 } }
-    };
-
-    // Global States
-    let hero = JSON.parse(localStorage.getItem('ergo_hero')) || {
-      classKey: 'psychologue_travail',
-      isClassLocked: false,
-      level: 1,
-      xp: 0,
-      statPoints: 0,
-      mentalLoad: 3,
-      statsBonus: { empathie: 0, stress: 0, analyse: 0, creativite: 0, methodologie: 0 },
-      inventory: [itemPool[0], itemPool[4]],
-      completedDates: []
-    };
-
-    let kanbanTasks = JSON.parse(localStorage.getItem('ergo_kanban_tasks')) || [];
-    let crmContacts = JSON.parse(localStorage.getItem('ergo_crm_contacts')) || [];
-    let jdbEntries = JSON.parse(localStorage.getItem('ergo_jdb_entries')) || [];
-    let resourcesList = JSON.parse(localStorage.getItem('ergo_resources_list')) || [];
-
-    let currentEditingId = null;
-    let sportBlockCounter = 0;
-
-    // Logo Switcher
-    function changeLogoStyle(styleKey) {
-      const box = document.getElementById('main-logo-container');
-      if (styleKey === 'A') {
-        box.innerHTML = `<h1 class="text-xl font-black tracking-wider text-emerald-400 font-mono">🌿 ERGO<span class="text-slate-100">.HUB</span></h1>`;
-      } else if (styleKey === 'B') {
-        box.innerHTML = `<h1 class="text-xl font-bold text-amber-400 font-mono">⚔️ ERGO<span class="text-emerald-400">_HUB</span></h1>`;
-      } else if (styleKey === 'C') {
-        box.innerHTML = `<div class="flex items-center gap-1.5"><span class="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded">M2 ECIT-FH</span><h1 class="text-lg font-bold text-slate-100">Ergo Lab</h1></div>`;
-      }
-    }
-
-    // Tabs Navigation
-    function switchTab(tabId) {
-      ['dashboard', 'workspace', 'crm', 'voyageur'].forEach(t => {
-        const sec = document.getElementById(`sec-${t}`);
-        const tab = document.getElementById(`tab-${t}`);
-        if (sec) sec.classList.add('hidden');
-        if (tab) tab.className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white";
-      });
-      const activeSec = document.getElementById(`sec-${tabId}`);
-      const activeTab = document.getElementById(`tab-${tabId}`);
-      if (activeSec) activeSec.classList.remove('hidden');
-      if (activeTab) activeTab.className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white";
-      
-      if (tabId === 'workspace') renderKanban();
-      if (tabId === 'crm') renderCrm();
-      if (tabId === 'voyageur') renderVoyageur();
-    }
-
-    function switchWorkspaceSubTab(subId) {
-      ['kanban', 'agenda', 'resources'].forEach(s => {
-        const div = document.getElementById(`wsub-${s}`);
-        const btn = document.getElementById(`wsubtab-${s}`);
-        if (div) div.classList.add('hidden');
-        if (btn) btn.className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700";
-      });
-      const activeDiv = document.getElementById(`wsub-${subId}`);
-      const activeBtn = document.getElementById(`wsubtab-${subId}`);
-      if (activeDiv) activeDiv.classList.remove('hidden');
-      if (activeBtn) activeBtn.className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white";
-      if (subId === 'resources') renderResources();
-    }
-
-    function switchVoyageurSubTab(subId) {
-      ['gamification', 'quest', 'analytics'].forEach(s => {
-        const div = document.getElementById(`vsub-${s}`);
-        const btn = document.getElementById(`vsubtab-${s}`);
-        if (div) div.classList.add('hidden');
-        if (btn) btn.className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700";
-      });
-      const activeDiv = document.getElementById(`vsub-${subId}`);
-      const activeBtn = document.getElementById(`vsubtab-${subId}`);
-      if (activeDiv) activeDiv.classList.remove('hidden');
-      if (activeBtn) activeBtn.className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white";
-      if (subId === 'quest') renderAccordionArchives();
-    }
-
-    function switchFormTab(idx) {
-      [1, 2, 3, 4].forEach(i => {
-        const fsec = document.getElementById(`fsec-${i}`);
-        const ftab = document.getElementById(`ftab-${i}`);
-        if (fsec) fsec.classList.add('hidden');
-        if (ftab) ftab.className = "px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300";
-      });
-      const targetSec = document.getElementById(`fsec-${idx}`);
-      const targetTab = document.getElementById(`ftab-${idx}`);
-      if (targetSec) targetSec.classList.remove('hidden');
-      if (targetTab) targetTab.className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
-    }
-
-    // KANBAN LOGIC
-    function toggleAddTaskModal() {
-      document.getElementById('add-task-form-box').classList.toggle('hidden');
-      document.getElementById('subquests-input-container').innerHTML = '';
-      addSubQuestInput();
-    }
-
-    function addSubQuestInput() {
-      const container = document.getElementById('subquests-input-container');
-      const div = document.createElement('div');
-      div.className = "p-3 bg-slate-900 rounded-lg border border-slate-700 space-y-2 relative text-xs";
-      div.innerHTML = `
-        <div class="flex justify-between items-center">
-          <input type="text" class="sq-title w-3/4 bg-slate-800 border border-slate-700 rounded px-2 py-1 font-bold text-slate-200" placeholder="Titre de la sous-quête">
-          <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400 text-xs hover:underline">Supprimer</button>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div>
-            <label class="block text-[10px] text-slate-400">Type</label>
-            <select class="sq-type w-full bg-slate-800 border border-slate-700 rounded p-1 text-[11px]">
-              <option value="lecture">📖 Lecture</option>
-              <option value="livrable">📝 Rédaction / Livrable</option>
-              <option value="rendezvous">🤝 Réunion / RDV</option>
-              <option value="preparation">🛠️ Préparation</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400">Durée Est.</label>
-            <input type="text" class="sq-dur w-full bg-slate-800 border border-slate-700 rounded p-1 text-[11px]" placeholder="ex: 1h30">
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400">Échéance Jalon</label>
-            <input type="date" class="sq-due w-full bg-slate-800 border border-slate-700 rounded p-1 text-[11px] text-amber-300 font-mono">
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400">Coût Charge</label>
-            <select class="sq-cost w-full bg-slate-800 border border-slate-700 rounded p-1 text-[11px]">
-              <option value="1">1 PT</option>
-              <option value="2">2 PTS</option>
-            </select>
-          </div>
-        </div>
-      `;
-      container.appendChild(div);
-    }
-
-    function addNewTask() {
-      const title = document.getElementById('new-task-title').value.trim();
-      const ue = document.getElementById('new-task-ue').value.trim();
-      const dueDate = document.getElementById('new-task-due').value;
-      const urgency = parseInt(document.getElementById('new-task-urgency').value);
-      const cost = parseInt(document.getElementById('new-task-cost').value);
-      const desc = document.getElementById('new-task-desc').value.trim();
-
-      if (!title) return alert("Le titre de la Quête Principale est obligatoire.");
-
-      const subBlocks = document.querySelectorAll('#subquests-input-container > div');
-      const subQuests = [];
-      subBlocks.forEach((b, idx) => {
-        const sqTitle = b.querySelector('.sq-title')?.value.trim();
-        if (sqTitle) {
-          subQuests.push({
-            id: `sq-${Date.now()}-${idx}`,
-            title: sqTitle,
-            type: b.querySelector('.sq-type')?.value || 'livrable',
-            duration: b.querySelector('.sq-dur')?.value.trim() || '1h',
-            dueDate: b.querySelector('.sq-due')?.value || '',
-            cost: parseInt(b.querySelector('.sq-cost')?.value || 1),
-            done: false
-          });
-        }
-      });
-
-      const newTask = {
-        id: `task-${Date.now()}`,
-        title, ue: ue || 'Projet Ergo', dueDate, urgency, cost, desc,
-        status: 'todo', expanded: true, subQuests
-      };
-
-      kanbanTasks.push(newTask);
-      saveKanban();
-      renderKanban();
-      toggleAddTaskModal();
-      document.getElementById('new-task-title').value = '';
-    }
-
-    function toggleSubQuest(taskId, sqId) {
-      kanbanTasks = kanbanTasks.map(t => {
-        if (t.id === taskId && t.subQuests) {
-          t.subQuests = t.subQuests.map(sq => {
-            if (sq.id === sqId) {
-              const newDone = !sq.done;
-              if (newDone) {
-                gainXp(10);
-                playRetroSound('subGoal');
-              }
-              return { ...sq, done: newDone };
-            }
-            return sq;
-          });
-
-          const allDone = t.subQuests.every(sq => sq.done);
-          if (allDone && t.status !== 'done') {
-            t.status = 'done';
-            gainXp(50);
-            playRetroSound('levelUp');
-            alert(`🎉 Toutes les sous-quêtes de "${t.title}" sont achevées ! Quête Principale terminée (+50 XP) !`);
-          }
-        }
-        return t;
-      });
-
-      saveKanban();
-      renderKanban();
-    }
-
-    function toggleExpandTask(id) {
-      kanbanTasks = kanbanTasks.map(t => t.id === id ? { ...t, expanded: !t.expanded } : t);
-      saveKanban();
-      renderKanban();
-    }
-
-    function moveTask(id, targetStatus) {
-      kanbanTasks = kanbanTasks.map(t => t.id === id ? { ...t, status: targetStatus } : t);
-      if (targetStatus === 'done') gainXp(50);
-      hero.mentalLoad = Math.min(10, hero.mentalLoad + 1);
-      saveHero();
-      saveKanban();
-      renderKanban();
-    }
-
-    function deleteTask(id) {
-      kanbanTasks = kanbanTasks.filter(t => t.id !== id);
-      saveKanban();
-      renderKanban();
-    }
-
-    function allowDrop(ev) { ev.preventDefault(); }
-    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
-    function drop(ev, targetCol) {
-      ev.preventDefault();
-      const id = ev.dataTransfer.getData("text");
-      moveTask(id, targetCol);
-    }
-
-    function saveKanban() { localStorage.setItem('ergo_kanban_tasks', JSON.stringify(kanbanTasks)); }
-
-    function renderKanban() {
-      const sortBy = document.getElementById('kanban-sort-by')?.value || 'urgency';
-      const urgencyLabels = { 1: "🟢 Basse", 2: "🟡 Moyenne", 3: "🟠 Haute", 4: "🔴 URGENT" };
-      const typeIcons = { lecture: "📖", livrable: "📝", rendezvous: "🤝", preparation: "🛠️" };
-
-      ['todo', 'doing', 'done'].forEach(status => {
-        const col = document.getElementById(`col-${status}`);
-        let tasks = kanbanTasks.filter(t => t.status === status);
-
-        if (sortBy === 'urgency') tasks.sort((a,b) => b.urgency - a.urgency);
-        else if (sortBy === 'dueDate') tasks.sort((a,b) => (a.dueDate || '9999').localeCompare(b.dueDate || '9999'));
-        else if (sortBy === 'ue') tasks.sort((a,b) => a.ue.localeCompare(b.ue));
-
-        document.getElementById(`count-${status}`).innerText = tasks.length;
-
-        col.innerHTML = tasks.map(t => {
-          const totalSq = t.subQuests ? t.subQuests.length : 0;
-          const doneSq = t.subQuests ? t.subQuests.filter(sq => sq.done).length : 0;
-          const pct = totalSq > 0 ? Math.round((doneSq / totalSq) * 100) : (t.status === 'done' ? 100 : 0);
-
-          return `
-            <div id="${t.id}" draggable="true" ondragstart="drag(event)" class="p-3 bg-slate-800 rounded-lg border border-slate-700 cursor-move space-y-2">
-              <div class="flex justify-between items-start">
-                <div>
-                  <span class="text-[9px] bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-amber-300 font-mono">👑 Quête Principale</span>
-                  <h4 class="text-sm font-bold text-slate-100 mt-1">${t.title}</h4>
-                  <p class="text-[11px] text-slate-400">${t.ue} • Livrable Final : <b class="text-amber-300 font-mono">${t.dueDate || 'N/C'}</b></p>
-                </div>
-                <div class="flex flex-col items-end gap-1">
-                  <span class="text-[10px] font-bold ${t.urgency >= 3 ? 'text-rose-400' : 'text-slate-400'}">${urgencyLabels[t.urgency]}</span>
-                  <button onclick="deleteTask('${t.id}')" class="text-[10px] text-rose-400 hover:underline">✕</button>
-                </div>
-              </div>
-
-              ${t.desc ? `<p class="text-xs text-slate-300 bg-slate-900/50 p-2 rounded border border-slate-800 italic">${t.desc}</p>` : ''}
-
-              <div class="space-y-1">
-                <div class="flex justify-between text-[10px] text-slate-400">
-                  <span>Progression : <b>${doneSq}/${totalSq} Jalons</b></span>
-                  <span class="text-emerald-400 font-bold">${pct}%</span>
-                </div>
-                <div class="w-full bg-slate-900 rounded-full h-2 border border-slate-700">
-                  <div class="bg-emerald-500 h-1.5 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
-                </div>
-              </div>
-
-              ${totalSq > 0 ? `
-                <div class="pt-2 border-t border-slate-700/50">
-                  <button onclick="toggleExpandTask('${t.id}')" class="w-full flex justify-between items-center text-[11px] font-bold text-slate-300 hover:text-emerald-400">
-                    <span>📜 Sous-Quêtes autonomes (${doneSq}/${totalSq})</span>
-                    <span>${t.expanded ? '▲ Masquer' : '▼ Déplier'}</span>
-                  </button>
-
-                  ${t.expanded ? `
-                    <div class="mt-2 space-y-2 pl-1">
-                      ${t.subQuests.map(sq => `
-                        <div class="p-2 bg-slate-900/80 rounded border border-slate-700/80 flex items-start gap-2">
-                          <input type="checkbox" ${sq.done ? 'checked' : ''} onchange="toggleSubQuest('${t.id}', '${sq.id}')" class="mt-0.5 rounded accent-emerald-500 cursor-pointer">
-                          <div class="flex-grow text-xs">
-                            <p class="font-bold ${sq.done ? 'line-through text-slate-500' : 'text-slate-200'}">
-                              ${typeIcons[sq.type] || '📌'} ${sq.title}
-                            </p>
-                            <div class="flex justify-between text-[10px] text-slate-400 mt-0.5 font-mono">
-                              <span>⏱️ ${sq.duration}</span>
-                              <span>📅 ${sq.dueDate || 'Aujourd\'hui'}</span>
-                              <span class="text-amber-400">+10 XP</span>
-                            </div>
-                          </div>
-                        </div>
-                      `).join('')}
-                    </div>
-                  ` : ''}
-                </div>
-              ` : ''}
-
-              <div class="flex justify-between items-center pt-2 text-[10px] text-slate-400 border-t border-slate-700/50">
-                <span>Coût Mental: ${t.cost} PT</span>
-                ${status !== 'done' ? `
-                  <button onclick="moveTask('${t.id}', '${status === 'todo' ? 'doing' : 'done'}')" class="bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-emerald-400 font-bold">Avancer ➡️</button>
-                ` : '<span class="text-emerald-400 font-bold">Livrable Validé ✅</span>'}
-              </div>
-            </div>
-          `;
-        }).join('');
-      });
-
-      const nextTaskEl = document.getElementById('dash-next-task');
-      const urgentTodo = kanbanTasks.filter(t => t.status === 'todo').sort((a,b) => b.urgency - a.urgency)[0];
-      if (nextTaskEl) nextTaskEl.innerText = urgentTodo ? urgentTodo.title : 'Aucune quête urgente';
-      updateMentalLoadUI();
-    }
-
-    // AGENDA / ICAL
-    function promptCalendarUrl() {
-      const url = prompt("Entre l'URL d'intégration Google Calendar :", document.getElementById('calendar-iframe').src);
-      if (url) document.getElementById('calendar-iframe').src = url;
-    }
-
-    // RESSOURCES LOGIC
-    function toggleAddResourceModal() {
-      document.getElementById('add-resource-form-box').classList.toggle('hidden');
-    }
-
-    function addNewResource() {
-      const title = document.getElementById('res-title').value.trim();
-      const type = document.getElementById('res-type').value;
-      const url = document.getElementById('res-url').value.trim();
-
-      if (!title || !url) return alert("Le titre et l'URL sont obligatoires.");
-
-      resourcesList.push({ id: Date.now(), title, type, url });
-      localStorage.setItem('ergo_resources_list', JSON.stringify(resourcesList));
-      renderResources();
-      toggleAddResourceModal();
-      document.getElementById('res-title').value = '';
-      document.getElementById('res-url').value = '';
-    }
-
-    function deleteResource(id) {
-      resourcesList = resourcesList.filter(r => r.id !== id);
-      localStorage.setItem('ergo_resources_list', JSON.stringify(resourcesList));
-      renderResources();
-    }
-
-    function renderResources() {
-      const box = document.getElementById('resources-list-box');
-      if (!box) return;
-      if (resourcesList.length === 0) {
-        box.innerHTML = `<p class="text-xs text-slate-500 italic col-span-full">Aucune ressource enregistrée pour le moment.</p>`;
-        return;
-      }
-      box.innerHTML = resourcesList.map(r => `
-        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-start space-x-2">
-          <div>
-            <span class="text-[9px] bg-slate-900 border border-slate-700 px-1.5 py-0.5 rounded text-emerald-400">${r.type}</span>
-            <h4 class="text-sm font-bold text-slate-100 mt-1">${r.title}</h4>
-            <a href="${r.url}" target="_blank" class="text-xs text-amber-400 hover:underline mt-2 inline-block">🔗 Ouvrir la ressource</a>
-          </div>
-          <button onclick="deleteResource(${r.id})" class="text-xs text-rose-400 hover:underline">Supprimer</button>
-        </div>
-      `).join('');
-    }
-
-    // CRM LOGIC
-    function toggleAddCrmModal() {
-      document.getElementById('add-crm-form-box').classList.toggle('hidden');
-    }
-
-    function addNewCrmContact() {
-      const name = document.getElementById('crm-name').value.trim();
-      const role = document.getElementById('crm-role').value.trim();
-      const org = document.getElementById('crm-org').value.trim();
-      const contact = document.getElementById('crm-contact').value.trim();
-
-      if (!name) return alert("Le nom est obligatoire.");
-
-      crmContacts.push({ id: Date.now(), name, role: role || 'Contact Ergonomie', org: org || 'Université', contact: contact || '-' });
-      localStorage.setItem('ergo_crm_contacts', JSON.stringify(crmContacts));
-      renderCrm();
-      toggleAddCrmModal();
-      document.getElementById('crm-name').value = '';
-    }
-
-    function deleteCrmContact(id) {
-      crmContacts = crmContacts.filter(c => c.id !== id);
-      localStorage.setItem('ergo_crm_contacts', JSON.stringify(crmContacts));
-      renderCrm();
-    }
-
-    function renderCrm() {
-      const container = document.getElementById('crm-contacts-list');
-      if (!container) return;
-      if (crmContacts.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 italic col-span-full">Aucun contact enregistré pour le moment.</p>`;
-        return;
-      }
-      container.innerHTML = crmContacts.map(c => `
-        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-start space-x-2">
-          <div>
-            <h3 class="text-sm font-bold text-emerald-400">${c.name}</h3>
-            <p class="text-xs text-slate-300">${c.role} @ ${c.org}</p>
-            <p class="text-[11px] text-slate-400 font-mono mt-2">✉️ ${c.contact}</p>
-          </div>
-          <button onclick="deleteCrmContact(${c.id})" class="text-xs text-rose-400 hover:underline">Supprimer</button>
-        </div>
-      `).join('');
-    }
-
-    // JOURNAL DE BORD LOGIC & BLOCS SPORTIFS (SANS CADENCE)
-    function updateMoodLabel(val) {
-      const el = document.getElementById('val-jdb-mood');
-      const desc = document.getElementById('lbl-mood-desc');
-      if (el) el.innerText = `${val}/10`;
-      
-      const v = parseInt(val);
-      let t = "😐 Neutre";
-      if (v <= 2) t = "☁️ Difficile / Épuisé";
-      else if (v <= 4) t = "🔋 Fatigué";
-      else if (v <= 6) t = "😐 Neutre / Correct";
-      else if (v <= 8) t = "😊 Bonne forme";
-      else t = "⚡ Excellente forme !";
-      if (desc) desc.innerText = t;
-    }
-
-    function updateSatisfactionLabel(val) {
-      const el = document.getElementById('val-jdb-satisfaction');
-      const desc = document.getElementById('lbl-satisfaction-desc');
-      if (el) el.innerText = `${val}/10`;
-
-      const v = parseInt(val);
-      let t = "🙂 Bonne satisfaction";
-      if (v <= 2) t = "🔴 Très insatisfaisant";
-      else if (v <= 4) t = "🟠 Passable";
-      else if (v <= 6) t = "🟡 Correct";
-      else if (v <= 8) t = "🟢 Très satisfaisant";
-      else t = "⚡ Parfait !";
-      if (desc) desc.innerText = t;
-    }
-
-    function addSportBlock(data = {}) {
-      sportBlockCounter++;
-      const id = sportBlockCounter;
-      const container = document.getElementById('sports-container');
-
-      const block = document.createElement('div');
-      block.id = `sport-block-${id}`;
-      block.className = "p-3 bg-slate-900 rounded-lg border border-slate-700 space-y-3 relative";
-      block.innerHTML = `
-        <div class="flex justify-between items-center">
-          <input type="text" id="sp-title-${id}" value="${data.title || ''}" placeholder="Titre de la séance (ex: Footing Seuil / Entraînement Wing Chun)" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-amber-300 font-bold w-3/4">
-          <button type="button" onclick="removeSportBlock(${id})" class="text-[11px] text-rose-400 hover:underline">Supprimer</button>
-        </div>
-        <div>
-          <label class="block text-[10px] font-semibold text-slate-300 mb-1">Discipline</label>
-          <select id="sp-type-${id}" onchange="updateSportFields(${id})" class="sp-type-select w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-            <option value="course">Course à pied</option>
-            <option value="wing_chun">Wing Chun</option>
-            <option value="taiji">TaiJi</option>
-            <option value="renforcement">Renforcement musculaire</option>
-            <option value="mobilite">Mobilité / Souplesse</option>
-            <option value="autre">Autre sport</option>
-          </select>
-        </div>
-        <div id="sp-fields-${id}" class="space-y-2"></div>
-      `;
-
-      container.appendChild(block);
-      if (data.type) document.getElementById(`sp-type-${id}`).value = data.type;
-      updateSportFields(id, data);
-    }
-
-    function removeSportBlock(id) {
-      const el = document.getElementById(`sport-block-${id}`);
-      if (el) el.remove();
-    }
-
-    function updateSportFields(id, data = {}) {
-      const typeEl = document.getElementById(`sp-type-${id}`);
-      if (!typeEl) return;
-      const type = typeEl.value;
-      const target = document.getElementById(`sp-fields-${id}`);
-
-      if (type === 'course') {
-        target.innerHTML = `
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] text-slate-400">Type de travail</label>
-              <select id="sp-run-work-${id}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-                <option value="EF">Endurance Fondamentale (EF)</option>
-                <option value="Seuil">Seuil</option>
-                <option value="Fractionne">Fractionné</option>
-                <option value="Libre">Sortie Libre</option>
-                <option value="Denivele">Côtes / Dénivelé</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400">Distance (km)</label>
-              <input type="number" step="0.1" id="sp-km-${id}" value="${data.km || 5.0}" oninput="calcRunningPaceOrDuration(${id}, 'km')" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] text-slate-400">Durée (min)</label>
-              <input type="number" id="sp-dur-${id}" value="${data.duration || 30}" oninput="calcRunningPaceOrDuration(${id}, 'dur')" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400">Allure (ex: 6:00)</label>
-              <input type="text" id="sp-pace-${id}" value="${data.pace || ''}" oninput="calcRunningPaceOrDuration(${id}, 'pace')" placeholder="6:00" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs font-mono">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] text-slate-400">FC Moyenne (BPM)</label>
-              <input type="number" id="sp-hr-${id}" value="${data.hr || 145}" placeholder="145" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400">Intensité (RPE)</label>
-              <select id="sp-rpe-${id}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-                <option value="1">1 - Très facile</option>
-                <option value="2">2 - Facile</option>
-                <option value="3">3 - Modéré</option>
-                <option value="4">4 - Un peu difficile</option>
-                <option value="5">5 - Difficile</option>
-                <option value="6" selected>6 - Soutenu</option>
-                <option value="7">7 - Très soutenu</option>
-                <option value="8">8 - Éprouvant</option>
-                <option value="9">9 - Très éprouvant</option>
-                <option value="10">10 - Effort Maximal</option>
-              </select>
-            </div>
-          </div>
-        `;
-        if (data.workType) document.getElementById(`sp-run-work-${id}`).value = data.workType;
-        if (data.rpe) document.getElementById(`sp-rpe-${id}`).value = data.rpe;
-        calcRunningPaceOrDuration(id, 'init');
-      } else {
-        target.innerHTML = `
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] text-slate-400">Durée (min)</label>
-              <input type="number" id="sp-dur-${id}" value="${data.duration || 45}" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400">FC Moyenne (BPM)</label>
-              <input type="number" id="sp-hr-${id}" value="${data.hr || 120}" placeholder="120" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    function calcRunningPaceOrDuration(id, changedField) {
-      const km = parseFloat(document.getElementById(`sp-km-${id}`)?.value || 0);
-      const durInput = document.getElementById(`sp-dur-${id}`);
-      const paceInput = document.getElementById(`sp-pace-${id}`);
-
-      if (!durInput || !paceInput || km <= 0) return;
-
-      if (changedField === 'km' || changedField === 'dur' || changedField === 'init') {
-        const dur = parseFloat(durInput.value || 0);
-        if (dur > 0) {
-          const paceDec = dur / km;
-          const pMin = Math.floor(paceDec);
-          const pSec = Math.round((paceDec - pMin) * 60);
-          paceInput.value = `${pMin}:${pSec < 10 ? '0' : ''}${pSec}`;
-        }
-      } else if (changedField === 'pace') {
-        const paceStr = paceInput.value.trim();
-        if (paceStr.includes(':')) {
-          const [pMin, pSec] = paceStr.split(':').map(Number);
-          if (!isNaN(pMin) && !isNaN(pSec)) {
-            const paceInMin = pMin + (pSec / 60);
-            durInput.value = Math.round(paceInMin * km);
-          }
-        }
-      }
-    }
-
-    function collectSportsData() {
-      const blocks = document.querySelectorAll('#sports-container > div');
-      const sports = [];
-      blocks.forEach(b => {
-        const id = b.id.replace('sport-block-', '');
-        const title = document.getElementById(`sp-title-${id}`)?.value || 'Séance de Sport';
-        const type = document.getElementById(`sp-type-${id}`)?.value || 'autre';
-        const duration = parseInt(document.getElementById(`sp-dur-${id}`)?.value || 0) || 0;
-        const hr = parseInt(document.getElementById(`sp-hr-${id}`)?.value || 0) || 0;
-
-        if (type === 'course') {
-          sports.push({
-            title, type, duration, hr,
-            workType: document.getElementById(`sp-run-work-${id}`)?.value || 'EF',
-            km: parseFloat(document.getElementById(`sp-km-${id}`)?.value || 0) || 0,
-            pace: document.getElementById(`sp-pace-${id}`)?.value || '',
-            rpe: parseInt(document.getElementById(`sp-rpe-${id}`)?.value || 6) || 6
-          });
-        } else {
-          sports.push({ title, type, duration, hr });
-        }
-      });
-      return sports;
-    }
-
-    function saveJdbEntry(e) {
-      e.preventDefault();
-      const rawDate = document.getElementById('jdb-custom-date').value;
-      if (!rawDate) return alert("Veuillez sélectionner une date.");
-
-      const dateObj = new Date(rawDate);
-      const formattedDate = dateObj.toLocaleDateString('fr-FR');
-      const timestamp = dateObj.getTime();
-      
-      const entry = {
-        id: currentEditingId || Date.now(),
-        date: formattedDate,
-        rawDate: rawDate,
-        timestamp: timestamp,
-        teachings: document.getElementById('jdb-teachings').value.trim(),
-        mood: parseInt(document.getElementById('jdb-mood').value) || 5,
-        satisfaction: parseInt(document.getElementById('jdb-satisfaction').value) || 7,
-        sleepOnset: parseInt(document.getElementById('sleep-onset').value) || 7,
-        sleepWake: parseInt(document.getElementById('sleep-wake').value) || 6,
-        sleepQuality: parseInt(document.getElementById('sleep-quality').value) || 7,
-        saeWork: parseInt(document.getElementById('sae-work').value) || 7,
-        saeSport: parseInt(document.getElementById('sae-sport').value) || 5,
-        saeSocial: parseInt(document.getElementById('sae-social').value) || 7,
-        sports: collectSportsData()
-      };
-
-      if (currentEditingId) {
-        jdbEntries = jdbEntries.map(item => item.id === currentEditingId ? entry : item);
-        currentEditingId = null;
-        alert("✅ Bilan mis à jour avec succès !");
-      } else {
-        jdbEntries.unshift(entry);
-        if (!hero.completedDates) hero.completedDates = [];
-        if (!hero.completedDates.includes(rawDate)) {
-          hero.completedDates.push(rawDate);
-          gainXp(50);
-          playRetroSound('questDone');
-        }
-        alert("🎉 Bilan consigné avec succès (+50 XP) !");
-      }
-
-      jdbEntries.sort((a, b) => b.timestamp - a.timestamp);
-      localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
-      
-      document.getElementById('form-jdb').reset();
-      document.getElementById('sports-container').innerHTML = '';
-      switchFormTab(1);
-      renderVoyageur();
-    }
-
-    // ARCHIVES EN ACCORDÉON HIÉRARCHISÉ
-    function getWeekNumber(d) {
-      d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-      d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-      var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-      var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-      return weekNo;
-    }
-
-    function renderAccordionArchives() {
-      const container = document.getElementById('jdb-accordion-tree');
-      if (!container) return;
-
-      if (!jdbEntries || jdbEntries.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 italic">Aucun bilan archivé pour le moment.</p>`;
-        return;
-      }
-
-      // Groupement par Année > Mois > Semaine
-      const tree = {};
-
-      jdbEntries.forEach(entry => {
-        const d = new Date(entry.timestamp || Date.now());
-        const year = d.getFullYear();
-        const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-        const month = `${monthNames[d.getMonth()]} ${year}`;
-        const week = `Semaine ${getWeekNumber(d)}`;
-
-        if (!tree[year]) tree[year] = {};
-        if (!tree[year][month]) tree[year][month] = {};
-        if (!tree[year][month][week]) tree[year][month][week] = [];
-
-        tree[year][month][week].push(entry);
-      });
-
-      let html = '';
-
-      Object.keys(tree).sort((a,b) => b - a).forEach(year => {
-        html += `
-          <details open class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden mb-3">
-            <summary class="p-3 bg-slate-800 font-bold text-sm text-amber-400 cursor-pointer flex justify-between items-center select-none">
-              <span>📅 Année ${year}</span>
-              <span class="text-xs text-slate-400 font-mono">${Object.values(tree[year]).reduce((acc, m) => acc + Object.values(m).reduce((a, w) => a + w.length, 0), 0)} bilans</span>
-            </summary>
-            
-            <div class="p-3 space-y-2">
-              ${Object.keys(tree[year]).map(month => `
-                <details class="bg-slate-800/60 border border-slate-700/80 rounded-lg overflow-hidden">
-                  <summary class="p-2.5 font-bold text-xs text-emerald-400 cursor-pointer flex justify-between items-center select-none">
-                    <span>🗓️ ${month}</span>
-                    <span class="text-[10px] text-slate-400 font-mono">${Object.values(tree[year][month]).reduce((a, w) => a + w.length, 0)} bilans</span>
-                  </summary>
-
-                  <div class="p-2 space-y-2">
-                    ${Object.keys(tree[year][month]).map(week => `
-                      <details class="bg-slate-900/90 border border-slate-700/50 rounded p-2">
-                        <summary class="font-bold text-xs text-slate-200 cursor-pointer flex justify-between items-center select-none">
-                          <span>📌 ${week}</span>
-                          <span class="text-[10px] text-amber-300 font-mono">${tree[year][month][week].length} entrée(s)</span>
-                        </summary>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 pt-2 border-t border-slate-800">
-                          ${tree[year][month][week].map(e => `
-                            <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs space-y-2">
-                              <div class="flex justify-between items-center">
-                                <span class="font-bold text-emerald-400">${e.date}</span>
-                                <span class="bg-slate-900 px-1.5 py-0.5 rounded text-[10px] text-amber-300">Mood: ${e.mood}/10</span>
-                              </div>
-                              <p class="text-slate-300 italic line-clamp-2">"${e.teachings}"</p>
-                              ${(e.sports && e.sports.length) ? `
-                                <div class="flex flex-wrap gap-1">
-                                  ${e.sports.map(s => `<span class="text-[9px] bg-slate-900 px-1.5 py-0.5 rounded text-slate-400">🏃 ${s.title || s.type} (${s.duration}m)</span>`).join('')}
-                                </div>
-                              ` : ''}
-                              <div class="flex justify-between items-center pt-2 border-t border-slate-700/50 text-[10px]">
-                                <span class="text-slate-500">Satisf: ${e.satisfaction}/10</span>
-                                <div class="space-x-2">
-                                  <button onclick="editEntry(${e.id})" class="text-emerald-400 hover:underline">Éditer</button>
-                                  <button onclick="deleteEntry(${e.id})" class="text-rose-400 hover:underline">Supprimer</button>
-                                </div>
-                              </div>
-                            </div>
-                          `).join('')}
-                        </div>
-                      </details>
-                    `).join('')}
-                  </div>
-                </details>
-              `).join('')}
-            </div>
-          </details>
-        `;
-      });
-
-      container.innerHTML = html;
-    }
-
-    function editEntry(id) {
-      const item = jdbEntries.find(e => e.id === id);
-      if (!item) return;
-      currentEditingId = id;
-
-      if (item.rawDate) document.getElementById('jdb-custom-date').value = item.rawDate;
-      document.getElementById('jdb-teachings').value = item.teachings || '';
-      document.getElementById('jdb-mood').value = item.mood || 5;
-      updateMoodLabel(item.mood || 5);
-      
-      document.getElementById('jdb-satisfaction').value = item.satisfaction || 7;
-      updateSatisfactionLabel(item.satisfaction || 7);
-      
-      document.getElementById('sleep-onset').value = item.sleepOnset || 7;
-      document.getElementById('val-sleep-onset').innerText = (item.sleepOnset || 7) + '/10';
-      document.getElementById('sleep-wake').value = item.sleepWake || 6;
-      document.getElementById('val-sleep-wake').innerText = (item.sleepWake || 6) + '/10';
-      document.getElementById('sleep-quality').value = item.sleepQuality || 7;
-      document.getElementById('val-sleep-quality').innerText = (item.sleepQuality || 7) + '/10';
-
-      document.getElementById('sae-work').value = item.saeWork || 7;
-      document.getElementById('sae-sport').value = item.saeSport || 5;
-      document.getElementById('sae-social').value = item.saeSocial || 7;
-      
-      document.getElementById('sports-container').innerHTML = '';
-      (item.sports || []).forEach(s => addSportBlock(s));
-
-      switchVoyageurSubTab('quest');
-      switchFormTab(1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function deleteEntry(id) {
-      if (confirm("Supprimer définitivement ce bilan du Journal de Bord ?")) {
-        jdbEntries = jdbEntries.filter(e => e.id !== id);
-        localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
-        renderVoyageur();
-      }
-    }
-
-    // EXPORTATION & SYNTHÈSE À LA CARTE
-    function handleExportPeriodPreset(val) {
-      const now = new Date();
-      let fromDate = new Date();
-      let toDate = new Date();
-
-      if (val === 'curr_week') {
-        const day = now.getDay() || 7;
-        fromDate.setDate(now.getDate() - day + 1);
-      } else if (val === 'prev_week') {
-        const day = now.getDay() || 7;
-        fromDate.setDate(now.getDate() - day - 6);
-        toDate.setDate(now.getDate() - day);
-      } else if (val === 'curr_month') {
-        fromDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      } else if (val === 'prev_month') {
-        fromDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        toDate = new Date(now.getFullYear(), now.getMonth(), 0);
-      } else if (val === 't1') {
-        fromDate = new Date(now.getFullYear(), 0, 1);
-        toDate = new Date(now.getFullYear(), 2, 31);
-      } else if (val === 't2') {
-        fromDate = new Date(now.getFullYear(), 3, 1);
-        toDate = new Date(now.getFullYear(), 5, 30);
-      } else if (val === 't3') {
-        fromDate = new Date(now.getFullYear(), 6, 1);
-        toDate = new Date(now.getFullYear(), 8, 30);
-      } else if (val === 't4') {
-        fromDate = new Date(now.getFullYear(), 9, 1);
-        toDate = new Date(now.getFullYear(), 11, 31);
-      } else if (val === 'sem1') {
-        fromDate = new Date(now.getFullYear() - 1, 8, 1);
-        toDate = new Date(now.getFullYear(), 0, 31);
-      } else if (val === 'sem2') {
-        fromDate = new Date(now.getFullYear(), 1, 1);
-        toDate = new Date(now.getFullYear(), 5, 30);
-      } else if (val === 'year') {
-        fromDate = new Date(now.getFullYear() - 1, 8, 1);
-      }
-
-      if (val !== 'custom') {
-        document.getElementById('export-date-from').value = fromDate.toISOString().split('T')[0];
-        document.getElementById('export-date-to').value = toDate.toISOString().split('T')[0];
-      }
-    }
-
-    function getFilteredEntriesForExport() {
-      const fromStr = document.getElementById('export-date-from').value;
-      const toStr = document.getElementById('export-date-to').value;
-
-      const fromTime = fromStr ? new Date(fromStr).getTime() : 0;
-      const toTime = toStr ? new Date(toStr).setHours(23, 59, 59, 999) : Infinity;
-
-      return jdbEntries.filter(e => {
-        const t = e.timestamp || new Date(e.rawDate).getTime();
-        return t >= fromTime && t <= toTime;
-      });
-    }
-
-    function generateCustomExportCSV() {
-      const filtered = getFilteredEntriesForExport();
-      if (filtered.length === 0) return alert("Aucune donnée disponible pour la période sélectionnée.");
-
-      const headers = ['date'];
-      if (document.getElementById('chk-sleep-quality').checked) headers.push('sommeil_qualite_globale');
-      if (document.getElementById('chk-sleep-onset').checked) headers.push('sommeil_endormissement');
-      if (document.getElementById('chk-sleep-wake').checked) headers.push('sommeil_reveil');
-      
-      if (document.getElementById('chk-sae-work').checked) headers.push('sae_travail');
-      if (document.getElementById('chk-sae-sport').checked) headers.push('sae_sport');
-      if (document.getElementById('chk-sae-social').checked) headers.push('sae_social');
-
-      if (document.getElementById('chk-sport-run').checked) headers.push('course_distance_km', 'course_duree_min', 'course_allure');
-      if (document.getElementById('chk-sport-wingchun').checked) headers.push('wingchun_duree_min');
-      if (document.getElementById('chk-sport-taiji').checked) headers.push('taiji_duree_min');
-      if (document.getElementById('chk-sport-renf').checked) headers.push('renforcement_duree_min');
-      if (document.getElementById('chk-sport-mob').checked) headers.push('mobilite_duree_min');
-
-      if (document.getElementById('chk-text-teachings').checked) headers.push('enseignements_observations');
-
-      let csv = headers.join(',') + '\n';
-
-      filtered.forEach(e => {
-        const row = [e.date];
-        
-        if (document.getElementById('chk-sleep-quality').checked) row.push(e.sleepQuality || '');
-        if (document.getElementById('chk-sleep-onset').checked) row.push(e.sleepOnset || '');
-        if (document.getElementById('chk-sleep-wake').checked) row.push(e.sleepWake || '');
-
-        if (document.getElementById('chk-sae-work').checked) row.push(e.saeWork || '');
-        if (document.getElementById('chk-sae-sport').checked) row.push(e.saeSport || '');
-        if (document.getElementById('chk-sae-social').checked) row.push(e.saeSocial || '');
-
-        // Calculations sports
-        let runKm = 0, runDur = 0, runPace = '', wcDur = 0, tjDur = 0, renfDur = 0, mobDur = 0;
-        (e.sports || []).forEach(s => {
-          if (s.type === 'course') { runKm += s.km || 0; runDur += s.duration || 0; runPace = s.pace || runPace; }
-          if (s.type === 'wing_chun') wcDur += s.duration || 0;
-          if (s.type === 'taiji') tjDur += s.duration || 0;
-          if (s.type === 'renforcement') renfDur += s.duration || 0;
-          if (s.type === 'mobilite') mobDur += s.duration || 0;
-        });
-
-        if (document.getElementById('chk-sport-run').checked) row.push(runKm, runDur, `"${runPace}"`);
-        if (document.getElementById('chk-sport-wingchun').checked) row.push(wcDur);
-        if (document.getElementById('chk-sport-taiji').checked) row.push(tjDur);
-        if (document.getElementById('chk-sport-renf').checked) row.push(renfDur);
-        if (document.getElementById('chk-sport-mob').checked) row.push(mobDur);
-
-        if (document.getElementById('chk-text-teachings').checked) row.push(`"${(e.teachings || '').replace(/"/g, '""')}"`);
-
-        csv += row.join(',') + '\n';
-      });
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `export_ergo_hub_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function generateCustomSynthesisText() {
-      const filtered = getFilteredEntriesForExport();
-      if (filtered.length === 0) return alert("Aucune donnée disponible pour la période sélectionnée.");
-
-      let txt = `📊 SYNTHÈSE RÉFLEXIVE & AUTO-QUANTIFICATION ERGO HUB\n`;
-      txt += `Période du : ${document.getElementById('export-date-from').value} au ${document.getElementById('export-date-to').value}\n`;
-      txt += `Nombre de bilans analysés : ${filtered.length}\n`;
-      txt += `=======================================================\n\n`;
-
-      // Sommeil
-      if (document.getElementById('chk-sleep-quality').checked || document.getElementById('chk-sleep-onset').checked) {
-        const avgQual = (filtered.reduce((a,e) => a + (e.sleepQuality||0),0)/filtered.length).toFixed(1);
-        const avgOns = (filtered.reduce((a,e) => a + (e.sleepOnset||0),0)/filtered.length).toFixed(1);
-        const avgWak = (filtered.reduce((a,e) => a + (e.sleepWake||0),0)/filtered.length).toFixed(1);
-        txt += `😴 RÉCUPÉRATION & SOMMEIL (Moyennes / 10) :\n`;
-        txt += `   • Qualité Globale : ${avgQual}/10\n`;
-        txt += `   • Endormissement : ${avgOns}/10 | Réveil : ${avgWak}/10\n\n`;
-      }
-
-      // SAE
-      if (document.getElementById('chk-sae-work').checked) {
-        const avgW = (filtered.reduce((a,e) => a + (e.saeWork||0),0)/filtered.length).toFixed(1);
-        const avgSp = (filtered.reduce((a,e) => a + (e.saeSport||0),0)/filtered.length).toFixed(1);
-        const avgSo = (filtered.reduce((a,e) => a + (e.saeSocial||0),0)/filtered.length).toFixed(1);
-        txt += `🎯 SENTIMENT D'AUTO-EFFICACITÉ (Moyennes / 10) :\n`;
-        txt += `   • SAE Travail / Master : ${avgW}/10\n`;
-        txt += `   • SAE Pratique Sportive : ${avgSp}/10\n`;
-        txt += `   • SAE Vie Personnelle/Sociale : ${avgSo}/10\n\n`;
-      }
-
-      // Sports Cumuls
-      let totalRunKm = 0, totalRunMin = 0, totalWc = 0, totalTj = 0, totalRenf = 0, totalMob = 0;
-      filtered.forEach(e => {
-        (e.sports||[]).forEach(s => {
-          if (s.type === 'course') { totalRunKm += s.km||0; totalRunMin += s.duration||0; }
-          if (s.type === 'wing_chun') totalWc += s.duration||0;
-          if (s.type === 'taiji') totalTj += s.duration||0;
-          if (s.type === 'renforcement') totalRenf += s.duration||0;
-          if (s.type === 'mobilite') totalMob += s.duration||0;
-        });
-      });
-
-      txt += `🏃 BILAN PRATIQUE SPORTIVE (Volume Cumulé) :\n`;
-      if (document.getElementById('chk-sport-run').checked) txt += `   • Course à pied : ${totalRunKm.toFixed(1)} km en ${Math.floor(totalRunMin/60)}h${totalRunMin%60}m\n`;
-      if (document.getElementById('chk-sport-wingchun').checked) txt += `   • Wing Chun : ${(totalWc/60).toFixed(1)}h\n`;
-      if (document.getElementById('chk-sport-taiji').checked) txt += `   • TaiJi : ${(totalTj/60).toFixed(1)}h\n`;
-      if (document.getElementById('chk-sport-renf').checked) txt += `   • Renforcement Musculaire : ${(totalRenf/60).toFixed(1)}h\n`;
-      if (document.getElementById('chk-sport-mob').checked) txt += `   • Mobilité & Souplesse : ${(totalMob/60).toFixed(1)}h\n`;
-      txt += `\n`;
-
-      // Verbatims Réflexifs
-      if (document.getElementById('chk-text-teachings').checked) {
-        txt += `🧠 EXTRAITS DES ENSEIGNEMENTS & OBSERVATIONS CONSIGNÉS :\n`;
-        filtered.forEach(e => {
-          if (e.teachings) txt += `   • [${e.date}] "${e.teachings}"\n`;
-        });
-      }
-
-      document.getElementById('report-text-content').innerText = txt;
-      document.getElementById('export-report-output').classList.remove('hidden');
-    }
-
-    function updateMentalLoadUI() {
-      const bar = document.getElementById('dash-mental-bar');
-      const text = document.getElementById('dash-mental-text');
-      const kbVal = document.getElementById('kb-mental-val');
-      if (bar) bar.style.width = `${hero.mentalLoad * 10}%`;
-      if (text) text.innerText = `${hero.mentalLoad} / 10 pts`;
-      if (kbVal) kbVal.innerText = hero.mentalLoad;
-    }
-
-    function lockClassChoice(key) {
-      hero.classKey = key;
-      hero.isClassLocked = true;
-      saveHero();
-      renderVoyageur();
-    }
-
-    function addStatPoint(stat) {
-      if(hero.statPoints > 0) {
-        hero.statPoints--;
-        hero.statsBonus[stat] = (hero.statsBonus[stat] || 0) + 1;
-        saveHero(); renderVoyageur();
-      }
-    }
-
-    function gainXp(amount) {
-      hero.xp += amount;
-      if(hero.xp >= hero.level * 100) {
-        hero.xp -= hero.level * 100;
-        hero.level++;
-        hero.statPoints += 2;
-        playRetroSound('levelUp');
-        alert(`🎉 Niveau supérieur ! Niveau ${hero.level}. +2 Points de caractéristiques !`);
-      }
-      saveHero(); renderVoyageur();
-    }
-
-    function renderVoyageur() {
-      const cfg = classConfigs[hero.classKey] || classConfigs['psychologue_travail'];
-      
-      const hName = document.getElementById('header-hero-name');
-      const hLvl = document.getElementById('header-hero-level');
-      const dName = document.getElementById('dash-hero-name');
-      const dLvl = document.getElementById('dash-hero-level');
-
-      if (hName) hName.innerText = cfg.name;
-      if (hLvl) hLvl.innerText = `Niv. ${hero.level}`;
-      if (dName) dName.innerText = cfg.name;
-      if (dLvl) dLvl.innerText = `Niveau ${hero.level} (${hero.xp} / 100 XP)`;
-
-      const archBox = document.getElementById('archetype-selection-box');
-      if (archBox) {
-        if (!hero.isClassLocked) {
-          archBox.innerHTML = `
-            <label class="block text-xs font-semibold text-amber-400 mb-1">Choisir sa spécialité (Définitif)</label>
-            <div class="flex gap-2">
-              <select id="select-class-init" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm">
-                <option value="psychologue_travail">Psychologue du Travail & des Orgs</option>
-                <option value="facteurs_humains">Spécialiste Facteurs Humains</option>
-                <option value="ux_designer">Ergonome UX / UI Designer</option>
-                <option value="px_designer">Player Experience (PX) Designer</option>
-                <option value="chercheur">Chercheur en Ergonomie Critique</option>
-              </select>
-              <button onclick="lockClassChoice(document.getElementById('select-class-init').value)" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 font-bold text-xs rounded-lg">Incarner</button>
-            </div>
-          `;
-        } else {
-          archBox.innerHTML = `
-            <div class="p-3 bg-slate-900/80 rounded-lg border border-slate-700 flex justify-between items-center">
-              <div>
-                <span class="text-[10px] text-slate-500 uppercase font-bold">Spécialité Incarnée</span>
-                <p class="text-sm font-bold text-emerald-400">${cfg.name}</p>
-              </div>
-              <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">⚔️ Incarné</span>
-            </div>
-          `;
-        }
-      }
-
-      const container = document.getElementById('stats-container');
-      if (container) {
-        const labels = { empathie: "Empathie", stress: "Régulation Stress", analyse: "Analyse Critique", creativite: "Créativité", methodologie: "Méthodologie" };
-        container.innerHTML = Object.keys(labels).map(k => {
-          const total = cfg.stats[k] + (hero.statsBonus[k] || 0);
-          return `
-            <div class="flex justify-between items-center">
-              <span class="text-slate-400">${labels[k]} : <b class="text-slate-200">${total}</b></span>
-              ${hero.statPoints > 0 ? `<button onclick="addStatPoint('${k}')" class="px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 rounded text-[10px] font-bold">+1</button>` : ''}
-            </div>
-          `;
-        }).join('');
-      }
-
-      renderAccordionArchives();
-      updateMentalLoadUI();
-    }
-
-    function saveHero() { localStorage.setItem('ergo_hero', JSON.stringify(hero)); }
-
-    // Init
-    document.addEventListener('DOMContentLoaded', () => {
-      const todayDate = new Date().toISOString().split('T')[0];
-      const customDateEl = document.getElementById('jdb-custom-date');
-      if (customDateEl) customDateEl.value = todayDate;
-
-      handleExportPeriodPreset('curr_month');
-      renderKanban();
-      renderCrm();
-      renderVoyageur();
-    });
-  </script>
+  <!-- Lien vers le fichier JavaScript externe -->
+  <script src="app.js"></script>
 </body>
 </html>
