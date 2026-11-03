@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ergo Hub - Productivité & Réflexivité M2</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -34,8 +33,6 @@
         <nav class="flex space-x-1 bg-slate-900 p-1 rounded-lg border border-slate-700">
           <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white">Dashboard</button>
           <button onclick="switchTab('workspace')" id="tab-workspace" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white">Workspace</button>
-          <button onclick="switchTab('crm')" id="tab-crm" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white">Réseau Pro</button>
-          <button onclick="switchTab('voyageur')" id="tab-voyageur" class="px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white">Voyageur & JdB</button>
         </nav>
       </div>
 
@@ -46,20 +43,6 @@
           <option value="C">Style: 🔬 ERGO LAB</option>
         </select>
 
-        <button onclick="switchTab('voyageur'); switchVoyageurSubTab('quest');" id="header-quest-btn" class="relative flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition">
-          <span class="animate-pulse">📜</span>
-          <span id="header-quest-text">Quête Dispo !</span>
-        </button>
-
-        <div onclick="switchTab('voyageur')" class="flex items-center space-x-3 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 cursor-pointer hover:border-emerald-500/50 transition">
-          <div class="w-8 h-8 rounded-full bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-center">
-            <span class="text-sm">🛡️</span>
-          </div>
-          <div class="text-left">
-            <p id="header-hero-name" class="text-xs font-bold text-slate-200 leading-tight">Voyageur</p>
-            <p id="header-hero-level" class="text-[10px] text-amber-400 font-mono">Niv. 1</p>
-          </div>
-        </div>
       </div>
     </div>
   </header>
@@ -68,26 +51,16 @@
 
     <!-- TAB 1: DASHBOARD -->
     <section id="sec-dashboard" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 cursor-pointer hover:border-slate-600 transition" onclick="switchTab('voyageur')">
-          <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Profil Voyageur</h3>
-          <p id="dash-hero-name" class="text-lg font-bold text-emerald-400">Psychologue du Travail</p>
-          <p id="dash-hero-level" class="text-xs text-amber-400 font-mono mt-0.5">Niveau 1 (0 / 100 XP)</p>
-          <div class="mt-3">
-            <span class="text-xs text-slate-400">Charge Mentale:</span>
-            <div class="w-full bg-slate-900 rounded-full h-2.5 mt-1 border border-slate-700">
-              <div id="dash-mental-bar" class="bg-amber-500 h-2 rounded-full" style="width: 30%"></div>
-            </div>
-            <p id="dash-mental-text" class="text-[10px] text-right text-slate-400 mt-0.5">3 / 10 pts</p>
-          </div>
-        </div>
-        <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 cursor-pointer hover:border-slate-600 transition" onclick="switchTab('workspace')">
           <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Prochaine Échéance</h3>
           <p id="dash-next-task" class="text-base font-medium text-slate-200">Aucune tâche urgente</p>
+          <p id="dash-next-task-meta" class="text-xs text-slate-400 mt-1"></p>
         </div>
-        <div class="bg-slate-800 p-5 rounded-xl border border-slate-700">
-          <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Dernier Bilan JdB</h3>
-          <p id="dash-last-reflexion" class="text-sm text-slate-300 italic">"Aucun bilan consigné."</p>
+        <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 cursor-pointer hover:border-slate-600 transition" onclick="switchTab('workspace')">
+          <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Quêtes en cours</h3>
+          <p id="dash-doing-count" class="text-base font-medium text-slate-200">0 quête en cours</p>
+          <p id="dash-todo-count" class="text-xs text-slate-400 mt-1">0 à faire</p>
         </div>
       </div>
     </section>
@@ -112,9 +85,6 @@
             </select>
           </div>
           <div class="flex items-center gap-3">
-            <span class="text-xs bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-amber-400 font-mono">
-              🧠 Charge Mentale : <span id="kb-mental-val">3</span>/10
-            </span>
             <button onclick="toggleAddTaskModal()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition">+ Créer une Quête Principale</button>
           </div>
         </div>
@@ -143,14 +113,6 @@
                 <option value="4">🔴 Critique / URGENT</option>
               </select>
             </div>
-            <div>
-              <label class="block text-slate-400 mb-1">Coût Charge Mentale</label>
-              <select id="new-task-cost" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-                <option value="1">1 Point</option>
-                <option value="2">2 Points</option>
-                <option value="3">3 Points</option>
-              </select>
-            </div>
           </div>
           <div>
             <label class="block text-xs text-slate-400 mb-1">Description / Objectif Global</label>
@@ -165,7 +127,8 @@
             </div>
             <div id="subquests-input-container" class="space-y-3"></div>
           </div>
-          <div class="flex justify-end gap-2 pt-2">
+          <div class="flex justify-end items-center gap-2 pt-2">
+            <p id="new-task-error" class="hidden text-xs text-rose-400 mr-auto">Donne un titre à la quête principale.</p>
             <button onclick="toggleAddTaskModal()" class="px-3 py-1.5 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
             <button onclick="addNewTask()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs rounded font-bold text-white">Créer l'Arbre</button>
           </div>
@@ -222,218 +185,6 @@
         <div id="resources-list-box" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
       </div>
     </section>
-
-    <!-- TAB 3: CRM -->
-    <section id="sec-crm" class="hidden space-y-6">
-      <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 flex-wrap gap-4">
-        <div><h2 class="text-xl font-bold">Réseau Pro Ergonomie (CRM)</h2></div>
-        <button onclick="toggleAddCrmModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white">+ Nouveau Contact</button>
-      </div>
-      <div id="add-crm-form-box" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-          <input type="text" id="crm-name" placeholder="Nom" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-          <input type="text" id="crm-role" placeholder="Rôle" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-          <input type="text" id="crm-org" placeholder="Structure" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-          <input type="text" id="crm-contact" placeholder="Email / Tel" class="bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
-        </div>
-        <div class="flex justify-end gap-2">
-          <button onclick="toggleAddCrmModal()" class="px-3 py-1 bg-slate-700 text-xs rounded text-slate-300">Annuler</button>
-          <button onclick="addNewCrmContact()" class="px-3 py-1 bg-emerald-600 text-xs rounded font-bold text-white">Enregistrer</button>
-        </div>
-      </div>
-      <div id="crm-contacts-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
-    </section>
-
-    <!-- TAB 4: VOYAGEUR & JDB -->
-    <section id="sec-voyageur" class="hidden space-y-6">
-      <div class="flex space-x-2 border-b border-slate-700 pb-3">
-        <button onclick="switchVoyageurSubTab('gamification')" id="vsubtab-gamification" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white">🛡️ Fiche Personnage</button>
-        <button onclick="switchVoyageurSubTab('quest')" id="vsubtab-quest" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">📜 Quête Journalière</button>
-        <button onclick="switchVoyageurSubTab('analytics')" id="vsubtab-analytics" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">📊 Dashboard & Sport</button>
-        <button onclick="switchVoyageurSubTab('archives')" id="vsubtab-archives" class="px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700">🗂️ Archives & Export</button>
-      </div>
-
-      <!-- GAMIFICATION -->
-      <div id="vsub-gamification" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-            <h2 class="text-xl font-bold text-amber-400">🛡️ Statut du Voyageur</h2>
-            <div id="archetype-selection-box"></div>
-            <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 space-y-2">
-              <div class="flex justify-between items-center text-xs">
-                <span class="font-bold text-slate-300">Points à attribuer :</span>
-                <span id="stat-points-pool" class="text-emerald-400 font-bold">0</span>
-              </div>
-              <div id="stats-container" class="space-y-2 text-xs"></div>
-            </div>
-          </div>
-          <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-            <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">📦 Sac d'Inventaire</h3>
-            <div id="inventory-list" class="flex flex-wrap gap-2 p-3 bg-slate-900 rounded-lg border border-slate-700 min-h-[80px]"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- QUÊTE JOURNALIÈRE -->
-      <div id="vsub-quest" class="hidden space-y-6">
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <h2 class="text-xl font-bold text-emerald-400">📜 Saisie de la Quête Journalière</h2>
-          <div class="flex space-x-2 border-b border-slate-700 pb-2">
-            <button onclick="switchFormTab(1)" id="ftab-1" class="px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white">1. Réflexivité</button>
-            <button onclick="switchFormTab(2)" id="ftab-2" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">2. Sommeil</button>
-            <button onclick="switchFormTab(3)" id="ftab-3" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">3. SAE</button>
-            <button onclick="switchFormTab(4)" id="ftab-4" class="px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300">4. Sport</button>
-          </div>
-
-          <form id="form-jdb" onsubmit="saveJdbEntry(event)" class="space-y-4">
-            <div id="fsec-1" class="space-y-3">
-              <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Date du bilan</label>
-                <input type="date" id="jdb-custom-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-amber-300 font-mono">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Enseignements & Observations</label>
-                <textarea id="jdb-teachings" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm" placeholder="Qu'as-tu appris..."></textarea>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-1">
-                  <label class="block text-xs font-semibold text-slate-300">Humeur : <span id="val-jdb-mood" class="text-amber-400 font-bold">5/10</span></label>
-                  <input type="range" id="jdb-mood" min="1" max="10" value="5" oninput="updateMoodLabel(this.value)" class="w-full accent-amber-500">
-                  <p id="lbl-mood-desc" class="text-[10px] text-slate-400 italic">😐 Neutre</p>
-                </div>
-                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-1">
-                  <label class="block text-xs font-semibold text-slate-300">Satisfaction : <span id="val-jdb-satisfaction" class="text-emerald-400 font-bold">7/10</span></label>
-                  <input type="range" id="jdb-satisfaction" min="1" max="10" value="7" oninput="updateSatisfactionLabel(this.value)" class="w-full accent-emerald-500">
-                  <p id="lbl-satisfaction-desc" class="text-[10px] text-slate-400 italic">🙂 Bonne</p>
-                </div>
-              </div>
-            </div>
-
-            <div id="fsec-2" class="hidden space-y-4">
-              <div class="space-y-3 bg-slate-900 p-4 rounded-lg border border-slate-700">
-                <div>
-                  <div class="flex justify-between text-xs mb-1"><span class="text-slate-300">Endormissement</span><span id="val-sleep-onset" class="text-emerald-400 font-bold">7/10</span></div>
-                  <input type="range" id="sleep-onset" min="1" max="10" value="7" oninput="document.getElementById('val-sleep-onset').innerText=this.value+'/10'" class="w-full accent-emerald-500">
-                </div>
-                <div>
-                  <div class="flex justify-between text-xs mb-1"><span class="text-slate-300">Réveil</span><span id="val-sleep-wake" class="text-emerald-400 font-bold">6/10</span></div>
-                  <input type="range" id="sleep-wake" min="1" max="10" value="6" oninput="document.getElementById('val-sleep-wake').innerText=this.value+'/10'" class="w-full accent-emerald-500">
-                </div>
-                <div>
-                  <div class="flex justify-between text-xs mb-1"><span class="text-slate-300">Qualité Globale</span><span id="val-sleep-quality" class="text-emerald-400 font-bold">7/10</span></div>
-                  <input type="range" id="sleep-quality" min="1" max="10" value="7" oninput="document.getElementById('val-sleep-quality').innerText=this.value+'/10'" class="w-full accent-emerald-500">
-                </div>
-              </div>
-            </div>
-
-            <div id="fsec-3" class="hidden space-y-3">
-              <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Travail : <span id="val-sae-work">7</span>/10</label>
-                <input type="range" id="sae-work" min="1" max="10" value="7" oninput="document.getElementById('val-sae-work').innerText=this.value" class="w-full accent-emerald-500">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Sport : <span id="val-sae-sport">5</span>/10</label>
-                <input type="range" id="sae-sport" min="1" max="10" value="5" oninput="document.getElementById('val-sae-sport').innerText=this.value" class="w-full accent-emerald-500">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-300 mb-1">Social : <span id="val-sae-social">7</span>/10</label>
-                <input type="range" id="sae-social" min="1" max="10" value="7" oninput="document.getElementById('val-sae-social').innerText=this.value" class="w-full accent-emerald-500">
-              </div>
-            </div>
-
-            <div id="fsec-4" class="hidden space-y-4">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-bold text-slate-300">Séances effectuées</span>
-                <button type="button" onclick="addSportBlock()" class="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-emerald-400 font-bold border border-slate-600">+ Ajouter une séance</button>
-              </div>
-              <div id="sports-container" class="space-y-3"></div>
-            </div>
-
-            <button type="submit" id="btn-submit-jdb" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-bold text-sm transition">Consigner le Bilan</button>
-          </form>
-        </div>
-      </div>
-
-      <!-- DASHBOARD & ANALYTICS -->
-      <div id="vsub-analytics" class="hidden space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-xs text-slate-400 font-semibold uppercase">Humeur Moyenne</span><p id="kpi-mood" class="text-2xl font-black text-emerald-400 mt-1">- / 10</p></div>
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-xs text-slate-400 font-semibold uppercase">Sommeil (Moy)</span><p id="kpi-sleep" class="text-2xl font-black text-teal-400 mt-1">- / 10</p></div>
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-xs text-slate-400 font-semibold uppercase">Volume Sport</span><p id="kpi-sport-hours" class="text-2xl font-black text-amber-400 mt-1">0h00</p><p id="kpi-course-km" class="text-xs text-slate-400 mt-1">Course : 0 km</p></div>
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-xs text-slate-400 font-semibold uppercase">Disciplines</span><div class="text-xs mt-2 space-y-1 text-slate-300"><p>🥋 AM / Wing Chun : <b id="kpi-am-h">0h</b></p><p>💪 Renf. : <b id="kpi-renf-h">0h</b></p><p>🧘 Mob. : <b id="kpi-mob-h">0h</b></p></div></div>
-        </div>
-
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <h3 class="text-sm font-bold text-slate-300">Évolution SAE</h3>
-          <div class="h-64 relative"><canvas id="chart-sae"></canvas></div>
-        </div>
-
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <h3 class="text-base font-bold text-amber-400">🔍 Centre d'Analyse Sportive</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-slate-900 rounded-lg border border-slate-700 text-xs">
-            <select id="filter-sport-type" onchange="applySportFilters()" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
-              <option value="all">Toutes disciplines</option>
-              <option value="course">Course</option>
-              <option value="wing_chun">Wing Chun</option>
-              <option value="taiji">TaiJi</option>
-              <option value="renforcement">Renforcement</option>
-              <option value="mobilite">Mobilité</option>
-            </select>
-            <input type="number" id="filter-sport-dur" placeholder="Durée min (min)" oninput="applySportFilters()" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
-            <input type="number" id="filter-sport-hr" placeholder="FC min (BPM)" oninput="applySportFilters()" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-slate-200">
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-300 border-collapse">
-              <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[10px]"><th class="p-2">Date</th><th class="p-2">Séance</th><th class="p-2">Discipline</th><th class="p-2">Durée</th><th class="p-2">Volume</th><th class="p-2">FC</th><th class="p-2">RPE</th></tr></thead>
-              <tbody id="sport-filtered-tbody" class="divide-y divide-slate-800"><tr><td colspan="7" class="p-3 text-center text-slate-500 italic">Aucune séance.</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- ARCHIVES & EXPORT -->
-      <div id="vsub-archives" class="hidden space-y-6">
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <h2 class="text-lg font-bold text-emerald-400">📥 Centre d'Exportation & Synthèse à la Carte</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 space-y-3">
-              <h3 class="text-xs font-bold text-amber-400 uppercase">1. Période</h3>
-              <select id="export-period-select" onchange="toggleCustomDatesExport(this.value)" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-slate-200">
-                <option value="month_current">Mois en cours</option>
-                <option value="month_last">Mois précédent</option>
-                <option value="week_current">Semaine en cours</option>
-                <option value="custom">Personnalisé</option>
-              </select>
-              <div id="export-custom-dates-box" class="hidden grid grid-cols-2 gap-2">
-                <input type="date" id="export-date-from" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs text-amber-300">
-                <input type="date" id="export-date-to" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs text-amber-300">
-              </div>
-            </div>
-            <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 space-y-3">
-              <h3 class="text-xs font-bold text-amber-400 uppercase">2. Variables</h3>
-              <div class="grid grid-cols-2 gap-2 text-xs">
-                <label class="flex items-center gap-1.5"><input type="checkbox" id="exp-var-sleep" checked class="accent-emerald-500"> Sommeil</label>
-                <label class="flex items-center gap-1.5"><input type="checkbox" id="exp-var-sae" checked class="accent-emerald-500"> SAE</label>
-                <label class="flex items-center gap-1.5"><input type="checkbox" id="exp-var-sports" checked class="accent-emerald-500"> Sports</label>
-                <label class="flex items-center gap-1.5"><input type="checkbox" id="exp-var-teachings" checked class="accent-emerald-500"> Verbatims</label>
-              </div>
-            </div>
-          </div>
-          <div class="flex justify-end gap-3 pt-2">
-            <button onclick="generateTextSummary()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-amber-300 rounded-lg text-xs font-bold">📊 Synthèse Textuelle</button>
-            <button onclick="exportCustomCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold">📥 Télécharger CSV</button>
-          </div>
-          <div id="summary-output-box" class="hidden p-4 bg-slate-950 border border-slate-700 rounded-lg space-y-2 text-xs font-mono text-slate-300"></div>
-        </div>
-
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-          <h2 class="text-lg font-bold text-slate-200">🗂️ Archives par Année > Mois</h2>
-          <div id="jdb-tree-container" class="space-y-3"></div>
-        </div>
-      </div>
-
-    </section>
-
   </main>
 
   <!-- Lien vers le fichier JavaScript externe -->

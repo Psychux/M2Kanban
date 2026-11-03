@@ -1,4 +1,8 @@
-// Sound Engine
+// ===== Ergo Hub : Kanban des quêtes =====
+// Modules retirés pour l'instant : Réseau Pro (CRM), Voyageur & JdB.
+// Ils seront redéveloppés plus tard, à partir du document 03 - Fonctions.
+
+// ----- Sons -----
 const playRetroSound = (type) => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -20,35 +24,75 @@ const playRetroSound = (type) => {
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
       osc.start(); osc.stop(ctx.currentTime + 0.1);
     }
-  } catch(e){}
+  } catch (e) {}
 };
 
-const itemPool = [
-  { name: "Gourdin du Plan Méthodologique", type: "Arme", rarity: "Épique", desc: "+3 Méthodologie." },
-  { name: "Robe de la Statistique Inférentielle", type: "Équipement", rarity: "Épique", desc: "+3 Analyse." },
-  { name: "Trousse de Soin Ergonomique", type: "Soin", rarity: "Consommable", desc: "Restaure 5 pts de Charge Mentale." }
-];
-
-const classConfigs = {
-  psychologue_travail: { name: "Psychologue du Travail", stats: { empathie: 13, stress: 12, analyse: 10, creativite: 10, methodologie: 10 } },
-  facteurs_humains: { name: "Spécialiste Facteurs Humains", stats: { analyse: 13, methodologie: 12, stress: 10, empathie: 10, creativite: 9 } }
+// ----- Constantes -----
+const STORAGE_KEY = 'ergo_kanban_tasks';
+const COLUMNS = ['todo', 'doing', 'done'];
+const URGENCY = {
+  1: { label: 'Basse', icon: '🟢', cls: 'border-emerald-500/40 text-emerald-300' },
+  2: { label: 'Moyenne', icon: '🟡', cls: 'border-yellow-500/40 text-yellow-300' },
+  3: { label: 'Haute', icon: '🟠', cls: 'border-orange-500/40 text-orange-300' },
+  4: { label: 'Critique', icon: '🔴', cls: 'border-rose-500/50 text-rose-300' }
 };
 
-let hero = JSON.parse(localStorage.getItem('ergo_hero')) || {
-  classKey: 'psychologue_travail', isClassLocked: false, level: 1, xp: 0, statPoints: 0,
-  mentalLoad: 3, statsBonus: { empathie: 0, stress: 0, analyse: 0, creativite: 0, methodologie: 0 },
-  inventory: [itemPool[0], itemPool[2]], completedDates: []
-};
+// ----- Données -----
+function loadTasks() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    return raw.map(normalizeTask);
+  } catch (e) {
+    return [];
+  }
+}
+function normalizeTask(t) {
+  return {
+    id: t.id || uid(),
+    title: t.title || 'Sans titre',
+    ue: t.ue || '',
+    due: t.due || '',
+    urgency: Number(t.urgency) || 2,
+    desc: t.desc || '',
+    status: COLUMNS.includes(t.status) ? t.status : 'todo',
+    subquests: Array.isArray(t.subquests) ? t.subquests.map(s => ({
+      id: s.id || uid(), title: s.title || '', due: s.due || '', done: !!s.done
+    })) : [],
+    expanded: !!t.expanded,
+    createdAt: t.createdAt || Date.now()
+  };
+}
+function saveTasks() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(kanbanTasks)); } catch (e) {}
+}
 
-let kanbanTasks = JSON.parse(localStorage.getItem('ergo_kanban_tasks')) || [];
-let crmContacts = JSON.parse(localStorage.getItem('ergo_crm_contacts')) || [];
-let jdbEntries = JSON.parse(localStorage.getItem('ergo_jdb_entries')) || [];
-let resourcesList = JSON.parse(localStorage.getItem('ergo_resources_list')) || [];
+let kanbanTasks = loadTasks();
 
-let currentEditingId = null;
-let saeChart = null;
-let sportBlockCounter = 0;
+// ----- Utilitaires -----
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function findTask(id) { return kanbanTasks.find(t => t.id === id); }
+function daysUntil(iso) {
+  if (!iso) return null;
+  const [y, m, d] = iso.split('-').map(Number);
+  const target = new Date(y, m - 1, d);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((target - today) / 86400000);
+}
+function dueLabel(iso) {
+  const n = daysUntil(iso);
+  if (n === null) return '';
+  if (n < 0) return `<span class="text-rose-400 font-bold">En retard de ${-n} j</span>`;
+  if (n === 0) return `<span class="text-amber-300 font-bold">Aujourd'hui</span>`;
+  if (n === 1) return `<span class="text-amber-300 font-bold">Demain</span>`;
+  const [y, m, d] = iso.split('-');
+  return `<span class="text-slate-300">${d}/${m}/${y}</span>`;
+}
 
+// ----- Navigation -----
 function changeLogoStyle(styleKey) {
   const box = document.getElementById('main-logo-container');
   if (styleKey === 'A') box.innerHTML = `<h1 class="text-xl font-black tracking-wider text-emerald-400 font-mono">🌿 ERGO<span class="text-slate-100">.HUB</span></h1>`;
@@ -57,18 +101,14 @@ function changeLogoStyle(styleKey) {
 }
 
 function switchTab(tabId) {
-  ['dashboard', 'workspace', 'crm', 'voyageur'].forEach(t => {
-    const sec = document.getElementById(`sec-${t}`);
-    const tab = document.getElementById(`tab-${t}`);
-    if (sec) sec.classList.add('hidden');
-    if (tab) tab.className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white";
+  ['dashboard', 'workspace'].forEach(t => {
+    document.getElementById(`sec-${t}`).classList.add('hidden');
+    document.getElementById(`tab-${t}`).className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition text-slate-400 hover:text-white";
   });
   document.getElementById(`sec-${tabId}`).classList.remove('hidden');
   document.getElementById(`tab-${tabId}`).className = "px-3.5 py-1.5 rounded-md font-medium text-xs transition bg-emerald-600 text-white";
-  
   if (tabId === 'workspace') renderKanban();
-  if (tabId === 'crm') renderCrm();
-  if (tabId === 'voyageur') renderVoyageur();
+  if (tabId === 'dashboard') renderDashboard();
 }
 
 function switchWorkspaceSubTab(subId) {
@@ -78,230 +118,297 @@ function switchWorkspaceSubTab(subId) {
   });
   document.getElementById(`wsub-${subId}`).classList.remove('hidden');
   document.getElementById(`wsubtab-${subId}`).className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white";
-  if (subId === 'resources') renderResources();
+  if (subId === 'kanban') renderKanban();
 }
 
-function switchVoyageurSubTab(subId) {
-  ['gamification', 'quest', 'analytics', 'archives'].forEach(s => {
-    document.getElementById(`vsub-${s}`).classList.add('hidden');
-    document.getElementById(`vsubtab-${s}`).className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-slate-800 text-slate-400 hover:text-white border border-slate-700";
+// ----- Formulaire de création -----
+function toggleAddTaskModal() {
+  const box = document.getElementById('add-task-form-box');
+  box.classList.toggle('hidden');
+  if (!box.classList.contains('hidden')) document.getElementById('new-task-title').focus();
+}
+
+function addSubQuestInput(data = {}) {
+  const container = document.getElementById('subquests-input-container');
+  const row = document.createElement('div');
+  row.className = 'subquest-input-row flex flex-wrap sm:flex-nowrap items-center gap-2 text-xs';
+  row.innerHTML = `
+    <input type="text" placeholder="Sous-quête (ex : Rédiger l'introduction)" value="${esc(data.title || '')}"
+      class="sq-title flex-1 min-w-0 bg-slate-900 border border-slate-700 rounded p-2 text-slate-200">
+    <input type="date" value="${esc(data.due || '')}" title="Jalon (facultatif)"
+      class="sq-due bg-slate-900 border border-slate-700 rounded p-2 text-amber-300 font-mono">
+    <button type="button" onclick="this.parentElement.remove()" aria-label="Retirer cette sous-quête"
+      class="px-2 py-1.5 text-rose-400 hover:text-rose-300">✕</button>`;
+  container.appendChild(row);
+  row.querySelector('.sq-title').focus();
+}
+
+function resetTaskForm() {
+  ['new-task-title', 'new-task-ue', 'new-task-due', 'new-task-desc'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('new-task-urgency').value = '2';
+  document.getElementById('subquests-input-container').innerHTML = '';
+  document.getElementById('new-task-error').classList.add('hidden');
+}
+
+function addNewTask() {
+  const titleEl = document.getElementById('new-task-title');
+  const title = titleEl.value.trim();
+  const err = document.getElementById('new-task-error');
+  if (!title) {
+    err.classList.remove('hidden');
+    titleEl.focus();
+    return;
+  }
+  err.classList.add('hidden');
+
+  const subquests = [...document.querySelectorAll('#subquests-input-container .subquest-input-row')]
+    .map(row => ({
+      id: uid(),
+      title: row.querySelector('.sq-title').value.trim(),
+      due: row.querySelector('.sq-due').value,
+      done: false
+    }))
+    .filter(s => s.title);
+
+  kanbanTasks.push(normalizeTask({
+    title,
+    ue: document.getElementById('new-task-ue').value.trim(),
+    due: document.getElementById('new-task-due').value,
+    urgency: document.getElementById('new-task-urgency').value,
+    desc: document.getElementById('new-task-desc').value.trim(),
+    status: 'todo',
+    subquests,
+    expanded: subquests.length > 0
+  }));
+  saveTasks();
+  resetTaskForm();
+  document.getElementById('add-task-form-box').classList.add('hidden');
+  renderKanban();
+}
+
+// Efface le message d'erreur dès que l'utilisateur tape un titre
+document.addEventListener('input', e => {
+  if (e.target.id === 'new-task-title') document.getElementById('new-task-error').classList.add('hidden');
+});
+
+// ----- Actions sur les cartes -----
+function setUrgency(id, value) {
+  const t = findTask(id); if (!t) return;
+  t.urgency = Number(value);
+  saveTasks();
+  renderKanban();
+}
+
+function toggleExpandTask(id) {
+  const t = findTask(id); if (!t) return;
+  t.expanded = !t.expanded;
+  saveTasks();
+  renderKanban();
+}
+
+function moveTask(id, direction) {
+  const t = findTask(id); if (!t) return;
+  const i = COLUMNS.indexOf(t.status) + direction;
+  if (i < 0 || i >= COLUMNS.length) return;
+  setStatus(t, COLUMNS[i]);
+}
+
+function setStatus(t, status) {
+  if (t.status === status) return;
+  t.status = status;
+  if (status === 'done') playRetroSound('levelUp');
+  saveTasks();
+  renderKanban();
+}
+
+function deleteTask(id) {
+  const t = findTask(id); if (!t) return;
+  if (!confirm(`Supprimer la quête « ${t.title} » et ses sous-quêtes ?`)) return;
+  kanbanTasks = kanbanTasks.filter(x => x.id !== id);
+  saveTasks();
+  renderKanban();
+}
+
+function toggleSubQuest(taskId, subId) {
+  const t = findTask(taskId); if (!t) return;
+  const s = t.subquests.find(x => x.id === subId); if (!s) return;
+  s.done = !s.done;
+  if (s.done) playRetroSound('subGoal');
+  saveTasks();
+  renderKanban();
+}
+
+function deleteSubQuest(taskId, subId) {
+  const t = findTask(taskId); if (!t) return;
+  t.subquests = t.subquests.filter(x => x.id !== subId);
+  saveTasks();
+  renderKanban();
+}
+
+function addSubQuestToTask(event, taskId) {
+  event.preventDefault();
+  const t = findTask(taskId); if (!t) return;
+  const form = event.target;
+  const title = form.querySelector('[name=sq-title]').value.trim();
+  if (!title) { form.querySelector('[name=sq-title]').focus(); return; }
+  t.subquests.push({ id: uid(), title, due: form.querySelector('[name=sq-due]').value, done: false });
+  saveTasks();
+  renderKanban();
+  const again = document.querySelector(`#task-${taskId} [name=sq-title]`);
+  if (again) again.focus();
+}
+
+// ----- Glisser-déposer -----
+function allowDrop(ev) {
+  ev.preventDefault();
+  ev.currentTarget.classList.add('ring-2', 'ring-emerald-500/40', 'rounded-lg');
+}
+function leaveDrop(ev) {
+  if (!ev.currentTarget.contains(ev.relatedTarget)) ev.currentTarget.classList.remove('ring-2', 'ring-emerald-500/40', 'rounded-lg');
+}
+function drag(ev) {
+  ev.dataTransfer.setData('text/plain', ev.currentTarget.dataset.id);
+  ev.dataTransfer.effectAllowed = 'move';
+}
+function drop(ev, col) {
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('ring-2', 'ring-emerald-500/40', 'rounded-lg');
+  const t = findTask(ev.dataTransfer.getData('text/plain'));
+  if (t) setStatus(t, col);
+}
+
+// ----- Tri -----
+function sortTasks(list) {
+  const mode = document.getElementById('kanban-sort-by')?.value || 'urgency';
+  const byDue = (a, b) => {
+    if (a.due && b.due && a.due !== b.due) return a.due < b.due ? -1 : 1;
+    if (a.due && !b.due) return -1;
+    if (!a.due && b.due) return 1;
+    return a.createdAt - b.createdAt;
+  };
+  return [...list].sort((a, b) => {
+    if (mode === 'urgency') return (b.urgency - a.urgency) || byDue(a, b);
+    if (mode === 'ue') return (a.ue || '~').localeCompare(b.ue || '~', 'fr') || byDue(a, b);
+    return byDue(a, b);
   });
-  document.getElementById(`vsub-${subId}`).classList.remove('hidden');
-  document.getElementById(`vsubtab-${subId}`).className = "px-4 py-2 rounded-lg font-bold text-xs transition bg-emerald-600 text-white";
-  if (subId === 'analytics') renderJdbDashboard();
-  if (subId === 'archives') renderJdbTreeArchives();
 }
 
-function switchFormTab(idx) {
-  [1, 2, 3, 4].forEach(i => {
-    document.getElementById(`fsec-${i}`).classList.add('hidden');
-    document.getElementById(`ftab-${i}`).className = "px-3 py-1 bg-slate-700 rounded text-xs font-bold text-slate-300";
+// ----- Rendu -----
+function urgencySelect(t) {
+  const u = URGENCY[t.urgency] || URGENCY[2];
+  return `<label class="sr-only" for="urg-${t.id}">Degré d'urgence</label>
+    <select id="urg-${t.id}" onchange="setUrgency('${t.id}', this.value)" title="Degré d'urgence"
+      class="bg-slate-900 border ${u.cls} rounded px-1.5 py-1 text-[11px] font-bold cursor-pointer">
+      ${Object.entries(URGENCY).map(([v, o]) => `<option value="${v}" ${Number(v) === t.urgency ? 'selected' : ''}>${o.icon} ${o.label}</option>`).join('')}
+    </select>`;
+}
+
+function taskCard(t) {
+  const total = t.subquests.length;
+  const done = t.subquests.filter(s => s.done).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  const colIdx = COLUMNS.indexOf(t.status);
+  const isDone = t.status === 'done';
+
+  const meta = [
+    t.ue ? `<span class="bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5">${esc(t.ue)}</span>` : '',
+    t.due && !isDone ? dueLabel(t.due) : ''
+  ].filter(Boolean).join('');
+
+  const subList = t.subquests.map(s => `
+    <li class="flex items-center gap-2 py-1">
+      <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSubQuest('${t.id}', '${s.id}')"
+        aria-label="Sous-quête accomplie" class="w-4 h-4 accent-emerald-500 shrink-0 cursor-pointer">
+      <span class="flex-1 min-w-0 break-words ${s.done ? 'line-through text-slate-500' : 'text-slate-200'}">${esc(s.title)}</span>
+      ${s.due && !s.done ? `<span class="text-[10px] shrink-0">${dueLabel(s.due)}</span>` : ''}
+      <button onclick="deleteSubQuest('${t.id}', '${s.id}')" aria-label="Supprimer la sous-quête"
+        class="text-slate-500 hover:text-rose-400 shrink-0 px-1">✕</button>
+    </li>`).join('');
+
+  const details = t.expanded ? `
+    <div class="mt-3 pt-3 border-t border-slate-700 space-y-3 text-xs">
+      ${t.desc ? `<p class="text-slate-300 whitespace-pre-line">${esc(t.desc)}</p>` : ''}
+      <div>
+        <h4 class="font-bold text-amber-400 mb-1">Sous-quêtes ${total ? `(${done}/${total})` : ''}</h4>
+        ${total ? `<ul class="divide-y divide-slate-700/60">${subList}</ul>` : '<p class="text-slate-500 italic">Aucune sous-quête.</p>'}
+      </div>
+      <form onsubmit="addSubQuestToTask(event, '${t.id}')" class="flex flex-wrap sm:flex-nowrap gap-2">
+        <input name="sq-title" type="text" placeholder="Nouvelle sous-quête" autocomplete="off"
+          class="flex-1 min-w-0 bg-slate-900 border border-slate-700 rounded p-1.5 text-slate-200">
+        <input name="sq-due" type="date" title="Jalon (facultatif)"
+          class="bg-slate-900 border border-slate-700 rounded p-1.5 text-amber-300 font-mono">
+        <button type="submit" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-emerald-400 font-bold border border-slate-600">+ Ajouter</button>
+      </form>
+      <div class="flex justify-between items-center pt-1">
+        <div class="flex gap-1">
+          <button onclick="moveTask('${t.id}', -1)" ${colIdx === 0 ? 'disabled' : ''}
+            class="px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">← Reculer</button>
+          <button onclick="moveTask('${t.id}', 1)" ${colIdx === COLUMNS.length - 1 ? 'disabled' : ''}
+            class="px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">Avancer →</button>
+        </div>
+        <button onclick="deleteTask('${t.id}')" class="text-rose-400 hover:text-rose-300">Supprimer</button>
+      </div>
+    </div>` : '';
+
+  return `
+    <article id="task-${t.id}" data-id="${t.id}" draggable="true" ondragstart="drag(event)"
+      class="bg-slate-800 p-3 rounded-lg border border-slate-700 hover:border-slate-600 transition cursor-grab active:cursor-grabbing">
+      <div class="flex items-start justify-between gap-2">
+        <h4 class="font-bold text-sm leading-snug break-words min-w-0 ${isDone ? 'line-through text-slate-400' : 'text-slate-100'}">${esc(t.title)}</h4>
+        ${urgencySelect(t)}
+      </div>
+      ${meta ? `<div class="flex flex-wrap items-center gap-2 mt-2 text-[11px] text-slate-400">${meta}</div>` : ''}
+      ${total ? `
+        <div class="flex items-center gap-2 mt-2" title="${done} sous-quête(s) sur ${total}">
+          <div class="flex-1 h-1.5 bg-slate-900 rounded-full overflow-hidden"><div class="h-full bg-emerald-500" style="width:${pct}%"></div></div>
+          <span class="text-[10px] text-slate-400">${done}/${total}</span>
+        </div>` : ''}
+      <button onclick="toggleExpandTask('${t.id}')" aria-expanded="${t.expanded}"
+        class="mt-2 text-[11px] text-emerald-400 hover:text-emerald-300 font-bold">${t.expanded ? '▴ Masquer les détails' : '▾ Détails et sous-quêtes'}</button>
+      ${details}
+    </article>`;
+}
+
+function renderKanban() {
+  COLUMNS.forEach(col => {
+    const list = sortTasks(kanbanTasks.filter(t => t.status === col));
+    document.getElementById(`col-${col}`).innerHTML = list.length
+      ? list.map(taskCard).join('')
+      : `<p class="text-xs text-slate-500 italic p-2">${col === 'todo' ? 'Aucune quête à faire.' : col === 'doing' ? 'Glisse une quête ici pour la démarrer.' : 'Les quêtes terminées arrivent ici.'}</p>`;
+    document.getElementById(`count-${col}`).innerText = list.length;
   });
-  document.getElementById(`fsec-${idx}`).classList.remove('hidden');
-  document.getElementById(`ftab-${idx}`).className = "px-3 py-1 bg-emerald-600 rounded text-xs font-bold text-white";
+  renderDashboard();
 }
 
-// Kanban & Resources & CRM Placeholders
-function toggleAddTaskModal() { document.getElementById('add-task-form-box').classList.toggle('hidden'); }
-function addSubQuestInput() {}
-function addNewTask() {}
-function toggleExpandTask() {}
-function moveTask() {}
-function deleteTask() {}
-function allowDrop(ev) { ev.preventDefault(); }
-function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
-function drop(ev, col) { ev.preventDefault(); }
-function renderKanban() {}
+function renderDashboard() {
+  const open = kanbanTasks.filter(t => t.status !== 'done');
+  const next = open.filter(t => t.due).sort((a, b) => (a.due < b.due ? -1 : 1))[0];
+  const nextEl = document.getElementById('dash-next-task');
+  const metaEl = document.getElementById('dash-next-task-meta');
+  if (nextEl) {
+    nextEl.textContent = next ? next.title : 'Aucune échéance à venir';
+    metaEl.innerHTML = next ? dueLabel(next.due) + (next.ue ? ` · ${esc(next.ue)}` : '') : '';
+  }
+  const doing = kanbanTasks.filter(t => t.status === 'doing').length;
+  const todo = kanbanTasks.filter(t => t.status === 'todo').length;
+  const d = document.getElementById('dash-doing-count');
+  if (d) {
+    d.textContent = `${doing} quête${doing > 1 ? 's' : ''} en cours`;
+    document.getElementById('dash-todo-count').textContent = `${todo} à faire`;
+  }
+}
+
+// ----- Agenda & Ressources (à développer) -----
 function promptCalendarUrl() {}
 function toggleAddResourceModal() { document.getElementById('add-resource-form-box').classList.toggle('hidden'); }
 function addNewResource() {}
 function deleteResource() {}
 function renderResources() {}
-function toggleAddCrmModal() { document.getElementById('add-crm-form-box').classList.toggle('hidden'); }
-function addNewCrmContact() {}
-function deleteCrmContact() {}
-function renderCrm() {}
 
-// JDB & Sport (Sans cadence)
-function updateMoodLabel(val) { document.getElementById('val-jdb-mood').innerText = `${val}/10`; }
-function updateSatisfactionLabel(val) { document.getElementById('val-jdb-satisfaction').innerText = `${val}/10`; }
-
-function addSportBlock(data = {}) {
-  sportBlockCounter++;
-  const id = sportBlockCounter;
-  const container = document.getElementById('sports-container');
-  const block = document.createElement('div');
-  block.id = `sport-block-${id}`;
-  block.className = "p-3 bg-slate-900 rounded-lg border border-slate-700 space-y-3 text-xs";
-  block.innerHTML = `
-    <div class="flex justify-between items-center">
-      <input type="text" id="sp-title-${id}" value="${data.title || ''}" placeholder="Titre de la séance" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-amber-300 font-bold w-3/4">
-      <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-rose-400 text-xs">Supprimer</button>
-    </div>
-    <select id="sp-type-${id}" onchange="updateSportFields(${id})" class="w-full bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-      <option value="course">Course à pied</option>
-      <option value="wing_chun">Wing Chun</option>
-      <option value="taiji">TaiJi</option>
-      <option value="renforcement">Renforcement</option>
-      <option value="mobilite">Mobilité</option>
-    </select>
-    <div id="sp-fields-${id}" class="space-y-2"></div>
-  `;
-  container.appendChild(block);
-  if (data.type) document.getElementById(`sp-type-${id}`).value = data.type;
-  updateSportFields(id, data);
-}
-
-function updateSportFields(id, data = {}) {
-  const type = document.getElementById(`sp-type-${id}`).value;
-  const target = document.getElementById(`sp-fields-${id}`);
-  if (type === 'course') {
-    target.innerHTML = `
-      <div class="grid grid-cols-2 gap-2">
-        <input type="number" step="0.1" id="sp-km-${id}" value="${data.km || 5}" placeholder="km" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-        <input type="number" id="sp-dur-${id}" value="${data.duration || 30}" placeholder="min" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <input type="number" id="sp-hr-${id}" value="${data.hr || 140}" placeholder="BPM" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-        <input type="number" min="1" max="10" id="sp-rpe-${id}" value="${data.rpe || 6}" placeholder="RPE (1-10)" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-      </div>
-    `;
-  } else {
-    target.innerHTML = `
-      <div class="grid grid-cols-3 gap-2">
-        <input type="number" id="sp-dur-${id}" value="${data.duration || 45}" placeholder="min" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-        <input type="number" id="sp-hr-${id}" value="${data.hr || 120}" placeholder="BPM" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-        <input type="number" min="1" max="10" id="sp-rpe-${id}" value="${data.rpe || 5}" placeholder="RPE" class="bg-slate-800 border border-slate-700 rounded p-1.5 text-xs">
-      </div>
-    `;
-  }
-}
-
-function collectSportsData() {
-  const blocks = document.querySelectorAll('#sports-container > div');
-  const sports = [];
-  blocks.forEach(b => {
-    const id = b.id.replace('sport-block-', '');
-    sports.push({
-      title: document.getElementById(`sp-title-${id}`)?.value || 'Sport',
-      type: document.getElementById(`sp-type-${id}`)?.value || 'autre',
-      duration: parseInt(document.getElementById(`sp-dur-${id}`)?.value || 0),
-      hr: parseInt(document.getElementById(`sp-hr-${id}`)?.value || 0),
-      rpe: parseInt(document.getElementById(`sp-rpe-${id}`)?.value || 5),
-      km: parseFloat(document.getElementById(`sp-km-${id}`)?.value || 0)
-    });
-  });
-  return sports;
-}
-
-function saveJdbEntry(e) {
-  e.preventDefault();
-  const rawDate = document.getElementById('jdb-custom-date').value;
-  const entry = {
-    id: currentEditingId || Date.now(),
-    date: new Date(rawDate).toLocaleDateString('fr-FR'),
-    rawDate,
-    timestamp: new Date(rawDate).getTime(),
-    teachings: document.getElementById('jdb-teachings').value,
-    mood: parseInt(document.getElementById('jdb-mood').value),
-    satisfaction: parseInt(document.getElementById('jdb-satisfaction').value),
-    sleepOnset: parseInt(document.getElementById('sleep-onset').value),
-    sleepWake: parseInt(document.getElementById('sleep-wake').value),
-    sleepQuality: parseInt(document.getElementById('sleep-quality').value),
-    saeWork: parseInt(document.getElementById('sae-work').value),
-    saeSport: parseInt(document.getElementById('sae-sport').value),
-    saeSocial: parseInt(document.getElementById('sae-social').value),
-    sports: collectSportsData()
-  };
-
-  if (currentEditingId) {
-    jdbEntries = jdbEntries.map(item => item.id === currentEditingId ? entry : item);
-    currentEditingId = null;
-  } else {
-    jdbEntries.unshift(entry);
-  }
-
-  localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
-  document.getElementById('form-jdb').reset();
-  document.getElementById('sports-container').innerHTML = '';
-  switchFormTab(1);
-  renderVoyageur();
-}
-
-function renderJdbDashboard() {
-  if (!jdbEntries.length) return;
-  document.getElementById('kpi-mood').innerText = `${(jdbEntries.reduce((a,e)=>a+e.mood,0)/jdbEntries.length).toFixed(1)} / 10`;
-  document.getElementById('kpi-sleep').innerText = `${(jdbEntries.reduce((a,e)=>a+e.sleepQuality,0)/jdbEntries.length).toFixed(1)} / 10`;
-  applySportFilters();
-}
-
-function applySportFilters() {
-  const tbody = document.getElementById('sport-filtered-tbody');
-  if (!tbody) return;
-  let html = '';
-  jdbEntries.forEach(e => {
-    (e.sports || []).forEach(s => {
-      html += `<tr class="border-b border-slate-800"><td class="p-2 text-emerald-400">${e.date}</td><td class="p-2">${s.title}</td><td class="p-2">${s.type}</td><td class="p-2">${s.duration}m</td><td class="p-2">${s.km||'-'}km</td><td class="p-2">${s.hr||'-'}</td><td class="p-2">${s.rpe}/10</td></tr>`;
-    });
-  });
-  tbody.innerHTML = html || `<tr><td colspan="7" class="p-3 text-center text-slate-500 italic">Aucune séance.</td></tr>`;
-}
-
-function renderJdbTreeArchives() {
-  const container = document.getElementById('jdb-tree-container');
-  if (!container) return;
-  container.innerHTML = jdbEntries.map(e => `
-    <div class="p-3 bg-slate-900 rounded border border-slate-700 flex justify-between items-center text-xs">
-      <div><span class="text-emerald-400 font-bold">${e.date}</span> : "${e.teachings}"</div>
-      <div class="flex gap-2">
-        <button onclick="editEntry(${e.id})" class="text-emerald-400">✏️</button>
-        <button onclick="deleteEntry(${e.id})" class="text-rose-400">✕</button>
-      </div>
-    </div>
-  `).join('') || `<p class="text-xs text-slate-500 italic">Aucune archive.</p>`;
-}
-
-function editEntry(id) {
-  const item = jdbEntries.find(e => e.id === id);
-  if (!item) return;
-  currentEditingId = id;
-  document.getElementById('jdb-custom-date').value = item.rawDate;
-  document.getElementById('jdb-teachings').value = item.teachings;
-  document.getElementById('sports-container').innerHTML = '';
-  (item.sports || []).forEach(s => addSportBlock(s));
-  switchVoyageurSubTab('quest');
-}
-
-function deleteEntry(id) {
-  jdbEntries = jdbEntries.filter(e => e.id !== id);
-  localStorage.setItem('ergo_jdb_entries', JSON.stringify(jdbEntries));
-  renderVoyageur();
-}
-
-function exportCustomCSV() {
-  let csv = 'date,humeur,satisfaction,enseignements\n';
-  jdbEntries.forEach(e => csv += `${e.date},${e.mood},${e.satisfaction},"${e.teachings}"\n`);
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'export_jdb.csv';
-  a.click();
-}
-
-function generateTextSummary() {
-  const box = document.getElementById('summary-output-box');
-  box.classList.remove('hidden');
-  box.innerHTML = `<p class="text-amber-400 font-bold">Synthèse : ${jdbEntries.length} bilans enregistrés.</p>`;
-}
-
-function renderVoyageur() {
-  renderJdbDashboard();
-  renderJdbTreeArchives();
-}
-
+// ----- Démarrage -----
 document.addEventListener('DOMContentLoaded', () => {
-  const yest = new Date(); yest.setDate(yest.getDate() - 1);
-  const dateEl = document.getElementById('jdb-custom-date');
-  if (dateEl) dateEl.value = yest.toISOString().split('T')[0];
-  renderVoyageur();
+  ['col-todo', 'col-doing', 'col-done'].forEach(id => {
+    document.getElementById(id).addEventListener('dragleave', leaveDrop);
+  });
+  renderKanban();
 });
