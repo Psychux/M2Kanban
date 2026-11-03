@@ -47,6 +47,7 @@
       </div>
 
       <div class="flex items-center space-x-3">
+        <div id="sync-box" class="relative"></div>
         <select onchange="changeLogoStyle(this.value)" class="bg-slate-900 text-[10px] text-slate-300 border border-slate-700 rounded px-2 py-1">
           <option value="A">Style: 🌿 ERGO.HUB</option>
           <option value="B">Style: ⚔️ ERGO_HUB</option>
@@ -199,5 +200,7 @@
 
   <!-- Lien vers le fichier JavaScript externe -->
   <script src="app.js"></script>
+  <!-- Synchronisation entre appareils (Firebase) -->
+  <script type="module" src="sync.js"></script>
 </body>
 </html>

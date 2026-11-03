@@ -59,11 +59,17 @@ function normalizeTask(t) {
       id: s.id || uid(), title: s.title || '', due: s.due || '', done: !!s.done
     })) : [],
     expanded: !!t.expanded,
-    createdAt: t.createdAt || Date.now()
+    createdAt: t.createdAt || Date.now(),
+    updatedAt: t.updatedAt || 0
   };
 }
-function saveTasks() {
+function saveLocal() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(kanbanTasks)); } catch (e) {}
+}
+// Enregistre sur l'appareil et, si la synchronisation est active, envoie les changements (sync.js)
+function saveTasks() {
+  if (window.ErgoSync && window.ErgoSync.active) window.ErgoSync.push(kanbanTasks);
+  saveLocal();
 }
 
 let kanbanTasks = loadTasks();
@@ -397,6 +403,23 @@ function renderDashboard() {
     document.getElementById('dash-todo-count').textContent = `${todo} à faire`;
   }
 }
+
+// ----- Lien avec la synchronisation (sync.js) -----
+// sync.js lit les quêtes avec getTasks() et remplace la liste par applyRemote()
+// quand une modification arrive d'un autre appareil.
+window.ErgoApp = {
+  getTasks: () => kanbanTasks,
+  normalizeTask,
+  applyRemote(list) {
+    const expanded = new Set(kanbanTasks.filter(t => t.expanded).map(t => t.id));
+    const order = (a, b) => (a.createdAt - b.createdAt) || (a.id < b.id ? -1 : 1);
+    const incoming = list.map(t => normalizeTask({ ...t, expanded: expanded.has(t.id) })).sort(order);
+    const same = JSON.stringify(incoming) === JSON.stringify([...kanbanTasks].sort(order));
+    kanbanTasks = incoming;
+    saveLocal();
+    if (!same) renderKanban();
+  }
+};
 
 // ----- Agenda & Ressources (à développer) -----
 function promptCalendarUrl() {}
