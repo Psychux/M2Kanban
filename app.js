@@ -412,3 +412,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   renderKanban();
 });
+
+// ----- Application installable : enregistrement du service worker -----
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.warn('Service worker non enregistré :', err));
+  });
+}
