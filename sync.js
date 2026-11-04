@@ -24,6 +24,7 @@ const firebaseConfig = {
 };
 
 const SYNCED_KEY = 'ergo_sync_known_ids'; // quêtes déjà présentes sur le serveur
+const OWNER_KEY = 'ergo_sync_owner';        // compte auquel appartiennent les quêtes de l'appareil
 const box = document.getElementById('sync-box');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -81,9 +82,13 @@ async function start(user) {
     // 1. Fusion entre ce qui est sur l'appareil et ce qui est sur le serveur
     const snap = await getDocs(col);
     const remote = new Map(snap.docs.map(d => [d.id, d.data()]));
-    const known = new Set(readKnown());
+    // Les quêtes de l'appareil ne sont fusionnées que si elles appartiennent à ce compte,
+    // ou si elles ont été créées sans être connecté. Celles d'un autre compte sont écartées.
+    const owner = readOwner();
+    const otherAccount = owner && owner !== user.uid;
+    const known = new Set(otherAccount ? [] : readKnown());
     if (!window.ErgoApp) throw Object.assign(new Error('app.js absent'), { code: 'app/outdated' });
-    const local = window.ErgoApp.getTasks();
+    const local = otherAccount ? [] : window.ErgoApp.getTasks();
     const merged = [];
     const toUpload = [];
     for (const t of local) {
@@ -100,6 +105,7 @@ async function start(user) {
 
     lastSent = new Map(merged.filter(t => !toUpload.includes(t)).map(t => [t.id, contentKey(window.ErgoApp.normalizeTask(t))]));
     window.ErgoApp.applyRemote(merged);
+    writeOwner(user.uid);
     window.ErgoSync.active = true;
     window.ErgoSync.push(window.ErgoApp.getTasks());
 
@@ -130,6 +136,8 @@ function stop() {
 
 function readKnown() { try { return JSON.parse(localStorage.getItem(SYNCED_KEY)) || []; } catch (e) { return []; } }
 function writeKnown(ids) { try { localStorage.setItem(SYNCED_KEY, JSON.stringify(ids)); } catch (e) {} }
+function readOwner() { try { return localStorage.getItem(OWNER_KEY); } catch (e) { return null; } }
+function writeOwner(uid) { try { if (uid) localStorage.setItem(OWNER_KEY, uid); else localStorage.removeItem(OWNER_KEY); } catch (e) {} }
 
 function setError(err) {
   console.warn('Synchronisation :', err);
@@ -168,7 +176,17 @@ function render() {
   box.querySelector('#sync-toggle').onclick = () => { state.panel = !state.panel; render(); };
   if (!state.panel) return;
   if (u) {
-    box.querySelector('#sync-logout').onclick = async () => { await signOut(auth); writeKnown([]); state.panel = false; render(); };
+    box.querySelector('#sync-logout').onclick = async () => {
+      // À la déconnexion, les quêtes du compte quittent l'appareil (elles restent sur le serveur)
+      stop();
+      await signOut(auth);
+      window.ErgoApp.applyRemote([]);
+      writeKnown([]);
+      writeOwner(null);
+      state.serverCount = null;
+      state.panel = false;
+      render();
+    };
   } else {
     box.querySelector('#sync-google').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).then(() => { state.panel = false; render(); }).catch(setError);
     const form = box.querySelector('#sync-form');
@@ -201,6 +219,7 @@ function panel(u) {
       <p class="text-slate-400">Compte ${u.providerData && u.providerData.some(p => p.providerId === 'google.com') ? 'Google' : 'e-mail'}. Tes quêtes sont synchronisées sur tous les appareils connectés à ce compte.</p>
       <p class="text-slate-400">${state.serverCount === null ? 'Connexion au serveur…' : `${state.serverCount} quête${state.serverCount > 1 ? 's' : ''} sur le serveur · ${state.lastSync.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`}</p>
       ${err}
+      <p class="text-slate-500">Se déconnecter retire tes quêtes de cet appareil. Elles restent sur ton compte.</p>
       <button type="button" id="sync-logout" class="w-full py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-200">Se déconnecter</button>
     </div>`;
   return `
