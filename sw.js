@@ -1,13 +1,15 @@
 // Service worker d'Ergo Hub : garde une copie de l'appli pour l'ouvrir sans réseau.
 // À chaque mise à jour des fichiers de l'appli, augmente le numéro de version
 // pour que les téléphones téléchargent la nouvelle version.
-const VERSION = 'ergo-hub-v1';
+const VERSION = 'ergo-hub-v2';
 
 // Fichiers de l'appli, mis en cache dès l'installation
 const APP_SHELL = [
   './',
   './index.html',
   './app.js',
+  './sync.js',
+  './vendor/firebase.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
