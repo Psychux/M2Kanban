@@ -11,17 +11,16 @@ import {
   collection, doc, getDocs, onSnapshot, writeBatch
 } from './vendor/firebase.js';
 
-// ----- Configuration du projet Firebase -----
-// À remplir avec les valeurs de la console Firebase :
-// Paramètres du projet → Général → Vos applications → Configuration du SDK.
+// ----- Configuration du projet Firebase (masterergo-planner) -----
+// Valeurs issues de la console Firebase : Paramètres du projet → Général → Vos applications.
 // Ces valeurs ne sont pas des secrets : la protection vient des règles Firestore.
 const firebaseConfig = {
-  apiKey: 'A_REMPLIR',
-  authDomain: 'A_REMPLIR.firebaseapp.com',
-  projectId: 'A_REMPLIR',
-  storageBucket: 'A_REMPLIR.appspot.com',
-  messagingSenderId: 'A_REMPLIR',
-  appId: 'A_REMPLIR'
+  apiKey: 'AIzaSyDGBF_F9ATLwZdq9NYY8SS9NB-Q7R75pfc',
+  authDomain: 'masterergo-planner.firebaseapp.com',
+  projectId: 'masterergo-planner',
+  storageBucket: 'masterergo-planner.firebasestorage.app',
+  messagingSenderId: '169447145171',
+  appId: '1:169447145171:web:4529a924f3ab3e778b9e26'
 };
 
 const SYNCED_KEY = 'ergo_sync_known_ids'; // quêtes déjà présentes sur le serveur
@@ -63,7 +62,7 @@ window.ErgoSync = {
 // ----- Démarrage -----
 function main() {
   if (!box) return;
-  if (firebaseConfig.apiKey === 'A_REMPLIR') { box.innerHTML = ''; return; }
+  if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'A_REMPLIR') { box.innerHTML = ''; return; }
   const app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
