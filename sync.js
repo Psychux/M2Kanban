@@ -33,7 +33,7 @@ const contentKey = t => { const { expanded, updatedAt, ...rest } = t; return JSO
 
 let db = null, auth = null, col = null, unsubscribe = null;
 let lastSent = new Map();   // id → contenu déjà connu du serveur
-let state = { user: null, pending: false, error: '', panel: false };
+let state = { user: null, pending: false, error: '', panel: false, serverCount: null, lastSync: null };
 
 // Interface utilisée par app.js
 window.ErgoSync = {
@@ -82,6 +82,7 @@ async function start(user) {
     const snap = await getDocs(col);
     const remote = new Map(snap.docs.map(d => [d.id, d.data()]));
     const known = new Set(readKnown());
+    if (!window.ErgoApp) throw Object.assign(new Error('app.js absent'), { code: 'app/outdated' });
     const local = window.ErgoApp.getTasks();
     const merged = [];
     const toUpload = [];
@@ -107,6 +108,7 @@ async function start(user) {
       state.pending = s.metadata.hasPendingWrites;
       if (!s.metadata.hasPendingWrites) {
         const list = s.docs.map(d => d.data());
+        if (!s.metadata.fromCache) { state.serverCount = list.length; state.lastSync = new Date(); }
         lastSent = new Map(list.map(t => [t.id, contentKey(window.ErgoApp.normalizeTask(t))]));
         writeKnown(list.map(t => t.id));
         window.ErgoApp.applyRemote(list);
@@ -142,7 +144,8 @@ function setError(err) {
     'auth/popup-closed-by-user': 'Connexion annulée.',
     'auth/popup-blocked': 'La fenêtre de connexion a été bloquée. Utilise l’adresse e-mail.',
     'auth/unauthorized-domain': 'Ce site n’est pas autorisé dans Firebase (Authentication → Paramètres → Domaines autorisés).',
-    'permission-denied': 'Accès refusé par Firestore : vérifie les règles de sécurité.'
+    'permission-denied': 'Accès refusé par Firestore : vérifie les règles de sécurité.',
+    'app/outdated': 'L’appli n’est pas à jour sur cet appareil : ferme-la complètement puis rouvre-la.'
   };
   state.error = messages[code] || 'La synchronisation a rencontré un problème. Réessaie plus tard.';
   render();
@@ -193,14 +196,15 @@ function render() {
 function panel(u) {
   const err = state.error ? `<p class="text-rose-300 text-xs">${esc(state.error)}</p>` : '';
   if (u) return `
-    <div class="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-3 text-xs shadow-xl z-50">
+    <div class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-[min(18rem,calc(100vw-2rem))] bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-3 text-xs shadow-xl z-50">
       <p class="text-slate-300">Connecté : <span class="text-slate-100 font-bold break-all">${esc(u.email || 'compte Google')}</span></p>
-      <p class="text-slate-400">Tes quêtes sont synchronisées sur tous les appareils connectés à ce compte.</p>
+      <p class="text-slate-400">Compte ${u.providerData && u.providerData.some(p => p.providerId === 'google.com') ? 'Google' : 'e-mail'}. Tes quêtes sont synchronisées sur tous les appareils connectés à ce compte.</p>
+      <p class="text-slate-400">${state.serverCount === null ? 'Connexion au serveur…' : `${state.serverCount} quête${state.serverCount > 1 ? 's' : ''} sur le serveur · ${state.lastSync.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`}</p>
       ${err}
       <button type="button" id="sync-logout" class="w-full py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-200">Se déconnecter</button>
     </div>`;
   return `
-    <div class="absolute right-0 mt-2 w-72 bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-3 text-xs shadow-xl z-50">
+    <div class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-[min(18rem,calc(100vw-2rem))] bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-3 text-xs shadow-xl z-50">
       <p class="text-slate-300">Connecte-toi avec le même compte sur ton téléphone et ton ordinateur pour retrouver tes quêtes partout.</p>
       <button type="button" id="sync-google" class="w-full py-2 bg-slate-100 hover:bg-white text-slate-900 rounded font-bold">Continuer avec Google</button>
       <p class="text-center text-slate-500">ou avec une adresse e-mail</p>

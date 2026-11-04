@@ -1,7 +1,7 @@
 // Service worker d'Ergo Hub : garde une copie de l'appli pour l'ouvrir sans réseau.
 // À chaque mise à jour des fichiers de l'appli, augmente le numéro de version
 // pour que les téléphones téléchargent la nouvelle version.
-const VERSION = 'ergo-hub-v2';
+const VERSION = 'ergo-hub-v3';
 
 // Fichiers de l'appli, mis en cache dès l'installation
 const APP_SHELL = [
@@ -54,7 +54,19 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Autres fichiers : cache d'abord (rapide), puis mise à jour en arrière-plan
+  // Code de l'appli (html, js, json) : réseau d'abord, pour que tous les fichiers
+  // restent de la même version ; copie en cache pour le hors ligne
+  const isAppCode = sameOrigin && /\.(html|js|json)$/.test(url.pathname) && !url.pathname.includes('/vendor/');
+  if (isAppCode) {
+    event.respondWith(
+      fetch(req)
+        .then(res => { if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); } return res; })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Icônes, SDK Firebase, Tailwind : cache d'abord (rapide), puis mise à jour en arrière-plan
   event.respondWith(
     caches.match(req).then(cached => {
       const network = fetch(req)
